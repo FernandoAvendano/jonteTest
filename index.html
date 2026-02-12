@@ -283,6 +283,10 @@
         });
       }
 
+      const API_BASE = window.location.hostname === 'localhost'
+        ? ''
+        : 'https://lexicostatistical-seamanly-elle.ngrok-free.dev';
+
       const form = document.getElementById('login-form');
       const statusMsg = document.getElementById('status-msg');
       const tokenBox = document.getElementById('token-output');
@@ -305,7 +309,7 @@
         tokenBox.classList.remove('empty');
 
         try {
-          const response = await fetch('/api/bmc-token', {
+          const response = await fetch(`${API_BASE}/api/bmc-token`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
