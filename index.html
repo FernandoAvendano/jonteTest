@@ -246,7 +246,18 @@
       <form id="login-form">
         <div class="input-group">
           <label for="username">BMC Username</label>
-          <input id="username" name="username" type="text" autocomplete="username" placeholder="example@domain" required />
+          <input
+            id="username"
+            name="username"
+            type="email"
+            autocomplete="username"
+            placeholder="user@example.com"
+            autocapitalize="none"
+            autocorrect="off"
+            spellcheck="false"
+            inputmode="email"
+            required
+          />
         </div>
         <div class="input-group">
           <label for="password">Password</label>
