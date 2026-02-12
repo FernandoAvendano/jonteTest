@@ -1,6 +1,6 @@
 # Tandis AI Console
 
-A mobile-friendly Tandis control panel: authenticate with BMC Remedy, then stream the latest orders through a secure proxy that runs on this machine.
+A mobile-friendly Tandis control panel: authenticate with BMC Remedy, then stream the latest orders and related data (services, tasks, attachments, comments) through a secure proxy that runs on this machine.
 
 ## Run locally (with proxy)
 
@@ -10,7 +10,12 @@ npm run dev # serves UI + /api/* proxy on http://localhost:4173
 ```
 
 - `POST /api/bmc-token` → forwards to `https://saas02.tandis.app:8443/api/jwt/login`
-- `POST /api/orders` → forwards to `https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order?...`
+- `POST /api/orders` → forwards to `.../BTS:SOT:Order`
+- `POST /api/order-services` → forwards to `.../BTS:SOT:Order:Service`
+- `POST /api/order-tasks` → forwards to `.../BTS:SOT:OrdetToServiceTask_J`
+- `POST /api/order-attachments-list` → forwards to `.../BTS:SOT:Order:Attachments?limit=...`
+- `POST /api/order-attachment-file` → streams a single attachment file through the proxy
+- `POST /api/order-comments` → forwards to `.../BTS:SOT:OrderComment`
 
 ## Static preview (UI only)
 
@@ -22,8 +27,11 @@ python3 -m http.server 4173
 ## Product notes
 
 - 📱 Tandis-branded UI optimized for phones
-- 🔐 Credentials stay client-side; JWT/token exchange handled server-side
+- 🔐 Credentials stay client-side; JWT/token exchange & API calls handled server-side
 - 📋 Orders auto-load after login + manual refresh button
+- 🧩 Order detail view for services, tasks, attachments, comments
+- 🔄 In-app "Refresh app" button clears caches + service workers to bust mobile cache
+- 📎 Attachment download proxy keeps AR-JWT off the browser
 - 📲 Installable PWA with offline shell
 
 ## Deployment

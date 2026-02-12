@@ -42,20 +42,20 @@
         background-attachment: fixed;
         color: var(--text);
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: center;
-        padding: clamp(1.25rem, 5vw, 3rem);
+        padding: clamp(1.25rem, 4vw, 3rem);
       }
 
       main {
-        width: min(42rem, 100%);
+        width: min(1100px, 100%);
         display: flex;
         flex-direction: column;
-        gap: 1.5rem;
+        gap: 1.25rem;
       }
 
       .panel {
-        padding: clamp(1.5rem, 5vw, 2.5rem);
+        padding: clamp(1.5rem, 4vw, 2.5rem);
         background: var(--panel);
         border-radius: 26px;
         border: 1px solid var(--panel-border);
@@ -63,14 +63,33 @@
         backdrop-filter: blur(20px) saturate(140%);
       }
 
-      header {
-        text-align: center;
+      .shell {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
       }
 
       h1 {
-        margin: 0;
-        font-size: clamp(2rem, 7vw, 2.8rem);
+        margin: 0 0 0.35rem;
+        font-size: clamp(2rem, 6vw, 2.8rem);
         letter-spacing: -0.02em;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: 1.4rem;
+      }
+
+      h3 {
+        margin: 0;
+        font-size: 1rem;
+      }
+
+      p {
+        margin: 0;
+        line-height: 1.5;
+        color: var(--muted);
       }
 
       .eyebrow {
@@ -82,15 +101,33 @@
         border: 1px solid rgba(248, 251, 255, 0.25);
         text-transform: uppercase;
         letter-spacing: 0.2em;
-        font-size: 0.7rem;
+        font-size: 0.65rem;
         color: var(--muted);
         margin-bottom: 0.65rem;
       }
 
-      p {
-        margin: 0;
-        line-height: 1.5;
-        color: var(--muted);
+      .user-pill {
+        display: flex;
+        align-items: center;
+        gap: 0.9rem;
+        padding: 0.8rem 1.2rem;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .user-pill strong {
+        display: block;
+      }
+
+      .user-pill button {
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: transparent;
+        color: var(--text);
+        border-radius: 999px;
+        padding: 0.4rem 0.9rem;
+        font-size: 0.85rem;
+        cursor: pointer;
       }
 
       form {
@@ -122,7 +159,7 @@
         color: rgba(248, 251, 255, 0.45);
       }
 
-      button {
+      button.primary {
         border: none;
         padding: 0.9rem 1.8rem;
         border-radius: 999px;
@@ -136,13 +173,13 @@
         box-shadow: 0 18px 35px rgba(126, 249, 194, 0.35);
       }
 
-      button:disabled {
+      button.primary:disabled {
         opacity: 0.55;
         cursor: not-allowed;
         box-shadow: none;
       }
 
-      button:active {
+      button.primary:active {
         transform: scale(0.98);
       }
 
@@ -150,6 +187,19 @@
         font-size: 0.85rem;
         min-height: 1.2rem;
         color: var(--muted);
+      }
+
+      .workspace {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+      }
+
+      @media (min-width: 960px) {
+        .workspace {
+          display: grid;
+          grid-template-columns: 0.9fr 1.1fr;
+        }
       }
 
       .orders-header {
@@ -160,30 +210,67 @@
         flex-wrap: wrap;
       }
 
+      #orders-btn {
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: transparent;
+        color: var(--text);
+        border-radius: 999px;
+        padding: 0.5rem 1.1rem;
+        cursor: pointer;
+      }
+
+      #orders-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
       .orders-list {
         margin-top: 1rem;
         display: flex;
         flex-direction: column;
-        gap: 0.8rem;
+        gap: 0.75rem;
+      }
+
+      .orders-list .empty {
+        font-size: 0.95rem;
+        color: var(--muted);
       }
 
       .order-card {
+        width: 100%;
+        text-align: left;
+        border: 1px solid rgba(255, 255, 255, 0.12);
         border-radius: 18px;
-        padding: 1rem;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 20px 35px rgba(0, 0, 0, 0.25);
-      }
-
-      .order-title {
+        padding: 0.9rem 1rem;
+        background: rgba(255, 255, 255, 0.03);
+        color: inherit;
+        font: inherit;
+        cursor: pointer;
         display: flex;
-        align-items: baseline;
-        justify-content: space-between;
-        gap: 0.5rem;
-        flex-wrap: wrap;
+        flex-direction: column;
+        gap: 0.4rem;
+        transition: border 0.2s ease, transform 0.2s ease;
       }
 
-      .order-status {
+      .order-card.active {
+        border-color: var(--accent);
+        box-shadow: 0 12px 35px rgba(126, 249, 194, 0.25);
+      }
+
+      .order-card strong {
+        font-size: 1rem;
+      }
+
+      .order-meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      .order-status-pill {
+        display: inline-flex;
         padding: 0.2rem 0.75rem;
         border-radius: 999px;
         font-size: 0.75rem;
@@ -193,36 +280,127 @@
         border: 1px solid rgba(126, 249, 194, 0.4);
       }
 
-      .order-meta {
-        margin-top: 0.6rem;
+      #detail-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .detail-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      @media (min-width: 700px) {
+        .detail-grid {
+          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        }
+      }
+
+      .detail-card {
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 18px;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.03);
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+      }
+
+      .detail-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         gap: 0.5rem;
-        font-size: 0.85rem;
+      }
+
+      .section-status {
+        font-size: 0.75rem;
         color: var(--muted);
       }
 
-      .order-description {
-        margin-top: 0.6rem;
-        font-size: 0.92rem;
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 0.6rem;
+        font-size: 0.9rem;
+      }
+
+      .summary-grid span {
+        display: block;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+      }
+
+      .detail-items {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .detail-item {
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 14px;
+        padding: 0.75rem;
+        background: rgba(0, 0, 0, 0.15);
+        display: flex;
+        justify-content: space-between;
+        gap: 0.8rem;
+        font-size: 0.9rem;
+      }
+
+      .detail-item p {
+        margin-top: 0.2rem;
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+
+      .detail-item button {
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: transparent;
         color: var(--text);
+        border-radius: 999px;
+        padding: 0.35rem 0.85rem;
+        cursor: pointer;
+        font-size: 0.8rem;
       }
 
-      footer {
-        text-align: center;
-        font-size: 0.85rem;
+      .empty-state {
+        font-size: 0.9rem;
         color: var(--muted);
+      }
+
+      .hidden {
+        display: none !important;
       }
     </style>
   </head>
   <body>
     <main>
-      <section class="panel">
-        <header>
+      <section class="panel shell">
+        <div>
           <span class="eyebrow">Tandis AI</span>
-          <h1>Orders at a glance</h1>
-          <p>Sign in with your BMC Remedy credentials to sync the latest Tandis orders.</p>
-        </header>
+          <h1>Command center</h1>
+          <p>Track orders, services, tasks, attachments, and comments.</p>
+        </div>
+        <div class="user-pill" style="gap:0.75rem; flex-wrap:wrap;">
+          <div style="min-width:160px;">
+            <p class="label" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.1em;">Signed in as</p>
+            <strong id="user-name">Not signed in</strong>
+          </div>
+          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            <button type="button" id="refresh-app-btn" disabled>Refresh app</button>
+            <button type="button" id="sign-out-btn" disabled>Sign out</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="login-panel">
+        <h2>Sign in</h2>
+        <p>Use your BMC Remedy credentials to retrieve a secure token.</p>
         <form id="login-form">
           <div>
             <label for="username">Username</label>
@@ -250,51 +428,133 @@
               required
             />
           </div>
-          <button type="submit" id="login-btn">Sign in</button>
+          <button type="submit" id="login-btn" class="primary">Sign in</button>
           <div class="status" id="status-msg"></div>
         </form>
       </section>
 
-      <section class="panel" id="orders-section">
-        <div class="orders-header">
-          <div>
-            <span class="eyebrow" style="font-size:0.65rem; letter-spacing:0.15em;">Latest 10 orders</span>
-            <h2 style="margin:0; font-size:1.35rem;">Live queue</h2>
+      <div class="workspace">
+        <section class="panel" id="orders-panel">
+          <div class="orders-header">
+            <div>
+              <span class="eyebrow">Latest 10 orders</span>
+              <h2>Orders</h2>
+            </div>
+            <button type="button" id="orders-btn" disabled>Refresh</button>
           </div>
-          <button type="button" id="orders-btn" disabled>Refresh</button>
-        </div>
-        <div class="status" id="orders-status"></div>
-        <div class="orders-list" id="orders-list"></div>
-      </section>
+          <div class="status" id="orders-status">Sign in to load orders.</div>
+          <div class="orders-list" id="orders-list"></div>
+        </section>
 
-      <footer>Powered by Tandis AI · 2026</footer>
+        <section class="panel" id="detail-panel">
+          <div class="orders-header">
+            <div>
+              <span class="eyebrow">Order detail</span>
+              <h2 id="detail-title">Select an order</h2>
+              <p id="detail-subtitle">Choose an order to load services, tasks, attachments, and comments.</p>
+            </div>
+          </div>
+          <div class="detail-grid">
+            <article class="detail-card">
+              <div class="detail-head">
+                <h3>Summary</h3>
+                <span class="section-status" id="summary-status">Awaiting selection</span>
+              </div>
+              <div class="summary-grid" id="summary-list"></div>
+            </article>
+            <article class="detail-card">
+              <div class="detail-head">
+                <h3>Services</h3>
+                <span class="section-status" id="services-status">Awaiting selection</span>
+              </div>
+              <div id="services-list" class="detail-items"></div>
+            </article>
+            <article class="detail-card">
+              <div class="detail-head">
+                <h3>Tasks</h3>
+                <span class="section-status" id="tasks-status">Awaiting selection</span>
+              </div>
+              <div id="tasks-list" class="detail-items"></div>
+            </article>
+            <article class="detail-card">
+              <div class="detail-head">
+                <h3>Attachments</h3>
+                <span class="section-status" id="attachments-status">Awaiting selection</span>
+              </div>
+              <div id="attachments-list" class="detail-items"></div>
+            </article>
+            <article class="detail-card" style="grid-column: 1 / -1;">
+              <div class="detail-head">
+                <h3>Comments</h3>
+                <span class="section-status" id="comments-status">Awaiting selection</span>
+              </div>
+              <div id="comments-list" class="detail-items"></div>
+            </article>
+          </div>
+        </section>
+      </div>
     </main>
 
     <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker
-            .register('service-worker.js')
-            .catch((err) => console.error('Service worker registration failed', err));
-        });
-      }
-
       const API_BASE = window.location.hostname === 'localhost'
         ? ''
         : 'https://lexicostatistical-seamanly-elle.ngrok-free.dev';
 
+      const state = {
+        token: '',
+        user: '',
+        orders: [],
+        selectedOrderId: null
+      };
+
       const form = document.getElementById('login-form');
+      const loginPanel = document.getElementById('login-panel');
       const statusMsg = document.getElementById('status-msg');
       const loginBtn = document.getElementById('login-btn');
       const ordersBtn = document.getElementById('orders-btn');
       const ordersStatus = document.getElementById('orders-status');
       const ordersList = document.getElementById('orders-list');
-      const ordersSection = document.getElementById('orders-section');
+      const userNameEl = document.getElementById('user-name');
+      const signOutBtn = document.getElementById('sign-out-btn');
+      const refreshAppBtn = document.getElementById('refresh-app-btn');
 
-      let currentToken = '';
-      let isFetchingOrders = false;
+      const detailTitle = document.getElementById('detail-title');
+      const detailSubtitle = document.getElementById('detail-subtitle');
+      const summaryStatus = document.getElementById('summary-status');
+      const summaryList = document.getElementById('summary-list');
+      const servicesStatus = document.getElementById('services-status');
+      const servicesList = document.getElementById('services-list');
+      const tasksStatus = document.getElementById('tasks-status');
+      const tasksList = document.getElementById('tasks-list');
+      const attachmentsStatus = document.getElementById('attachments-status');
+      const attachmentsList = document.getElementById('attachments-list');
+      const commentsStatus = document.getElementById('comments-status');
+      const commentsList = document.getElementById('comments-list');
 
-      form.addEventListener('submit', async (event) => {
+      form.addEventListener('submit', handleLogin);
+      ordersBtn.addEventListener('click', () => fetchOrders(true));
+      signOutBtn.addEventListener('click', () => window.location.reload());
+      refreshAppBtn.addEventListener('click', forceRefresh);
+      ordersList.addEventListener('click', (event) => {
+        const card = event.target.closest('.order-card');
+        if (!card) return;
+        const orderId = card.dataset.orderId;
+        const order = state.orders.find((entry) => entry.ID === orderId);
+        if (order) {
+          selectOrder(order);
+        }
+      });
+      attachmentsList.addEventListener('click', (event) => {
+        const btn = event.target.closest('.download-btn');
+        if (!btn) return;
+        const attachmentId = btn.dataset.attachmentId;
+        const fileName = btn.dataset.fileName;
+        downloadAttachment(attachmentId, fileName, btn);
+      });
+
+      resetDetailPanel();
+
+      async function handleLogin(event) {
         event.preventDefault();
         const formData = new FormData(form);
         const username = formData.get('username');
@@ -309,110 +569,387 @@
         statusMsg.textContent = 'Signing in…';
 
         try {
-          const response = await fetch(`${API_BASE}/api/bmc-token`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-          });
-
-          const text = (await response.text()).trim();
-          const ok = response.ok && text;
-          statusMsg.textContent = ok ? 'Signed in. Fetching orders…' : `Error: ${response.status}`;
-          currentToken = ok ? text : '';
-          ordersBtn.disabled = !ok;
-
-          if (ok) {
-            await fetchOrders();
-            ordersSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          const token = await post('/api/bmc-token', { username, password }, { expect: 'text' });
+          const trimmed = token.trim();
+          if (!trimmed) {
+            throw new Error('Empty token response.');
           }
+          state.token = trimmed;
+          state.user = username;
+          userNameEl.textContent = username;
+          signOutBtn.disabled = false;
+          refreshAppBtn.disabled = false;
+          loginPanel.classList.add('hidden');
+          statusMsg.textContent = 'Signed in. Fetching orders…';
+          ordersBtn.disabled = false;
+          await fetchOrders();
+          document.getElementById('orders-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
         } catch (error) {
-          statusMsg.textContent = 'Server connection error.';
-          currentToken = '';
-          ordersBtn.disabled = true;
+          statusMsg.textContent = error.message || 'Login failed.';
         } finally {
           loginBtn.disabled = false;
         }
-      });
-
-      ordersBtn.addEventListener('click', () => fetchOrders(true));
+      }
 
       async function fetchOrders(manual = false) {
-        if (!currentToken || isFetchingOrders) return;
-
-        isFetchingOrders = true;
+        if (!state.token) return;
         ordersBtn.disabled = true;
         ordersStatus.textContent = manual ? 'Refreshing orders…' : 'Loading orders…';
         ordersList.innerHTML = '';
 
         try {
-          const response = await fetch(`${API_BASE}/api/orders`, {
+          const data = await post('/api/orders', { token: state.token });
+          const entries = Array.isArray(data?.entries) ? data.entries : [];
+          state.orders = entries.map((entry) => entry.values || {});
+          renderOrders();
+          if (!state.orders.length) {
+            ordersStatus.textContent = 'No orders returned.';
+            state.selectedOrderId = null;
+            resetDetailPanel('No orders available.');
+          } else {
+            ordersStatus.textContent = `Updated · ${new Date().toLocaleTimeString()}`;
+            const current = state.selectedOrderId
+              ? state.orders.find((order) => order.ID === state.selectedOrderId)
+              : state.orders[0];
+            if (current) {
+              await selectOrder(current, { preserveScroll: true });
+            }
+          }
+        } catch (error) {
+          ordersStatus.textContent = error.message || 'Failed to load orders.';
+        } finally {
+          ordersBtn.disabled = !state.token;
+        }
+      }
+
+      function renderOrders() {
+        ordersList.innerHTML = '';
+        if (!state.orders.length) {
+          ordersList.innerHTML = '<p class="empty">Nothing to show yet.</p>';
+          return;
+        }
+
+        state.orders.forEach((order) => {
+          const button = document.createElement('button');
+          button.className = `order-card${state.selectedOrderId === order.ID ? ' active' : ''}`;
+          button.dataset.orderId = order.ID;
+          button.innerHTML = `
+            <strong>#${order.OrdernumberShort || order.ID || '—'}</strong>
+            <div class="order-meta-row">
+              <span>${order.Patient_FirstName || ''} ${order.Patient_LastName || ''}</span>
+              <span>${order.ClinicName || '—'}</span>
+            </div>
+            <div class="order-meta-row" style="justify-content: space-between;">
+              <span title="Created">${formatDate(order['Create Date'])}</span>
+              <span class="order-status-pill">${order.StatusName || 'Unknown'}</span>
+            </div>
+          `;
+          ordersList.appendChild(button);
+        });
+      }
+
+      async function selectOrder(order, options = {}) {
+        state.selectedOrderId = order.ID;
+        renderOrders();
+        summaryStatus.textContent = 'Loaded';
+        renderSummary(order);
+        detailTitle.textContent = `Order #${order.OrdernumberShort || order.ID}`;
+        const subtitleLab = order.Lab_Name || 'Unknown lab';
+        const subtitleClinic = order.ClinicName || 'Unknown clinic';
+        const subtitleDept = order.DepartmentName ? ` · ${order.DepartmentName}` : '';
+        detailSubtitle.textContent = `${subtitleClinic} · ${subtitleLab}${subtitleDept}`;
+        await Promise.all([
+          loadServices(order),
+          loadTasks(order),
+          loadAttachments(order),
+          loadComments(order)
+        ]);
+        if (!options.preserveScroll) {
+          document.getElementById('detail-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+
+      function renderSummary(order) {
+        const items = [
+          { label: 'Patient', value: `${order.Patient_FirstName || ''} ${order.Patient_LastName || ''}`.trim() || '—' },
+          { label: 'Patient ID', value: order.Patient_PersonID || '—' },
+          { label: 'Clinic', value: order.ClinicName || '—' },
+          { label: 'Lab', value: order.Lab_Name || '—' },
+          { label: 'Department', value: order.DepartmentName || '—' },
+          { label: 'Status', value: order.StatusName || '—' },
+          { label: 'Created', value: formatDate(order['Create Date']) },
+          { label: 'Updated', value: formatDate(order['Modified Date']) },
+          { label: 'Description', value: order.Order_Description || '—' }
+        ];
+
+        summaryList.innerHTML = items
+          .map((item) => `
+            <div>
+              <span>${item.label}</span>
+              <strong style="display:block; margin-top:0.2rem; font-size:0.95rem;">${item.value}</strong>
+            </div>
+          `)
+          .join('');
+      }
+
+      async function loadServices(order) {
+        servicesStatus.textContent = 'Loading…';
+        servicesList.innerHTML = '';
+        try {
+          const data = await post('/api/order-services', { token: state.token, orderId: order.ID });
+          const entries = Array.isArray(data?.entries) ? data.entries : [];
+          if (!entries.length) {
+            servicesStatus.textContent = 'No services';
+            servicesList.innerHTML = '<p class="empty-state">No services found for this order.</p>';
+            return;
+          }
+          servicesStatus.textContent = `${entries.length} service(s)`;
+          servicesList.innerHTML = entries
+            .map(({ values = {} }) => {
+              const price = values.Price != null ? `${values.Price} ${values.Unit || ''}`.trim() : '—';
+              return `
+                <div class="detail-item">
+                  <div>
+                    <strong>${values.ServiceName || 'Service'}</strong>
+                    <p>${values.ServiceDescription || ''}</p>
+                    <p>${values.Category || ''}</p>
+                  </div>
+                  <div style="text-align:right;">
+                    <strong>${values.Amount || '—'} ${values.Unit || ''}</strong>
+                    <p>${price}</p>
+                  </div>
+                </div>
+              `;
+            })
+            .join('');
+        } catch (error) {
+          servicesStatus.textContent = 'Failed';
+          servicesList.innerHTML = `<p class="empty-state">${error.message || 'Unable to load services.'}</p>`;
+        }
+      }
+
+      async function loadTasks(order) {
+        tasksStatus.textContent = 'Loading…';
+        tasksList.innerHTML = '';
+        const labId = order.IDLabCurrent || order.IDLab;
+        const labDepartmentId = order.IDLabDepartment;
+        if (!labId || !labDepartmentId) {
+          tasksStatus.textContent = 'Missing lab info';
+          tasksList.innerHTML = '<p class="empty-state">This order is missing lab identifiers.</p>';
+          return;
+        }
+        try {
+          const data = await post('/api/order-tasks', {
+            token: state.token,
+            labId,
+            labDepartmentId
+          });
+          const entries = Array.isArray(data?.entries) ? data.entries : [];
+          if (!entries.length) {
+            tasksStatus.textContent = 'No tasks';
+            tasksList.innerHTML = '<p class="empty-state">No active tasks for this order.</p>';
+            return;
+          }
+          tasksStatus.textContent = `${entries.length} task(s)`;
+          tasksList.innerHTML = entries
+            .map(({ values = {} }) => `
+              <div class="detail-item">
+                <div>
+                  <strong>${values.Order_DepartmentName || 'Task'}</strong>
+                  <p>${values.Order_Description || ''}</p>
+                </div>
+                <div style="text-align:right;">
+                  <strong>${values.Task_AssigneeFullName || 'Unassigned'}</strong>
+                  <p>${values.Order_IDLabDepartment || ''}</p>
+                </div>
+              </div>
+            `)
+            .join('');
+        } catch (error) {
+          tasksStatus.textContent = 'Failed';
+          tasksList.innerHTML = `<p class="empty-state">${error.message || 'Unable to load tasks.'}</p>`;
+        }
+      }
+
+      async function loadAttachments(order) {
+        attachmentsStatus.textContent = 'Loading…';
+        attachmentsList.innerHTML = '';
+        try {
+          const data = await post('/api/order-attachments-list', { token: state.token, orderId: order.ID });
+          const entries = Array.isArray(data?.entries) ? data.entries : [];
+          if (!entries.length) {
+            attachmentsStatus.textContent = 'No attachments';
+            attachmentsList.innerHTML = '<p class="empty-state">No attachments uploaded.</p>';
+            return;
+          }
+          attachmentsStatus.textContent = `${entries.length} attachment(s)`;
+          attachmentsList.innerHTML = entries
+            .map(({ values = {} }) => {
+              const attachmentField = values.Attachment_File;
+              const fileName = getAttachmentName(attachmentField);
+              const requestId = values['Request ID'] || values.RequestID || values.Request_Id;
+              const created = values['Create Date'] || values['Created Date'];
+              const createdBy = values['Created By'] || values.CreatedBy || '';
+              const disabled = requestId ? '' : 'disabled';
+              return `
+                <div class="detail-item">
+                  <div>
+                    <strong>${fileName}</strong>
+                    <p>${formatDate(created)} · ${createdBy || 'Unknown author'}</p>
+                  </div>
+                  <button type="button" class="download-btn" data-attachment-id="${requestId || ''}" data-file-name="${fileName}" ${disabled}>
+                    ${requestId ? 'Download' : 'Unavailable'}
+                  </button>
+                </div>
+              `;
+            })
+            .join('');
+        } catch (error) {
+          attachmentsStatus.textContent = 'Failed';
+          attachmentsList.innerHTML = `<p class="empty-state">${error.message || 'Unable to load attachments.'}</p>`;
+        }
+      }
+
+      async function loadComments(order) {
+        commentsStatus.textContent = 'Loading…';
+        commentsList.innerHTML = '';
+        try {
+          const data = await post('/api/order-comments', { token: state.token, orderId: order.ID });
+          const entries = Array.isArray(data?.entries) ? data.entries : [];
+          if (!entries.length) {
+            commentsStatus.textContent = 'No comments';
+            commentsList.innerHTML = '<p class="empty-state">No chat history for this order.</p>';
+            return;
+          }
+          commentsStatus.textContent = `${entries.length} message(s)`;
+          commentsList.innerHTML = entries
+            .map(({ values = {} }) => {
+              const text = pickField(values, ['Comment_Text', 'CommentText', 'Comment', 'Comments', 'OrderComment', 'Description'], '(no text)');
+              const author = pickField(values, ['Author', 'AuthorName', 'FullName', 'Created By', 'Last Modified By'], 'Unknown user');
+              const timestamp = formatDate(pickField(values, ['Create Date', 'Modified Date', 'Last Modified Date', 'CreateDate']));
+              return `
+                <div class="detail-item" style="flex-direction: column;">
+                  <div style="display:flex; justify-content:space-between; gap:0.5rem;">
+                    <strong>${author}</strong>
+                    <span style="font-size:0.75rem; color:${'var(--muted)'};">${timestamp}</span>
+                  </div>
+                  <p>${text}</p>
+                </div>
+              `;
+            })
+            .join('');
+        } catch (error) {
+          commentsStatus.textContent = 'Failed';
+          commentsList.innerHTML = `<p class="empty-state">${error.message || 'Unable to load comments.'}</p>`;
+        }
+      }
+
+      function resetDetailPanel(message = 'Choose an order to load services, tasks, attachments, and comments.') {
+        detailTitle.textContent = 'Select an order';
+        detailSubtitle.textContent = message;
+        summaryStatus.textContent = 'Awaiting selection';
+        servicesStatus.textContent = 'Awaiting selection';
+        tasksStatus.textContent = 'Awaiting selection';
+        attachmentsStatus.textContent = 'Awaiting selection';
+        commentsStatus.textContent = 'Awaiting selection';
+        summaryList.innerHTML = '';
+        servicesList.innerHTML = '';
+        tasksList.innerHTML = '';
+        attachmentsList.innerHTML = '';
+        commentsList.innerHTML = '';
+      }
+
+      async function downloadAttachment(attachmentId, fileName = 'attachment', button) {
+        if (!attachmentId || !state.token) return;
+        if (button) {
+          button.disabled = true;
+          button.textContent = 'Downloading…';
+        }
+        try {
+          const response = await fetch(`${API_BASE}/api/order-attachment-file`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token: currentToken })
+            body: JSON.stringify({ token: state.token, attachmentId })
           });
-
-          const text = await response.text();
           if (!response.ok) {
-            ordersStatus.textContent = `Error: ${response.status}`;
-            ordersList.textContent = text;
-            return;
+            throw new Error(`Download failed (${response.status})`);
           }
-
-          let payload;
-          try {
-            payload = JSON.parse(text);
-          } catch (err) {
-            ordersStatus.textContent = 'Unexpected response format.';
-            ordersList.textContent = text;
-            return;
-          }
-
-          const entries = payload?.entries || [];
-          if (!entries.length) {
-            ordersStatus.textContent = 'No orders returned.';
-            return;
-          }
-
-          ordersStatus.textContent = `Updated · ${new Date().toLocaleTimeString()}`;
-          entries.forEach(({ values }) => {
-            const card = document.createElement('article');
-            card.className = 'order-card';
-
-            const title = document.createElement('div');
-            title.className = 'order-title';
-            title.innerHTML = `<strong>#${values?.OrdernumberShort || values?.ID || '—'}</strong>`;
-
-            const status = document.createElement('span');
-            status.className = 'order-status';
-            status.textContent = values?.StatusName || 'Unknown';
-            title.appendChild(status);
-
-            const meta = document.createElement('div');
-            meta.className = 'order-meta';
-            meta.innerHTML = `
-              <div><strong>Patient:</strong> ${values?.Patient_FirstName || ''} ${values?.Patient_LastName || ''}</div>
-              <div><strong>Clinic:</strong> ${values?.ClinicName || '—'}</div>
-              <div><strong>Lab:</strong> ${values?.Lab_Name || '—'}</div>
-              <div><strong>Created:</strong> ${values?.['Create Date'] || '—'}</div>
-              <div><strong>Updated:</strong> ${values?.['Modified Date'] || '—'}</div>
-            `;
-
-            const desc = document.createElement('p');
-            desc.className = 'order-description';
-            desc.textContent = values?.Order_Description || 'No description provided.';
-
-            card.appendChild(title);
-            card.appendChild(meta);
-            card.appendChild(desc);
-            ordersList.appendChild(card);
-          });
+          const blob = await response.blob();
+          const url = URL.createObjectURL(blob);
+          const anchor = document.createElement('a');
+          anchor.href = url;
+          anchor.download = fileName || 'attachment';
+          document.body.appendChild(anchor);
+          anchor.click();
+          anchor.remove();
+          URL.revokeObjectURL(url);
         } catch (error) {
-          ordersStatus.textContent = 'Server connection error.';
-          ordersList.textContent = error.message;
+          alert(error.message || 'Download failed');
         } finally {
-          isFetchingOrders = false;
-          ordersBtn.disabled = !currentToken;
+          if (button) {
+            button.disabled = false;
+            button.textContent = 'Download';
+          }
         }
+      }
+
+      async function post(path, payload, { expect = 'json' } = {}) {
+        const response = await fetch(`${API_BASE}${path}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!response.ok) {
+          const text = await response.text();
+          throw new Error(text || `Request failed (${response.status})`);
+        }
+        if (expect === 'text') {
+          return response.text();
+        }
+        return response.json();
+      }
+
+      function formatDate(value) {
+        if (!value) return '—';
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) {
+          return value;
+        }
+        return date.toLocaleString();
+      }
+
+      function getAttachmentName(field) {
+        if (!field) return 'Attachment';
+        if (typeof field === 'string') return field;
+        return field.name || field.fileName || 'Attachment';
+      }
+
+      async function forceRefresh() {
+        refreshAppBtn.disabled = true;
+        refreshAppBtn.textContent = 'Refreshing…';
+        try {
+          if ('caches' in window) {
+            const names = await caches.keys();
+            await Promise.all(names.map((name) => caches.delete(name)));
+          }
+          if ('serviceWorker' in navigator) {
+            const regs = await navigator.serviceWorker.getRegistrations();
+            await Promise.all(regs.map((reg) => reg.unregister()));
+          }
+        } catch (error) {
+          console.warn('Force refresh failed', error);
+        } finally {
+          window.location.reload();
+        }
+      }
+
+      function pickField(obj, keys, fallback = '') {
+        for (const key of keys) {
+          if (obj && obj[key]) {
+            return obj[key];
+          }
+        }
+        return fallback;
       }
     </script>
   </body>
