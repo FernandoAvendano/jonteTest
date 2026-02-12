@@ -47,7 +47,7 @@
       }
 
       .card {
-        width: min(32rem, 100%);
+        width: min(36rem, 100%);
         padding: clamp(1.75rem, 6vw, 2.75rem);
         background: var(--card-bg);
         backdrop-filter: blur(18px) saturate(140%);
@@ -227,6 +227,68 @@
         color: rgba(248, 251, 255, 0.75);
         min-height: 1.2rem;
       }
+
+      .orders {
+        margin-top: 1.25rem;
+        text-align: left;
+      }
+
+      .orders-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .orders-list {
+        margin-top: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .order-card {
+        border-radius: 16px;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
+      }
+
+      .order-title {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        font-size: 1rem;
+      }
+
+      .order-status {
+        padding: 0.2rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        background: rgba(126, 249, 194, 0.15);
+        border: 1px solid rgba(126, 249, 194, 0.4);
+      }
+
+      .order-meta {
+        margin-top: 0.65rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        color: rgba(248, 251, 255, 0.75);
+      }
+
+      .order-description {
+        margin-top: 0.65rem;
+        font-size: 0.9rem;
+        color: rgba(248, 251, 255, 0.85);
+      }
     </style>
   </head>
   <body>
@@ -267,6 +329,16 @@
         <div class="status" id="status-msg"></div>
         <div id="token-output" class="token-box empty">Token response will appear here.</div>
       </form>
+
+      <section class="orders">
+        <div class="orders-header">
+          <h2 style="margin:0;font-size:1.2rem;">Latest orders</h2>
+          <button type="button" id="orders-btn" disabled>Load orders</button>
+        </div>
+        <div class="status" id="orders-status"></div>
+        <div class="orders-list" id="orders-list"></div>
+      </section>
+
       <div style="margin-top: 1.25rem">
         <button type="button" onclick="alert('Hello back!')">Say hello</button>
       </div>
@@ -302,6 +374,11 @@
       const statusMsg = document.getElementById('status-msg');
       const tokenBox = document.getElementById('token-output');
       const loginBtn = document.getElementById('login-btn');
+      const ordersBtn = document.getElementById('orders-btn');
+      const ordersStatus = document.getElementById('orders-status');
+      const ordersList = document.getElementById('orders-list');
+
+      let currentToken = '';
 
       form.addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -326,14 +403,99 @@
             body: JSON.stringify({ username, password })
           });
 
-          const text = await response.text();
+          const text = (await response.text()).trim();
           tokenBox.textContent = text || '(empty response)';
-          statusMsg.textContent = response.ok ? 'Token retrieved successfully.' : `Error: ${response.status}`;
+          const ok = response.ok && text;
+          statusMsg.textContent = ok ? 'Token retrieved successfully.' : `Error: ${response.status}`;
+          currentToken = ok ? text : '';
+          ordersBtn.disabled = !ok;
         } catch (error) {
           tokenBox.textContent = error.message;
           statusMsg.textContent = 'Server connection error.';
+          currentToken = '';
+          ordersBtn.disabled = true;
         } finally {
           loginBtn.disabled = false;
+        }
+      });
+
+      ordersBtn.addEventListener('click', async () => {
+        if (!currentToken) {
+          ordersStatus.textContent = 'Retrieve a token first.';
+          return;
+        }
+
+        ordersBtn.disabled = true;
+        ordersStatus.textContent = 'Loading orders…';
+        ordersList.innerHTML = '';
+
+        try {
+          const response = await fetch(`${API_BASE}/api/orders`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: currentToken })
+          });
+
+          const text = await response.text();
+          if (!response.ok) {
+            ordersStatus.textContent = `Error: ${response.status}`;
+            ordersList.textContent = text;
+            return;
+          }
+
+          let payload;
+          try {
+            payload = JSON.parse(text);
+          } catch (err) {
+            ordersStatus.textContent = 'Unexpected response format.';
+            ordersList.textContent = text;
+            return;
+          }
+
+          const entries = payload?.entries || [];
+          if (!entries.length) {
+            ordersStatus.textContent = 'No orders returned.';
+            return;
+          }
+
+          ordersStatus.textContent = `Showing ${entries.length} orders`;
+          entries.forEach(({ values }) => {
+            const card = document.createElement('article');
+            card.className = 'order-card';
+
+            const title = document.createElement('div');
+            title.className = 'order-title';
+            title.innerHTML = `<strong>#${values?.OrdernumberShort || values?.ID || '—'}</strong>`;
+
+            const status = document.createElement('span');
+            status.className = 'order-status';
+            status.textContent = values?.StatusName || 'Unknown';
+            title.appendChild(status);
+
+            const meta = document.createElement('div');
+            meta.className = 'order-meta';
+            meta.innerHTML = `
+              <div><strong>Patient:</strong> ${values?.Patient_FirstName || ''} ${values?.Patient_LastName || ''}</div>
+              <div><strong>Clinic:</strong> ${values?.ClinicName || '—'}</div>
+              <div><strong>Lab:</strong> ${values?.Lab_Name || '—'}</div>
+              <div><strong>Created:</strong> ${values?.['Create Date'] || '—'}</div>
+              <div><strong>Updated:</strong> ${values?.['Modified Date'] || '—'}</div>
+            `;
+
+            const desc = document.createElement('p');
+            desc.className = 'order-description';
+            desc.textContent = values?.Order_Description || 'No description provided.';
+
+            card.appendChild(title);
+            card.appendChild(meta);
+            card.appendChild(desc);
+            ordersList.appendChild(card);
+          });
+        } catch (error) {
+          ordersStatus.textContent = 'Server connection error.';
+          ordersList.textContent = error.message;
+        } finally {
+          ordersBtn.disabled = false;
         }
       });
     </script>
