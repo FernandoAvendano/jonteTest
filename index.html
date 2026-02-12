@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hello World · Jonte Test</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: linear-gradient(145deg, #0f2027, #203a43, #2c5364);
+        --card-bg: rgba(255, 255, 255, 0.1);
+        --text: #f8fbff;
+        --accent: #7ef9c2;
+        --shadow: rgba(0, 0, 0, 0.25);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        background-image: var(--bg);
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: clamp(1.5rem, 5vw, 3.5rem);
+      }
+
+      .card {
+        width: min(28rem, 100%);
+        padding: clamp(1.75rem, 6vw, 2.75rem);
+        background: var(--card-bg);
+        backdrop-filter: blur(16px);
+        border-radius: 28px;
+        box-shadow: 0 25px 60px var(--shadow);
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        animation: float 6s ease-in-out infinite;
+      }
+
+      h1 {
+        margin: 0 0 0.5rem;
+        font-size: clamp(2.25rem, 8vw, 3rem);
+        letter-spacing: -0.03em;
+      }
+
+      p {
+        margin: 0 0 1.5rem;
+        line-height: 1.5;
+        font-size: clamp(1rem, 3.8vw, 1.2rem);
+        color: rgba(248, 251, 255, 0.8);
+      }
+
+      button {
+        border: none;
+        padding: 0.9rem 1.8rem;
+        border-radius: 999px;
+        font-size: 1rem;
+        font-weight: 600;
+        font-family: inherit;
+        color: #06121a;
+        background: var(--accent);
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 15px 35px rgba(126, 249, 194, 0.45);
+      }
+
+      button:active {
+        transform: scale(0.98);
+      }
+
+      .sparkles {
+        display: flex;
+        justify-content: center;
+        gap: 0.4rem;
+        margin-bottom: 1.25rem;
+      }
+
+      .sparkles span {
+        width: 0.75rem;
+        height: 0.75rem;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.35);
+        animation: twinkle 1.8s ease-in-out infinite;
+      }
+
+      .sparkles span:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+
+      .sparkles span:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+
+      @keyframes twinkle {
+        0%,
+        100% {
+          transform: scale(0.7);
+          opacity: 0.4;
+        }
+        50% {
+          transform: scale(1.2);
+          opacity: 1;
+        }
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-8px);
+        }
+      }
+
+      footer {
+        margin-top: 1.5rem;
+        font-size: 0.85rem;
+        color: rgba(248, 251, 255, 0.6);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <div class="sparkles" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <p style="letter-spacing: 0.4em; text-transform: uppercase; font-size: 0.85rem; color: rgba(248, 251, 255, 0.7); margin-bottom: 0.75rem;">
+        hello world
+      </p>
+      <h1>Hi there 👋</h1>
+      <p>
+        Welcome to your shiny new mobile-friendly playground. This layout scales
+        gracefully from tiny phones to roomy desktops.
+      </p>
+      <button onclick="alert('Hello back!')">Say hello</button>
+      <footer>crafted for Jonte · 2026</footer>
+    </main>
+  </body>
+</html>
