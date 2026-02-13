@@ -1702,6 +1702,15 @@
         return currency ? `${value} ${currency}` : `${value}`;
       }
 
+      function formatDate(value) {
+        if (!value) return "—";
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) {
+          return value;
+        }
+        return date.toLocaleString();
+      }
+
       function formatCount(key, count) {
         return t(key).replace("{count}", count);
       }
