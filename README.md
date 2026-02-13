@@ -32,7 +32,8 @@ python3 -m http.server 4173
 - 📋 Orders auto-load after login + manual refresh button
 - 🧩 Order detail view for services, tasks, materials, attachments, comments
 - 📱 Mobile: inline accordion per order · Desktop: split view panel
-- 🔄 In-app "Refresh app" button clears caches + service workers to bust mobile cache
+- 🔄 In-app "Refresh app" button clears caches + service workers
+- 💾 Session auto-restore (stores token locally for 60 min) with graceful expiry handling
 - 📎 Attachment download proxy keeps AR-JWT off the browser
 - 📲 Installable PWA with offline shell
 

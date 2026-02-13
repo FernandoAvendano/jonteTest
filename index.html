@@ -568,6 +568,8 @@
         details: {},
         loadingDetails: {}
       };
+      const SESSION_KEY = 'tandisSession';
+      const SESSION_TTL = 60 * 60 * 1000; // 60 minutes
 
       const form = document.getElementById('login-form');
       const loginPanel = document.getElementById('login-panel');
@@ -597,7 +599,10 @@
 
       form.addEventListener('submit', handleLogin);
       ordersBtn.addEventListener('click', () => fetchOrders(true));
-      signOutBtn.addEventListener('click', () => window.location.reload());
+      signOutBtn.addEventListener('click', () => {
+        clearSession();
+        window.location.reload();
+      });
       refreshAppBtn.addEventListener('click', forceRefresh);
       ordersList.addEventListener('click', (event) => {
         const card = event.target.closest('.order-card');
@@ -618,6 +623,7 @@
       });
 
       resetDetailPanel();
+      restoreSession();
 
       async function handleLogin(event) {
         event.preventDefault();
@@ -644,6 +650,7 @@
           userNameEl.textContent = username;
           signOutBtn.disabled = false;
           refreshAppBtn.disabled = false;
+          saveSession(trimmed, username);
           loginPanel.classList.add('hidden');
           statusMsg.textContent = 'Signed in. Fetching orders…';
           ordersBtn.disabled = false;
@@ -1116,6 +1123,73 @@
         return currency ? `${value} ${currency}` : `${value}`;
       }
 
+      function saveSession(token, username) {
+        try {
+          localStorage.setItem(
+            SESSION_KEY,
+            JSON.stringify({ token, username, savedAt: Date.now() })
+          );
+        } catch (error) {
+          console.warn('Unable to persist session', error);
+        }
+      }
+
+      function loadSession() {
+        try {
+          const raw = localStorage.getItem(SESSION_KEY);
+          if (!raw) return null;
+          const stored = JSON.parse(raw);
+          if (!stored.token || !stored.username || !stored.savedAt) return null;
+          if (Date.now() - stored.savedAt > SESSION_TTL) {
+            localStorage.removeItem(SESSION_KEY);
+            return null;
+          }
+          return stored;
+        } catch (error) {
+          console.warn('Unable to load persisted session', error);
+          return null;
+        }
+      }
+
+      function clearSession() {
+        try {
+          localStorage.removeItem(SESSION_KEY);
+        } catch (error) {
+          console.warn('Unable to clear persisted session', error);
+        }
+        state.token = '';
+        state.user = '';
+        state.selectedOrderId = null;
+        state.details = {};
+        state.loadingDetails = {};
+        signOutBtn.disabled = true;
+        refreshAppBtn.disabled = true;
+      }
+
+      function handleSessionExpired() {
+        clearSession();
+        loginPanel.classList.remove('hidden');
+        statusMsg.textContent = 'Session expired. Please sign in again.';
+      }
+
+      async function restoreSession() {
+        const stored = loadSession();
+        if (!stored) return;
+        state.token = stored.token;
+        state.user = stored.username;
+        userNameEl.textContent = stored.username;
+        signOutBtn.disabled = false;
+        refreshAppBtn.disabled = false;
+        loginPanel.classList.add('hidden');
+        statusMsg.textContent = 'Restoring session…';
+        try {
+          await fetchOrders();
+          statusMsg.textContent = '';
+        } catch (error) {
+          statusMsg.textContent = error.message || 'Unable to restore session.';
+        }
+      }
+
       function formatDate(value) {
         if (!value) return '—';
         const date = new Date(value);
@@ -1188,6 +1262,10 @@
         });
         if (!response.ok) {
           const text = await response.text();
+          if (response.status === 401 || text.includes('Message number = 623')) {
+            handleSessionExpired();
+            throw new Error('Session expired. Please sign in again.');
+          }
           throw new Error(text || `Request failed (${response.status})`);
         }
         if (expect === 'text') {
