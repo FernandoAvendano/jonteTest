@@ -115,6 +115,18 @@
         margin-bottom: 0.65rem;
       }
 
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
       .user-pill {
         display: flex;
         align-items: center;
@@ -464,7 +476,10 @@
             >
               Signed in as
             </p>
-            <strong id="user-name" data-i18n="user.notSigned"
+            <strong
+              id="user-name"
+              data-i18n-dynamic="true"
+              data-i18n="user.notSigned"
               >Not signed in</strong
             >
           </div>
@@ -582,10 +597,18 @@
           <div class="orders-header">
             <div>
               <span class="eyebrow" data-i18n="detail.badge">Order detail</span>
-              <h2 id="detail-title" data-i18n="detail.title">
+              <h2
+                id="detail-title"
+                data-i18n-dynamic="true"
+                data-i18n="detail.title"
+              >
                 Select an order
               </h2>
-              <p id="detail-subtitle" data-i18n="detail.subtitle">
+              <p
+                id="detail-subtitle"
+                data-i18n-dynamic="true"
+                data-i18n="detail.subtitle"
+              >
                 Choose an order to load services, tasks, attachments, and
                 comments.
               </p>
@@ -657,6 +680,250 @@
           ? ""
           : "https://lexicostatistical-seamanly-elle.ngrok-free.dev";
       const DESKTOP_BREAKPOINT = 1024;
+      const SESSION_KEY = "tandisSession";
+      const SESSION_TTL = 60 * 60 * 1000;
+      const LANGUAGE_KEY = "tandisLanguage";
+
+      const translations = {
+        en: {
+          "app.badge": "Tandis AI",
+          "app.title": "Command center",
+          "app.subtitle":
+            "Track orders, services, tasks, attachments, and comments.",
+          "user.signedIn": "Signed in as",
+          "user.notSigned": "Not signed in",
+          "lang.label": "Language",
+          "action.refreshApp": "Refresh app",
+          "action.refreshingApp": "Refreshing…",
+          "action.signOut": "Sign out",
+          "action.refresh": "Refresh",
+          "login.title": "Sign in",
+          "login.subtitle":
+            "Use your BMC Remedy credentials to retrieve a secure token.",
+          "login.username": "Username",
+          "login.usernamePlaceholder": "user@company.com",
+          "login.password": "Password",
+          "login.passwordPlaceholder": "••••••••",
+          "login.submit": "Sign in",
+          "orders.badge": "Latest 10 orders",
+          "orders.title": "Orders",
+          "orders.signInPrompt": "Sign in to load orders.",
+          "orders.loading": "Loading orders…",
+          "orders.refreshing": "Refreshing orders…",
+          "orders.updatedPrefix": "Updated",
+          "orders.none": "No orders returned.",
+          "orders.failed": "Failed to load orders.",
+          "orders.nothing": "Nothing to show yet.",
+          "orders.loadingDetails": "Loading details…",
+          "orders.selectForDetails": "Select the order to load details.",
+          "detail.badge": "Order detail",
+          "detail.title": "Select an order",
+          "detail.subtitle":
+            "Choose an order to load services, tasks, attachments, and comments.",
+          "detail.selectPrompt": "Select an order to see its details.",
+          "summary.patient": "Patient",
+          "summary.patientId": "Patient ID",
+          "summary.clinic": "Clinic",
+          "summary.lab": "Lab",
+          "summary.department": "Department",
+          "summary.status": "Status",
+          "summary.created": "Created",
+          "summary.updated": "Updated",
+          "summary.totalPrice": "Total price",
+          "summary.description": "Description",
+          "status.requireCreds": "Please provide both username and password.",
+          "status.signingIn": "Signing in…",
+          "status.signedInFetching": "Signed in. Fetching orders…",
+          "status.emptyToken": "Empty token response.",
+          "status.loginFailed": "Login failed.",
+          "status.sessionExpired": "Session expired. Please sign in again.",
+          "status.restoringSession": "Restoring session…",
+          "status.restoreFailed": "Unable to restore session.",
+          "status.loading": "Loading…",
+          "status.error": "Error",
+          "services.title": "Services",
+          "services.count": "{count} service(s)",
+          "services.none": "No services found.",
+          "tasks.title": "Tasks",
+          "tasks.count": "{count} task(s)",
+          "tasks.none": "No active tasks.",
+          "materials.title": "Materials",
+          "materials.count": "{count} item(s)",
+          "materials.none": "No materials logged.",
+          "materials.batch": "Batch {number}",
+          "attachments.title": "Attachments",
+          "attachments.count": "{count} attachment(s)",
+          "attachments.none": "No attachments uploaded.",
+          "attachments.download": "Download",
+          "attachments.unavailable": "Unavailable",
+          "attachments.downloadFailed": "Download failed",
+          "comments.title": "Comments",
+          "comments.count": "{count} message(s)",
+          "comments.none": "No chat history.",
+          "comments.noText": "(no text)",
+          "comments.unknownUser": "Unknown user",
+          "orders.listEmpty": "Nothing to show yet.",
+        },
+        sv: {
+          "app.badge": "Tandis AI",
+          "app.title": "Kontrollcenter",
+          "app.subtitle":
+            "Följ order, tjänster, uppgifter, bilagor och kommentarer.",
+          "user.signedIn": "Inloggad som",
+          "user.notSigned": "Inte inloggad",
+          "lang.label": "Språk",
+          "action.refreshApp": "Uppdatera app",
+          "action.refreshingApp": "Uppdaterar…",
+          "action.signOut": "Logga ut",
+          "action.refresh": "Uppdatera",
+          "login.title": "Logga in",
+          "login.subtitle":
+            "Använd dina BMC Remedy-uppgifter för att hämta en token.",
+          "login.username": "Användarnamn",
+          "login.usernamePlaceholder": "användare@företag.se",
+          "login.password": "Lösenord",
+          "login.passwordPlaceholder": "••••••••",
+          "login.submit": "Logga in",
+          "orders.badge": "Senaste 10 order",
+          "orders.title": "Order",
+          "orders.signInPrompt": "Logga in för att ladda order.",
+          "orders.loading": "Laddar order…",
+          "orders.refreshing": "Uppdaterar order…",
+          "orders.updatedPrefix": "Uppdaterad",
+          "orders.none": "Inga order hittades.",
+          "orders.failed": "Kunde inte ladda order.",
+          "orders.nothing": "Inget att visa ännu.",
+          "orders.loadingDetails": "Laddar detaljer…",
+          "orders.selectForDetails": "Välj order för att se detaljer.",
+          "detail.badge": "Orderdetalj",
+          "detail.title": "Välj en order",
+          "detail.subtitle":
+            "Välj en order för att visa tjänster, uppgifter, bilagor och kommentarer.",
+          "detail.selectPrompt": "Välj en order för att se detaljer.",
+          "summary.patient": "Patient",
+          "summary.patientId": "Personnummer",
+          "summary.clinic": "Klinik",
+          "summary.lab": "Lab",
+          "summary.department": "Avdelning",
+          "summary.status": "Status",
+          "summary.created": "Skapad",
+          "summary.updated": "Uppdaterad",
+          "summary.totalPrice": "Totalpris",
+          "summary.description": "Beskrivning",
+          "status.requireCreds": "Fyll i både användarnamn och lösenord.",
+          "status.signingIn": "Loggar in…",
+          "status.signedInFetching": "Inloggad. Hämtar order…",
+          "status.emptyToken": "Tomt tokensvar.",
+          "status.loginFailed": "Inloggningen misslyckades.",
+          "status.sessionExpired": "Sessionen har gått ut. Logga in igen.",
+          "status.restoringSession": "Återställer session…",
+          "status.restoreFailed": "Kunde inte återställa session.",
+          "status.loading": "Laddar…",
+          "status.error": "Fel",
+          "services.title": "Tjänster",
+          "services.count": "{count} tjänster",
+          "services.none": "Inga tjänster hittades.",
+          "tasks.title": "Uppgifter",
+          "tasks.count": "{count} uppgifter",
+          "tasks.none": "Inga aktiva uppgifter.",
+          "materials.title": "Material",
+          "materials.count": "{count} artiklar",
+          "materials.none": "Inget material registrerat.",
+          "materials.batch": "Batch {number}",
+          "attachments.title": "Bilagor",
+          "attachments.count": "{count} bilagor",
+          "attachments.none": "Inga bilagor uppladdade.",
+          "attachments.download": "Ladda ner",
+          "attachments.unavailable": "Inte tillgänglig",
+          "attachments.downloadFailed": "Nedladdning misslyckades",
+          "comments.title": "Kommentarer",
+          "comments.count": "{count} meddelanden",
+          "comments.none": "Ingen chatthistorik.",
+          "comments.noText": "(inget meddelande)",
+          "comments.unknownUser": "Okänd användare",
+          "orders.listEmpty": "Inget att visa ännu.",
+        },
+        es: {
+          "app.badge": "Tandis AI",
+          "app.title": "Centro de control",
+          "app.subtitle":
+            "Supervisa pedidos, servicios, tareas, adjuntos y comentarios.",
+          "user.signedIn": "Conectado como",
+          "user.notSigned": "No has iniciado sesión",
+          "lang.label": "Idioma",
+          "action.refreshApp": "Actualizar app",
+          "action.refreshingApp": "Actualizando…",
+          "action.signOut": "Cerrar sesión",
+          "action.refresh": "Actualizar",
+          "login.title": "Iniciar sesión",
+          "login.subtitle":
+            "Usa tus credenciales de BMC Remedy para obtener un token.",
+          "login.username": "Usuario",
+          "login.usernamePlaceholder": "usuario@empresa.com",
+          "login.password": "Contraseña",
+          "login.passwordPlaceholder": "••••••••",
+          "login.submit": "Iniciar sesión",
+          "orders.badge": "Últimos 10 pedidos",
+          "orders.title": "Pedidos",
+          "orders.signInPrompt": "Inicia sesión para cargar pedidos.",
+          "orders.loading": "Cargando pedidos…",
+          "orders.refreshing": "Actualizando pedidos…",
+          "orders.updatedPrefix": "Actualizado",
+          "orders.none": "No se encontraron pedidos.",
+          "orders.failed": "No se pudieron cargar los pedidos.",
+          "orders.nothing": "Nada que mostrar todavía.",
+          "orders.loadingDetails": "Cargando detalles…",
+          "orders.selectForDetails":
+            "Selecciona el pedido para ver los detalles.",
+          "detail.badge": "Detalle del pedido",
+          "detail.title": "Selecciona un pedido",
+          "detail.subtitle":
+            "Selecciona un pedido para ver servicios, tareas, adjuntos y comentarios.",
+          "detail.selectPrompt": "Selecciona un pedido para ver los detalles.",
+          "summary.patient": "Paciente",
+          "summary.patientId": "ID del paciente",
+          "summary.clinic": "Clínica",
+          "summary.lab": "Laboratorio",
+          "summary.department": "Departamento",
+          "summary.status": "Estado",
+          "summary.created": "Creado",
+          "summary.updated": "Actualizado",
+          "summary.totalPrice": "Precio total",
+          "summary.description": "Descripción",
+          "status.requireCreds": "Introduce usuario y contraseña.",
+          "status.signingIn": "Iniciando sesión…",
+          "status.signedInFetching": "Sesión iniciada. Obteniendo pedidos…",
+          "status.emptyToken": "El token recibido está vacío.",
+          "status.loginFailed": "Error al iniciar sesión.",
+          "status.sessionExpired": "La sesión expiró. Inicia sesión de nuevo.",
+          "status.restoringSession": "Restaurando sesión…",
+          "status.restoreFailed": "No se pudo restaurar la sesión.",
+          "status.loading": "Cargando…",
+          "status.error": "Error",
+          "services.title": "Servicios",
+          "services.count": "{count} servicios",
+          "services.none": "No se encontraron servicios.",
+          "tasks.title": "Tareas",
+          "tasks.count": "{count} tareas",
+          "tasks.none": "No hay tareas activas.",
+          "materials.title": "Materiales",
+          "materials.count": "{count} artículos",
+          "materials.none": "No hay materiales registrados.",
+          "materials.batch": "Lote {number}",
+          "attachments.title": "Adjuntos",
+          "attachments.count": "{count} adjuntos",
+          "attachments.none": "No hay adjuntos.",
+          "attachments.download": "Descargar",
+          "attachments.unavailable": "No disponible",
+          "attachments.downloadFailed": "La descarga falló",
+          "comments.title": "Comentarios",
+          "comments.count": "{count} mensajes",
+          "comments.none": "Sin historial de chat.",
+          "comments.noText": "(sin texto)",
+          "comments.unknownUser": "Usuario desconocido",
+          "orders.listEmpty": "Nada que mostrar aún.",
+        },
+      };
 
       const state = {
         token: "",
@@ -665,9 +932,8 @@
         selectedOrderId: null,
         details: {},
         loadingDetails: {},
+        language: loadLanguage(),
       };
-      const SESSION_KEY = "tandisSession";
-      const SESSION_TTL = 60 * 60 * 1000; // 60 minutes
 
       const form = document.getElementById("login-form");
       const loginPanel = document.getElementById("login-panel");
@@ -679,6 +945,8 @@
       const userNameEl = document.getElementById("user-name");
       const signOutBtn = document.getElementById("sign-out-btn");
       const refreshAppBtn = document.getElementById("refresh-app-btn");
+      const languageSelect = document.getElementById("language-select");
+      const tip = document.getElementById("tip");
 
       const detailTitle = document.getElementById("detail-title");
       const detailSubtitle = document.getElementById("detail-subtitle");
@@ -695,6 +963,10 @@
       const commentsStatus = document.getElementById("comments-status");
       const commentsList = document.getElementById("comments-list");
 
+      setLanguage(state.language || "en");
+      resetDetailPanel();
+      restoreSession();
+
       form.addEventListener("submit", handleLogin);
       ordersBtn.addEventListener("click", () => fetchOrders(true));
       signOutBtn.addEventListener("click", () => {
@@ -702,6 +974,9 @@
         window.location.reload();
       });
       refreshAppBtn.addEventListener("click", forceRefresh);
+      languageSelect.addEventListener("change", (event) =>
+        setLanguage(event.target.value),
+      );
       ordersList.addEventListener("click", (event) => {
         const card = event.target.closest(".order-card");
         if (!card) return;
@@ -720,9 +995,6 @@
         downloadAttachment(attachmentId, fileName, btn);
       });
 
-      resetDetailPanel();
-      restoreSession();
-
       async function handleLogin(event) {
         event.preventDefault();
         const formData = new FormData(form);
@@ -730,12 +1002,12 @@
         const password = formData.get("password");
 
         if (!username || !password) {
-          statusMsg.textContent = "Please provide both username and password.";
+          statusMsg.textContent = t("status.requireCreds");
           return;
         }
 
         loginBtn.disabled = true;
-        statusMsg.textContent = "Signing in…";
+        statusMsg.textContent = t("status.signingIn");
 
         try {
           const token = await post(
@@ -745,7 +1017,7 @@
           );
           const trimmed = token.trim();
           if (!trimmed) {
-            throw new Error("Empty token response.");
+            throw new Error(t("status.emptyToken"));
           }
           state.token = trimmed;
           state.user = username;
@@ -754,14 +1026,14 @@
           refreshAppBtn.disabled = false;
           saveSession(trimmed, username);
           loginPanel.classList.add("hidden");
-          statusMsg.textContent = "Signed in. Fetching orders…";
+          statusMsg.textContent = t("status.signedInFetching");
           ordersBtn.disabled = false;
           await fetchOrders();
           document
             .getElementById("orders-panel")
             .scrollIntoView({ behavior: "smooth", block: "start" });
         } catch (error) {
-          statusMsg.textContent = error.message || "Login failed.";
+          statusMsg.textContent = error.message || t("status.loginFailed");
         } finally {
           loginBtn.disabled = false;
         }
@@ -771,8 +1043,8 @@
         if (!state.token) return;
         ordersBtn.disabled = true;
         ordersStatus.textContent = manual
-          ? "Refreshing orders…"
-          : "Loading orders…";
+          ? t("orders.refreshing")
+          : t("orders.loading");
         ordersList.innerHTML = "";
 
         try {
@@ -788,11 +1060,11 @@
           });
           renderOrders();
           if (!state.orders.length) {
-            ordersStatus.textContent = "No orders returned.";
+            ordersStatus.textContent = t("orders.none");
             state.selectedOrderId = null;
-            resetDetailPanel("No orders available.");
+            resetDetailPanel(t("detail.selectPrompt"));
           } else {
-            ordersStatus.textContent = `Updated · ${new Date().toLocaleTimeString()}`;
+            ordersStatus.textContent = `${t("orders.updatedPrefix")} · ${new Date().toLocaleTimeString()}`;
             const current = state.selectedOrderId
               ? state.orders.find((order) => order.ID === state.selectedOrderId)
               : state.orders[0];
@@ -801,7 +1073,7 @@
             }
           }
         } catch (error) {
-          ordersStatus.textContent = error.message || "Failed to load orders.";
+          ordersStatus.textContent = error.message || t("orders.failed");
         } finally {
           ordersBtn.disabled = !state.token;
         }
@@ -810,7 +1082,7 @@
       function renderOrders() {
         ordersList.innerHTML = "";
         if (!state.orders.length) {
-          ordersList.innerHTML = '<p class="empty">Nothing to show yet.</p>';
+          ordersList.innerHTML = `<p class="empty">${t("orders.listEmpty")}</p>`;
           return;
         }
 
@@ -823,16 +1095,16 @@
           button.className = `order-card${state.selectedOrderId === order.ID ? " active" : ""}`;
           button.dataset.orderId = order.ID;
           button.innerHTML = `
-            <strong>#${order.OrdernumberShort || order.ID || "—"}</strong>
-            <div class="order-meta-row">
-              <span>${order.Patient_FirstName || ""} ${order.Patient_LastName || ""}</span>
-              <span>${order.ClinicName || "—"}</span>
-            </div>
-            <div class="order-meta-row" style="justify-content: space-between;">
-              <span title="Created">${formatDate(order["Create Date"])}</span>
-              <span class="order-status-pill">${order.StatusName || "Unknown"}</span>
-            </div>
-          `;
+        <strong>#${order.OrdernumberShort || order.ID || "—"}</strong>
+        <div class="order-meta-row">
+          <span>${order.Patient_FirstName || ""} ${order.Patient_LastName || ""}</span>
+          <span>${order.ClinicName || "—"}</span>
+        </div>
+        <div class="order-meta-row" style="justify-content: space-between;">
+          <span title="${t("summary.created")}">${formatDate(order["Create Date"])}</span>
+          <span class="order-status-pill">${order.StatusName || "Unknown"}</span>
+        </div>
+      `;
 
           const detail = document.createElement("div");
           detail.className = "order-detail";
@@ -840,15 +1112,14 @@
           if (state.selectedOrderId === order.ID) {
             detail.classList.add("is-open");
             if (state.loadingDetails[order.ID]) {
-              detail.innerHTML = '<p class="empty-state">Loading details…</p>';
+              detail.innerHTML = `<p class="empty-state">${t("orders.loadingDetails")}</p>`;
             } else if (state.details[order.ID]) {
               detail.innerHTML = "";
               detail.appendChild(
                 buildInlineDetailContent(order, state.details[order.ID]),
               );
             } else {
-              detail.innerHTML =
-                '<p class="empty-state">Select the order to load details.</p>';
+              detail.innerHTML = `<p class="empty-state">${t("orders.selectForDetails")}</p>`;
             }
           }
 
@@ -881,7 +1152,7 @@
           state.details[order.ID] = details;
           renderDesktopDetail(order, details);
         } catch (error) {
-          const message = error?.message || "Failed to load order details.";
+          const message = error?.message || t("status.error");
           state.details[order.ID] = {
             services: [],
             servicesError: message,
@@ -905,16 +1176,15 @@
       }
 
       function renderSummarySection(order) {
-        detailTitle.textContent = `Order #${order.OrdernumberShort || order.ID}`;
-        const subtitleLab = order.Lab_Name || "Unknown lab";
-        const subtitleClinic = order.ClinicName || "Unknown clinic";
+        detailTitle.textContent = `#${order.OrdernumberShort || order.ID}`;
+        const subtitleLab = order.Lab_Name || "—";
+        const subtitleClinic = order.ClinicName || "—";
         const subtitleDept = order.DepartmentName
           ? ` · ${order.DepartmentName}`
           : "";
         detailSubtitle.textContent = `${subtitleClinic} · ${subtitleLab}${subtitleDept}`;
 
         const summary = buildSummarySection(order);
-        orderDetailCache.set(order.ID, summary);
         summaryStatus.textContent = summary.status;
         summaryList.innerHTML = summary.html;
       }
@@ -928,7 +1198,7 @@
           { statusEl: commentsStatus, listEl: commentsList },
         ];
         sections.forEach(({ statusEl, listEl }) => {
-          statusEl.textContent = "Loading…";
+          statusEl.textContent = t("status.loading");
           listEl.innerHTML = "";
         });
       }
@@ -943,7 +1213,7 @@
           { statusEl: commentsStatus, listEl: commentsList },
         ];
         sections.forEach(({ statusEl, listEl }) => {
-          statusEl.textContent = "Error";
+          statusEl.textContent = t("status.error");
           listEl.innerHTML = html;
         });
       }
@@ -1042,31 +1312,29 @@
         const sections = getDetailSections(order, details);
         sections.forEach((section) => {
           switch (section.title) {
-            case "Summary":
-              summaryStatus.textContent = section.status;
-              summaryList.innerHTML = section.html;
-              break;
-            case "Services":
+            case t("services.title"):
               servicesStatus.textContent = section.status;
               servicesList.innerHTML = section.html;
               break;
-            case "Tasks":
+            case t("tasks.title"):
               tasksStatus.textContent = section.status;
               tasksList.innerHTML = section.html;
               break;
-            case "Materials":
+            case t("materials.title"):
               materialsStatus.textContent = section.status;
               materialsList.innerHTML = section.html;
               break;
-            case "Attachments":
+            case t("attachments.title"):
               attachmentsStatus.textContent = section.status;
               attachmentsList.innerHTML = section.html;
               break;
-            case "Comments":
+            case t("comments.title"):
               commentsStatus.textContent = section.status;
               commentsList.innerHTML = section.html;
               break;
             default:
+              summaryStatus.textContent = section.status;
+              summaryList.innerHTML = section.html;
               break;
           }
         });
@@ -1079,96 +1347,109 @@
           const card = document.createElement("article");
           card.className = "detail-card";
           card.innerHTML = `
-            <div class="detail-head">
-              <h3>${section.title}</h3>
-              <span class="section-status">${section.status}</span>
-            </div>
-            ${section.html}
-          `;
+        <div class="detail-head">
+          <h3>${section.title}</h3>
+          <span class="section-status">${section.status}</span>
+        </div>
+        ${section.html}
+      `;
           fragment.appendChild(card);
         });
         return fragment;
       }
 
-      const orderDetailCache = new Map();
-
       function buildSummarySection(order) {
         const items = [
           {
-            label: "Patient",
+            label: t("summary.patient"),
             value:
               `${order.Patient_FirstName || ""} ${order.Patient_LastName || ""}`.trim() ||
               "—",
           },
-          { label: "Patient ID", value: order.Patient_PersonID || "—" },
-          { label: "Clinic", value: order.ClinicName || "—" },
-          { label: "Lab", value: order.Lab_Name || "—" },
-          { label: "Department", value: order.DepartmentName || "—" },
-          { label: "Status", value: order.StatusName || "—" },
-          { label: "Created", value: formatDate(order["Create Date"]) },
-          { label: "Updated", value: formatDate(order["Modified Date"]) },
           {
-            label: "Total price",
+            label: t("summary.patientId"),
+            value: order.Patient_PersonID || "—",
+          },
+          { label: t("summary.clinic"), value: order.ClinicName || "—" },
+          { label: t("summary.lab"), value: order.Lab_Name || "—" },
+          {
+            label: t("summary.department"),
+            value: order.DepartmentName || "—",
+          },
+          { label: t("summary.status"), value: order.StatusName || "—" },
+          {
+            label: t("summary.created"),
+            value: formatDate(order["Create Date"]),
+          },
+          {
+            label: t("summary.updated"),
+            value: formatDate(order["Modified Date"]),
+          },
+          {
+            label: t("summary.totalPrice"),
             value: formatMoney(
               order.OrderPrice,
               order.Currency || "SEK",
               order.PriceInSek,
             ),
           },
-          { label: "Description", value: order.Order_Description || "—" },
+          {
+            label: t("summary.description"),
+            value: order.Order_Description || "—",
+          },
         ];
 
         const html = `
-          <div class="summary-grid">
-            ${items
-              .map(
-                (item) => `
-                <div>
-                  <span>${item.label}</span>
-                  <strong style="display:block; margin-top:0.2rem; font-size:0.95rem;">${item.value}</strong>
-                </div>
-              `,
-              )
-              .join("")}
-          </div>
-        `;
-        return { title: "Summary", status: "Loaded", html };
+      <div class="summary-grid">
+        ${items
+          .map(
+            (item) => `
+            <div>
+              <span>${item.label}</span>
+              <strong style="display:block; margin-top:0.2rem; font-size:0.95rem;">${item.value}</strong>
+            </div>
+          `,
+          )
+          .join("")}
+      </div>
+    `;
+        return { title: t("detail.badge"), status: t("detail.badge"), html };
       }
 
       function buildServicesSection(services, error) {
         if (error) {
           return {
-            title: "Services",
-            status: "Error",
+            title: t("services.title"),
+            status: t("status.error"),
             html: `<p class="empty-state">${error}</p>`,
           };
         }
         if (!services.length) {
           return {
-            title: "Services",
-            status: "No services",
-            html: '<p class="empty-state">No services found.</p>',
+            title: t("services.title"),
+            status: t("services.none"),
+            html: `<p class="empty-state">${t("services.none")}</p>`,
           };
         }
         const html = services
           .map(
             (service) => `
-            <div class="detail-item">
-              <div>
-                <strong>${service.ServiceName || "Service"}</strong>
-                <p>${service.ServiceDescription || ""}</p>
-              </div>
-              <div style="text-align:right;">
-                <strong>${formatAmount(service.Amount, service.Unit)}</strong>
-                <p>${formatMoney(service.Price, service.Currency)}</p>
-              </div>
-            </div>
-          `,
+        <div class="detail-item">
+          <div>
+            <strong>${service.ServiceName || "Service"}</strong>
+            <p>${service.ServiceDescription || ""}</p>
+          </div>
+          <div style="text-align:right;">
+            <strong>${formatAmount(service.Amount, service.Unit)}</strong>
+            <p>${formatMoney(service.Price, service.Currency)}</p>
+          </div>
+        </div>
+      `,
           )
           .join("");
         return {
-          title: "Services",
-          status: `${services.length} service(s)`,
+          title: t("services.title"),
+          status: formatCount("services.count", services.length),
           html,
         };
       }
@@ -1176,16 +1457,16 @@
       function buildTasksSection(tasks, error) {
         if (error) {
           return {
-            title: "Tasks",
-            status: "Error",
+            title: t("tasks.title"),
+            status: t("status.error"),
             html: `<p class="empty-state">${error}</p>`,
           };
         }
         if (!tasks.length) {
           return {
-            title: "Tasks",
-            status: "No tasks",
-            html: '<p class="empty-state">No active tasks.</p>',
+            title: t("tasks.title"),
+            status: t("tasks.none"),
+            html: `<p class="empty-state">${t("tasks.none")}</p>`,
           };
         }
         const sorted = [...tasks].sort((a, b) => {
@@ -1199,59 +1480,63 @@
         const html = sorted
           .map(
             (task) => `
-            <div class="detail-item">
-              <div>
-                <strong>${task.TaskName || "Task"}</strong>
-                <p>${task.DepartmentName || "—"}</p>
-              </div>
-              <div style="text-align:right;">
-                <span class="order-status-pill" style="margin-bottom:0.35rem; display:inline-flex;">${task.StatusTask || "—"}</span>
-                <p>${task.AssigneeFullName || ""}</p>
-              </div>
-            </div>
-          `,
+        <div class="detail-item">
+          <div>
+            <strong>${task.TaskName || "Task"}</strong>
+            <p>${task.DepartmentName || "—"}</p>
+          </div>
+          <div style="text-align:right;">
+            <span class="order-status-pill" style="margin-bottom:0.35rem; display:inline-flex;">${task.StatusTask || "—"}</span>
+            <p>${task.AssigneeFullName || ""}</p>
+          </div>
+        </div>
+      `,
           )
           .join("");
-        return { title: "Tasks", status: `${tasks.length} task(s)`, html };
+        return {
+          title: t("tasks.title"),
+          status: formatCount("tasks.count", tasks.length),
+          html,
+        };
       }
 
       function buildMaterialsSection(materials, error) {
         if (error) {
           return {
-            title: "Materials",
-            status: "Error",
+            title: t("materials.title"),
+            status: t("status.error"),
             html: `<p class="empty-state">${error}</p>`,
           };
         }
         if (!materials.length) {
           return {
-            title: "Materials",
-            status: "No materials",
-            html: '<p class="empty-state">No materials logged.</p>',
+            title: t("materials.title"),
+            status: t("materials.none"),
+            html: `<p class="empty-state">${t("materials.none")}</p>`,
           };
         }
         const html = materials
           .map((material) => {
             const batch = material.BatchNumber
-              ? `Batch ${material.BatchNumber}`
+              ? t("materials.batch").replace("{number}", material.BatchNumber)
               : "";
             return `
-              <div class="detail-item">
-                <div>
-                  <strong>${material.MaterialCode || "Material"} · ${material.MaterialName || ""}</strong>
-                  <p>${batch}</p>
-                </div>
-                <div style="text-align:right;">
-                  <strong>${formatAmount(material.AmountMaterial, material.UnitMaterial)}</strong>
-                  <p>${formatMoney(material.PriceMaterial, material.Currency || "SEK", material.PriceInSek)}</p>
-                </div>
-              </div>
-            `;
+          <div class="detail-item">
+            <div>
+              <strong>${material.MaterialCode || "Material"} · ${material.MaterialName || ""}</strong>
+              <p>${batch}</p>
+            </div>
+            <div style="text-align:right;">
+              <strong>${formatAmount(material.AmountMaterial, material.UnitMaterial)}</strong>
+              <p>${formatMoney(material.PriceMaterial, material.Currency || "SEK", material.PriceInSek)}</p>
+            </div>
+          </div>
+        `;
           })
           .join("");
         return {
-          title: "Materials",
-          status: `${materials.length} item(s)`,
+          title: t("materials.title"),
+          status: formatCount("materials.count", materials.length),
           html,
         };
       }
@@ -1259,16 +1544,16 @@
       function buildAttachmentsSection(attachments, error) {
         if (error) {
           return {
-            title: "Attachments",
-            status: "Error",
+            title: t("attachments.title"),
+            status: t("status.error"),
             html: `<p class="empty-state">${error}</p>`,
           };
         }
         if (!attachments.length) {
           return {
-            title: "Attachments",
-            status: "No attachments",
-            html: '<p class="empty-state">No attachments uploaded.</p>',
+            title: t("attachments.title"),
+            status: t("attachments.none"),
+            html: `<p class="empty-state">${t("attachments.none")}</p>`,
           };
         }
         const html = attachments
@@ -1281,21 +1566,21 @@
             const fileName = getAttachmentName(attachment.Attachment_File);
             const disabled = requestId ? "" : "disabled";
             return `
-              <div class="detail-item">
-                <div>
-                  <strong>${fileName}</strong>
-                  <p>${created}</p>
-                </div>
-                <button type="button" class="download-btn" data-attachment-id="${requestId || ""}" data-file-name="${fileName}" ${disabled}>
-                  ${requestId ? "Download" : "Unavailable"}
-                </button>
-              </div>
-            `;
+          <div class="detail-item">
+            <div>
+              <strong>${fileName}</strong>
+              <p>${created}</p>
+            </div>
+            <button type="button" class="download-btn" data-attachment-id="${requestId || ""}" data-file-name="${fileName}" ${disabled}>
+              ${requestId ? t("attachments.download") : t("attachments.unavailable")}
+            </button>
+          </div>
+        `;
           })
           .join("");
         return {
-          title: "Attachments",
-          status: `${attachments.length} attachment(s)`,
+          title: t("attachments.title"),
+          status: formatCount("attachments.count", attachments.length),
           html,
         };
       }
@@ -1303,21 +1588,21 @@
       function buildCommentsSection(comments, error) {
         if (error) {
           return {
-            title: "Comments",
-            status: "Error",
+            title: t("comments.title"),
+            status: t("status.error"),
             html: `<p class="empty-state">${error}</p>`,
           };
         }
         if (!comments.length) {
           return {
-            title: "Comments",
-            status: "No comments",
-            html: '<p class="empty-state">No chat history.</p>',
+            title: t("comments.title"),
+            status: t("comments.none"),
+            html: `<p class="empty-state">${t("comments.none")}</p>`,
           };
         }
         const html = comments
           .map((comment) => {
-            const text = pickField(
+            const textValue = pickField(
               comment,
               [
                 "Comment_Text",
@@ -1327,7 +1612,7 @@
                 "OrderComment",
                 "Description",
               ],
-              "(no text)",
+              t("comments.noText"),
             );
             const author = pickField(
               comment,
@@ -1338,7 +1623,7 @@
                 "Created By",
                 "Last Modified By",
               ],
-              "Unknown user",
+              t("comments.unknownUser"),
             );
             const timestamp = formatDate(
               pickField(comment, [
@@ -1349,19 +1634,19 @@
               ]),
             );
             return `
-              <div class="detail-item" style="flex-direction: column;">
-                <div style="display:flex; justify-content:space-between; gap:0.5rem;">
-                  <strong>${author}</strong>
-                  <span style="font-size:0.75rem; color:var(--muted);">${timestamp}</span>
-                </div>
-                <p>${text}</p>
-              </div>
-            `;
+          <div class="detail-item" style="flex-direction: column;">
+            <div style="display:flex; justify-content:space-between; gap:0.5rem;">
+              <strong>${author}</strong>
+              <span style="font-size:0.75rem; color:var(--muted);">${timestamp}</span>
+            </div>
+            <p>${textValue}</p>
+          </div>
+        `;
           })
           .join("");
         return {
-          title: "Comments",
-          status: `${comments.length} message(s)`,
+          title: t("comments.title"),
+          status: formatCount("comments.count", comments.length),
           html,
         };
       }
@@ -1397,6 +1682,78 @@
           return "—";
         }
         return currency ? `${value} ${currency}` : `${value}`;
+      }
+
+      function formatCount(key, count) {
+        return t(key).replace("{count}", count);
+      }
+
+      function getAttachmentName(field) {
+        if (!field) return "Attachment";
+        if (typeof field === "string") return field;
+        return field.name || field.fileName || "Attachment";
+      }
+
+      function getErrorMessage(error) {
+        if (!error) return t("status.error");
+        if (typeof error === "string") return error;
+        return error.message || t("status.error");
+      }
+
+      function loadLanguage() {
+        try {
+          return localStorage.getItem(LANGUAGE_KEY) || "en";
+        } catch (error) {
+          return "en";
+        }
+      }
+
+      function saveLanguage(lang) {
+        try {
+          localStorage.setItem(LANGUAGE_KEY, lang);
+        } catch (error) {
+          // ignore
+        }
+      }
+
+      function translateStaticText() {
+        document.querySelectorAll("[data-i18n]").forEach((el) => {
+          if (el.dataset.i18nDynamic === "true") return;
+          const key = el.dataset.i18n;
+          if (!key) return;
+          el.textContent = t(key, el.textContent.trim());
+        });
+        document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+          const key = el.dataset.i18nPlaceholder;
+          if (!key) return;
+          el.setAttribute(
+            "placeholder",
+            t(key, el.getAttribute("placeholder")),
+          );
+        });
+      }
+
+      function setLanguage(lang) {
+        const next = translations[lang] ? lang : "en";
+        state.language = next;
+        saveLanguage(next);
+        if (languageSelect.value !== next) {
+          languageSelect.value = next;
+        }
+        translateStaticText();
+        if (!state.user) {
+          userNameEl.textContent = t("user.notSigned");
+        }
+        if (!state.token) {
+          ordersStatus.textContent = t("orders.signInPrompt");
+        }
+      }
+
+      function t(key, fallback = "") {
+        const lang = state.language || "en";
+        return (
+          translations[lang]?.[key] ?? translations.en?.[key] ?? fallback ?? key
+        );
       }
 
       function saveSession(token, username) {
@@ -1438,6 +1795,8 @@
         state.selectedOrderId = null;
         state.details = {};
         state.loadingDetails = {};
+        userNameEl.textContent = t("user.notSigned");
+        ordersStatus.textContent = t("orders.signInPrompt");
         signOutBtn.disabled = true;
         refreshAppBtn.disabled = true;
       }
@@ -1445,7 +1804,7 @@
       function handleSessionExpired() {
         clearSession();
         loginPanel.classList.remove("hidden");
-        statusMsg.textContent = "Session expired. Please sign in again.";
+        statusMsg.textContent = t("status.sessionExpired");
       }
 
       async function restoreSession() {
@@ -1457,43 +1816,13 @@
         signOutBtn.disabled = false;
         refreshAppBtn.disabled = false;
         loginPanel.classList.add("hidden");
-        statusMsg.textContent = "Restoring session…";
+        statusMsg.textContent = t("status.restoringSession");
         try {
           await fetchOrders();
           statusMsg.textContent = "";
         } catch (error) {
-          statusMsg.textContent = error.message || "Unable to restore session.";
+          statusMsg.textContent = error.message || t("status.restoreFailed");
         }
-      }
-
-      function formatDate(value) {
-        if (!value) return "—";
-        const date = new Date(value);
-        if (Number.isNaN(date.getTime())) {
-          return value;
-        }
-        return date.toLocaleString();
-      }
-
-      function getAttachmentName(field) {
-        if (!field) return "Attachment";
-        if (typeof field === "string") return field;
-        return field.name || field.fileName || "Attachment";
-      }
-
-      function getErrorMessage(error) {
-        if (!error) return "Unknown error";
-        if (typeof error === "string") return error;
-        return error.message || "Unknown error";
-      }
-
-      function pickField(obj, keys, fallback = "") {
-        for (const key of keys) {
-          if (obj && obj[key]) {
-            return obj[key];
-          }
-        }
-        return fallback;
       }
 
       async function downloadAttachment(
@@ -1504,7 +1833,7 @@
         if (!attachmentId || !state.token) return;
         if (button) {
           button.disabled = true;
-          button.textContent = "Downloading…";
+          button.textContent = t("attachments.download");
         }
         try {
           const response = await fetch(
@@ -1516,7 +1845,9 @@
             },
           );
           if (!response.ok) {
-            throw new Error(`Download failed (${response.status})`);
+            throw new Error(
+              `${t("attachments.downloadFailed")} (${response.status})`,
+            );
           }
           const blob = await response.blob();
           const url = URL.createObjectURL(blob);
@@ -1528,11 +1859,11 @@
           anchor.remove();
           URL.revokeObjectURL(url);
         } catch (error) {
-          alert(error.message || "Download failed");
+          alert(error.message || t("attachments.downloadFailed"));
         } finally {
           if (button) {
             button.disabled = false;
-            button.textContent = "Download";
+            button.textContent = t("attachments.download");
           }
         }
       }
@@ -1550,7 +1881,7 @@
             text.includes("Message number = 623")
           ) {
             handleSessionExpired();
-            throw new Error("Session expired. Please sign in again.");
+            throw new Error(t("status.sessionExpired"));
           }
           throw new Error(text || `Request failed (${response.status})`);
         }
@@ -1562,7 +1893,7 @@
 
       async function forceRefresh() {
         refreshAppBtn.disabled = true;
-        refreshAppBtn.textContent = "Refreshing…";
+        refreshAppBtn.textContent = t("action.refreshingApp");
         try {
           if ("caches" in window) {
             const names = await caches.keys();
@@ -1584,12 +1915,10 @@
           .matches;
       }
 
-      function resetDetailPanel(
-        message = "Choose an order to load services, tasks, materials, attachments, and comments.",
-      ) {
-        detailTitle.textContent = "Select an order";
+      function resetDetailPanel(message = t("detail.selectPrompt")) {
+        detailTitle.textContent = t("detail.title");
         detailSubtitle.textContent = message;
-        summaryStatus.textContent = "Awaiting selection";
+        summaryStatus.textContent = t("detail.badge");
         summaryList.innerHTML = "";
         const sections = [
           { statusEl: servicesStatus, listEl: servicesList },
@@ -1599,10 +1928,22 @@
           { statusEl: commentsStatus, listEl: commentsList },
         ];
         sections.forEach(({ statusEl, listEl }) => {
-          statusEl.textContent = "Awaiting selection";
+          statusEl.textContent = t("status.loading");
           listEl.innerHTML = "";
         });
       }
+
+      function translateInitialUI() {
+        translateStaticText();
+        if (!state.user) {
+          userNameEl.textContent = t("user.notSigned");
+        }
+        if (!state.token) {
+          ordersStatus.textContent = t("orders.signInPrompt");
+        }
+      }
+
+      translateInitialUI();
     </script>
   </body>
 </html>
