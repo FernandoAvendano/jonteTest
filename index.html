@@ -1,11 +1,14 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0f2027" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
     <title>Tandis AI</title>
     <link rel="icon" sizes="192x192" href="icons/icon-192.png" />
     <link rel="apple-touch-icon" href="icons/icon-192.png" />
@@ -37,7 +40,12 @@
       body {
         margin: 0;
         min-height: 100vh;
-        font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        font-family:
+          "Poppins",
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
         background-image: var(--bg);
         background-attachment: fixed;
         color: var(--text);
@@ -170,7 +178,9 @@
         color: #041018;
         background: var(--accent);
         cursor: pointer;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
         box-shadow: 0 18px 35px rgba(126, 249, 194, 0.35);
       }
 
@@ -292,7 +302,9 @@
         display: flex;
         flex-direction: column;
         gap: 0.4rem;
-        transition: border 0.2s ease, transform 0.2s ease;
+        transition:
+          border 0.2s ease,
+          transform 0.2s ease;
       }
 
       .order-card.active {
@@ -433,34 +445,80 @@
     <main>
       <section class="panel shell">
         <div>
-          <span class="eyebrow">Tandis AI</span>
-          <h1>Command center</h1>
-          <p>Track orders, services, tasks, attachments, and comments.</p>
+          <span class="eyebrow" data-i18n="app.badge">Tandis AI</span>
+          <h1 data-i18n="app.title">Command center</h1>
+          <p data-i18n="app.subtitle">
+            Track orders, services, tasks, attachments, and comments.
+          </p>
         </div>
-        <div class="user-pill" style="gap:0.75rem; flex-wrap:wrap;">
-          <div style="min-width:160px;">
-            <p class="label" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.1em;">Signed in as</p>
-            <strong id="user-name">Not signed in</strong>
+        <div class="user-pill" style="gap: 0.75rem; flex-wrap: wrap">
+          <div style="min-width: 160px">
+            <p
+              class="label"
+              style="
+                font-size: 0.75rem;
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+              "
+              data-i18n="user.signedIn"
+            >
+              Signed in as
+            </p>
+            <strong id="user-name" data-i18n="user.notSigned"
+              >Not signed in</strong
+            >
           </div>
-          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
-            <button type="button" id="refresh-app-btn" disabled>Refresh app</button>
-            <button type="button" id="sign-out-btn" disabled>Sign out</button>
+          <div
+            style="
+              display: flex;
+              gap: 0.5rem;
+              flex-wrap: wrap;
+              align-items: center;
+            "
+          >
+            <label for="language-select" class="sr-only" data-i18n="lang.label"
+              >Language</label
+            >
+            <select id="language-select" aria-label="Language">
+              <option value="en">English</option>
+              <option value="sv">Svenska</option>
+              <option value="es">Español</option>
+            </select>
+            <button
+              type="button"
+              id="refresh-app-btn"
+              disabled
+              data-i18n="action.refreshApp"
+            >
+              Refresh app
+            </button>
+            <button
+              type="button"
+              id="sign-out-btn"
+              disabled
+              data-i18n="action.signOut"
+            >
+              Sign out
+            </button>
           </div>
         </div>
       </section>
 
       <section class="panel" id="login-panel">
-        <h2>Sign in</h2>
-        <p>Use your BMC Remedy credentials to retrieve a secure token.</p>
+        <h2 data-i18n="login.title">Sign in</h2>
+        <p data-i18n="login.subtitle">
+          Use your BMC Remedy credentials to retrieve a secure token.
+        </p>
         <form id="login-form">
           <div>
-            <label for="username">Username</label>
+            <label for="username" data-i18n="login.username">Username</label>
             <input
               id="username"
               name="username"
               type="email"
               autocomplete="username"
               placeholder="user@company.com"
+              data-i18n-placeholder="login.usernamePlaceholder"
               autocapitalize="none"
               autocorrect="off"
               spellcheck="false"
@@ -469,17 +527,25 @@
             />
           </div>
           <div>
-            <label for="password">Password</label>
+            <label for="password" data-i18n="login.password">Password</label>
             <input
               id="password"
               name="password"
               type="password"
               autocomplete="current-password"
               placeholder="••••••••"
+              data-i18n-placeholder="login.passwordPlaceholder"
               required
             />
           </div>
-          <button type="submit" id="login-btn" class="primary">Sign in</button>
+          <button
+            type="submit"
+            id="login-btn"
+            class="primary"
+            data-i18n="login.submit"
+          >
+            Sign in
+          </button>
           <div class="status" id="status-msg"></div>
         </form>
       </section>
@@ -488,63 +554,95 @@
         <section class="panel" id="orders-panel">
           <div class="orders-header">
             <div>
-              <span class="eyebrow">Latest 10 orders</span>
-              <h2>Orders</h2>
+              <span class="eyebrow" data-i18n="orders.badge"
+                >Latest 10 orders</span
+              >
+              <h2 data-i18n="orders.title">Orders</h2>
             </div>
-            <button type="button" id="orders-btn" disabled>Refresh</button>
+            <button
+              type="button"
+              id="orders-btn"
+              disabled
+              data-i18n="action.refresh"
+            >
+              Refresh
+            </button>
           </div>
-          <div class="status" id="orders-status">Sign in to load orders.</div>
+          <div
+            class="status"
+            id="orders-status"
+            data-i18n="orders.signInPrompt"
+          >
+            Sign in to load orders.
+          </div>
           <div class="orders-list" id="orders-list"></div>
         </section>
 
         <section class="panel" id="detail-panel">
           <div class="orders-header">
             <div>
-              <span class="eyebrow">Order detail</span>
-              <h2 id="detail-title">Select an order</h2>
-              <p id="detail-subtitle">Choose an order to load services, tasks, attachments, and comments.</p>
+              <span class="eyebrow" data-i18n="detail.badge">Order detail</span>
+              <h2 id="detail-title" data-i18n="detail.title">
+                Select an order
+              </h2>
+              <p id="detail-subtitle" data-i18n="detail.subtitle">
+                Choose an order to load services, tasks, attachments, and
+                comments.
+              </p>
             </div>
           </div>
           <div class="detail-grid">
             <article class="detail-card">
               <div class="detail-head">
                 <h3>Summary</h3>
-                <span class="section-status" id="summary-status">Awaiting selection</span>
+                <span class="section-status" id="summary-status"
+                  >Awaiting selection</span
+                >
               </div>
               <div class="summary-grid" id="summary-list"></div>
             </article>
             <article class="detail-card">
               <div class="detail-head">
                 <h3>Services</h3>
-                <span class="section-status" id="services-status">Awaiting selection</span>
+                <span class="section-status" id="services-status"
+                  >Awaiting selection</span
+                >
               </div>
               <div id="services-list" class="detail-items"></div>
             </article>
             <article class="detail-card">
               <div class="detail-head">
                 <h3>Tasks</h3>
-                <span class="section-status" id="tasks-status">Awaiting selection</span>
+                <span class="section-status" id="tasks-status"
+                  >Awaiting selection</span
+                >
               </div>
               <div id="tasks-list" class="detail-items"></div>
             </article>
             <article class="detail-card">
               <div class="detail-head">
                 <h3>Materials</h3>
-                <span class="section-status" id="materials-status">Awaiting selection</span>
+                <span class="section-status" id="materials-status"
+                  >Awaiting selection</span
+                >
               </div>
               <div id="materials-list" class="detail-items"></div>
             </article>
             <article class="detail-card">
               <div class="detail-head">
                 <h3>Attachments</h3>
-                <span class="section-status" id="attachments-status">Awaiting selection</span>
+                <span class="section-status" id="attachments-status"
+                  >Awaiting selection</span
+                >
               </div>
               <div id="attachments-list" class="detail-items"></div>
             </article>
-            <article class="detail-card" style="grid-column: 1 / -1;">
+            <article class="detail-card" style="grid-column: 1 / -1">
               <div class="detail-head">
                 <h3>Comments</h3>
-                <span class="section-status" id="comments-status">Awaiting selection</span>
+                <span class="section-status" id="comments-status"
+                  >Awaiting selection</span
+                >
               </div>
               <div id="comments-list" class="detail-items"></div>
             </article>
@@ -553,59 +651,59 @@
       </div>
     </main>
 
-
     <script>
-      const API_BASE = window.location.hostname === 'localhost'
-        ? ''
-        : 'https://lexicostatistical-seamanly-elle.ngrok-free.dev';
+      const API_BASE =
+        window.location.hostname === "localhost"
+          ? ""
+          : "https://lexicostatistical-seamanly-elle.ngrok-free.dev";
       const DESKTOP_BREAKPOINT = 1024;
 
       const state = {
-        token: '',
-        user: '',
+        token: "",
+        user: "",
         orders: [],
         selectedOrderId: null,
         details: {},
-        loadingDetails: {}
+        loadingDetails: {},
       };
-      const SESSION_KEY = 'tandisSession';
+      const SESSION_KEY = "tandisSession";
       const SESSION_TTL = 60 * 60 * 1000; // 60 minutes
 
-      const form = document.getElementById('login-form');
-      const loginPanel = document.getElementById('login-panel');
-      const statusMsg = document.getElementById('status-msg');
-      const loginBtn = document.getElementById('login-btn');
-      const ordersBtn = document.getElementById('orders-btn');
-      const ordersStatus = document.getElementById('orders-status');
-      const ordersList = document.getElementById('orders-list');
-      const userNameEl = document.getElementById('user-name');
-      const signOutBtn = document.getElementById('sign-out-btn');
-      const refreshAppBtn = document.getElementById('refresh-app-btn');
+      const form = document.getElementById("login-form");
+      const loginPanel = document.getElementById("login-panel");
+      const statusMsg = document.getElementById("status-msg");
+      const loginBtn = document.getElementById("login-btn");
+      const ordersBtn = document.getElementById("orders-btn");
+      const ordersStatus = document.getElementById("orders-status");
+      const ordersList = document.getElementById("orders-list");
+      const userNameEl = document.getElementById("user-name");
+      const signOutBtn = document.getElementById("sign-out-btn");
+      const refreshAppBtn = document.getElementById("refresh-app-btn");
 
-      const detailTitle = document.getElementById('detail-title');
-      const detailSubtitle = document.getElementById('detail-subtitle');
-      const summaryStatus = document.getElementById('summary-status');
-      const summaryList = document.getElementById('summary-list');
-      const servicesStatus = document.getElementById('services-status');
-      const servicesList = document.getElementById('services-list');
-      const tasksStatus = document.getElementById('tasks-status');
-      const tasksList = document.getElementById('tasks-list');
-      const materialsStatus = document.getElementById('materials-status');
-      const materialsList = document.getElementById('materials-list');
-      const attachmentsStatus = document.getElementById('attachments-status');
-      const attachmentsList = document.getElementById('attachments-list');
-      const commentsStatus = document.getElementById('comments-status');
-      const commentsList = document.getElementById('comments-list');
+      const detailTitle = document.getElementById("detail-title");
+      const detailSubtitle = document.getElementById("detail-subtitle");
+      const summaryStatus = document.getElementById("summary-status");
+      const summaryList = document.getElementById("summary-list");
+      const servicesStatus = document.getElementById("services-status");
+      const servicesList = document.getElementById("services-list");
+      const tasksStatus = document.getElementById("tasks-status");
+      const tasksList = document.getElementById("tasks-list");
+      const materialsStatus = document.getElementById("materials-status");
+      const materialsList = document.getElementById("materials-list");
+      const attachmentsStatus = document.getElementById("attachments-status");
+      const attachmentsList = document.getElementById("attachments-list");
+      const commentsStatus = document.getElementById("comments-status");
+      const commentsList = document.getElementById("comments-list");
 
-      form.addEventListener('submit', handleLogin);
-      ordersBtn.addEventListener('click', () => fetchOrders(true));
-      signOutBtn.addEventListener('click', () => {
+      form.addEventListener("submit", handleLogin);
+      ordersBtn.addEventListener("click", () => fetchOrders(true));
+      signOutBtn.addEventListener("click", () => {
         clearSession();
         window.location.reload();
       });
-      refreshAppBtn.addEventListener('click', forceRefresh);
-      ordersList.addEventListener('click', (event) => {
-        const card = event.target.closest('.order-card');
+      refreshAppBtn.addEventListener("click", forceRefresh);
+      ordersList.addEventListener("click", (event) => {
+        const card = event.target.closest(".order-card");
         if (!card) return;
         const orderId = card.dataset.orderId;
         const order = state.orders.find((entry) => entry.ID === orderId);
@@ -613,8 +711,8 @@
           selectOrder(order);
         }
       });
-      document.addEventListener('click', (event) => {
-        const btn = event.target.closest('.download-btn');
+      document.addEventListener("click", (event) => {
+        const btn = event.target.closest(".download-btn");
         if (!btn) return;
         const attachmentId = btn.dataset.attachmentId;
         if (!attachmentId) return;
@@ -628,22 +726,26 @@
       async function handleLogin(event) {
         event.preventDefault();
         const formData = new FormData(form);
-        const username = formData.get('username');
-        const password = formData.get('password');
+        const username = formData.get("username");
+        const password = formData.get("password");
 
         if (!username || !password) {
-          statusMsg.textContent = 'Please provide both username and password.';
+          statusMsg.textContent = "Please provide both username and password.";
           return;
         }
 
         loginBtn.disabled = true;
-        statusMsg.textContent = 'Signing in…';
+        statusMsg.textContent = "Signing in…";
 
         try {
-          const token = await post('/api/bmc-token', { username, password }, { expect: 'text' });
+          const token = await post(
+            "/api/bmc-token",
+            { username, password },
+            { expect: "text" },
+          );
           const trimmed = token.trim();
           if (!trimmed) {
-            throw new Error('Empty token response.');
+            throw new Error("Empty token response.");
           }
           state.token = trimmed;
           state.user = username;
@@ -651,13 +753,15 @@
           signOutBtn.disabled = false;
           refreshAppBtn.disabled = false;
           saveSession(trimmed, username);
-          loginPanel.classList.add('hidden');
-          statusMsg.textContent = 'Signed in. Fetching orders…';
+          loginPanel.classList.add("hidden");
+          statusMsg.textContent = "Signed in. Fetching orders…";
           ordersBtn.disabled = false;
           await fetchOrders();
-          document.getElementById('orders-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+          document
+            .getElementById("orders-panel")
+            .scrollIntoView({ behavior: "smooth", block: "start" });
         } catch (error) {
-          statusMsg.textContent = error.message || 'Login failed.';
+          statusMsg.textContent = error.message || "Login failed.";
         } finally {
           loginBtn.disabled = false;
         }
@@ -666,11 +770,13 @@
       async function fetchOrders(manual = false) {
         if (!state.token) return;
         ordersBtn.disabled = true;
-        ordersStatus.textContent = manual ? 'Refreshing orders…' : 'Loading orders…';
-        ordersList.innerHTML = '';
+        ordersStatus.textContent = manual
+          ? "Refreshing orders…"
+          : "Loading orders…";
+        ordersList.innerHTML = "";
 
         try {
-          const data = await post('/api/orders', { token: state.token });
+          const data = await post("/api/orders", { token: state.token });
           const entries = Array.isArray(data?.entries) ? data.entries : [];
           state.orders = entries.map((entry) => entry.values || {});
           const validIds = new Set(state.orders.map((order) => order.ID));
@@ -682,9 +788,9 @@
           });
           renderOrders();
           if (!state.orders.length) {
-            ordersStatus.textContent = 'No orders returned.';
+            ordersStatus.textContent = "No orders returned.";
             state.selectedOrderId = null;
-            resetDetailPanel('No orders available.');
+            resetDetailPanel("No orders available.");
           } else {
             ordersStatus.textContent = `Updated · ${new Date().toLocaleTimeString()}`;
             const current = state.selectedOrderId
@@ -695,51 +801,54 @@
             }
           }
         } catch (error) {
-          ordersStatus.textContent = error.message || 'Failed to load orders.';
+          ordersStatus.textContent = error.message || "Failed to load orders.";
         } finally {
           ordersBtn.disabled = !state.token;
         }
       }
 
       function renderOrders() {
-        ordersList.innerHTML = '';
+        ordersList.innerHTML = "";
         if (!state.orders.length) {
           ordersList.innerHTML = '<p class="empty">Nothing to show yet.</p>';
           return;
         }
 
         state.orders.forEach((order) => {
-          const block = document.createElement('div');
-          block.className = 'order-block';
+          const block = document.createElement("div");
+          block.className = "order-block";
 
-          const button = document.createElement('button');
-          button.type = 'button';
-          button.className = `order-card${state.selectedOrderId === order.ID ? ' active' : ''}`;
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = `order-card${state.selectedOrderId === order.ID ? " active" : ""}`;
           button.dataset.orderId = order.ID;
           button.innerHTML = `
-            <strong>#${order.OrdernumberShort || order.ID || '—'}</strong>
+            <strong>#${order.OrdernumberShort || order.ID || "—"}</strong>
             <div class="order-meta-row">
-              <span>${order.Patient_FirstName || ''} ${order.Patient_LastName || ''}</span>
-              <span>${order.ClinicName || '—'}</span>
+              <span>${order.Patient_FirstName || ""} ${order.Patient_LastName || ""}</span>
+              <span>${order.ClinicName || "—"}</span>
             </div>
             <div class="order-meta-row" style="justify-content: space-between;">
-              <span title="Created">${formatDate(order['Create Date'])}</span>
-              <span class="order-status-pill">${order.StatusName || 'Unknown'}</span>
+              <span title="Created">${formatDate(order["Create Date"])}</span>
+              <span class="order-status-pill">${order.StatusName || "Unknown"}</span>
             </div>
           `;
 
-          const detail = document.createElement('div');
-          detail.className = 'order-detail';
+          const detail = document.createElement("div");
+          detail.className = "order-detail";
           detail.dataset.orderId = order.ID;
           if (state.selectedOrderId === order.ID) {
-            detail.classList.add('is-open');
+            detail.classList.add("is-open");
             if (state.loadingDetails[order.ID]) {
               detail.innerHTML = '<p class="empty-state">Loading details…</p>';
             } else if (state.details[order.ID]) {
-              detail.innerHTML = '';
-              detail.appendChild(buildInlineDetailContent(order, state.details[order.ID]));
+              detail.innerHTML = "";
+              detail.appendChild(
+                buildInlineDetailContent(order, state.details[order.ID]),
+              );
             } else {
-              detail.innerHTML = '<p class="empty-state">Select the order to load details.</p>';
+              detail.innerHTML =
+                '<p class="empty-state">Select the order to load details.</p>';
             }
           }
 
@@ -772,7 +881,7 @@
           state.details[order.ID] = details;
           renderDesktopDetail(order, details);
         } catch (error) {
-          const message = error?.message || 'Failed to load order details.';
+          const message = error?.message || "Failed to load order details.";
           state.details[order.ID] = {
             services: [],
             servicesError: message,
@@ -783,7 +892,7 @@
             attachments: [],
             attachmentsError: message,
             comments: [],
-            commentsError: message
+            commentsError: message,
           };
           setSectionsError(message);
         } finally {
@@ -797,9 +906,11 @@
 
       function renderSummarySection(order) {
         detailTitle.textContent = `Order #${order.OrdernumberShort || order.ID}`;
-        const subtitleLab = order.Lab_Name || 'Unknown lab';
-        const subtitleClinic = order.ClinicName || 'Unknown clinic';
-        const subtitleDept = order.DepartmentName ? ` · ${order.DepartmentName}` : '';
+        const subtitleLab = order.Lab_Name || "Unknown lab";
+        const subtitleClinic = order.ClinicName || "Unknown clinic";
+        const subtitleDept = order.DepartmentName
+          ? ` · ${order.DepartmentName}`
+          : "";
         detailSubtitle.textContent = `${subtitleClinic} · ${subtitleLab}${subtitleDept}`;
 
         const summary = buildSummarySection(order);
@@ -814,11 +925,11 @@
           { statusEl: tasksStatus, listEl: tasksList },
           { statusEl: materialsStatus, listEl: materialsList },
           { statusEl: attachmentsStatus, listEl: attachmentsList },
-          { statusEl: commentsStatus, listEl: commentsList }
+          { statusEl: commentsStatus, listEl: commentsList },
         ];
         sections.forEach(({ statusEl, listEl }) => {
-          statusEl.textContent = 'Loading…';
-          listEl.innerHTML = '';
+          statusEl.textContent = "Loading…";
+          listEl.innerHTML = "";
         });
       }
 
@@ -829,36 +940,84 @@
           { statusEl: tasksStatus, listEl: tasksList },
           { statusEl: materialsStatus, listEl: materialsList },
           { statusEl: attachmentsStatus, listEl: attachmentsList },
-          { statusEl: commentsStatus, listEl: commentsList }
+          { statusEl: commentsStatus, listEl: commentsList },
         ];
         sections.forEach(({ statusEl, listEl }) => {
-          statusEl.textContent = 'Error';
+          statusEl.textContent = "Error";
           listEl.innerHTML = html;
         });
       }
 
       async function fetchOrderDetails(order) {
         const requests = [
-          post('/api/order-services', { token: state.token, orderId: order.ID }),
-          post('/api/order-tasks', { token: state.token, orderId: order.ID }),
-          post('/api/order-materials', { token: state.token, orderId: order.ID }),
-          post('/api/order-attachments-list', { token: state.token, orderId: order.ID }),
-          post('/api/order-comments', { token: state.token, orderId: order.ID })
+          post("/api/order-services", {
+            token: state.token,
+            orderId: order.ID,
+          }),
+          post("/api/order-tasks", { token: state.token, orderId: order.ID }),
+          post("/api/order-materials", {
+            token: state.token,
+            orderId: order.ID,
+          }),
+          post("/api/order-attachments-list", {
+            token: state.token,
+            orderId: order.ID,
+          }),
+          post("/api/order-comments", {
+            token: state.token,
+            orderId: order.ID,
+          }),
         ];
 
-        const [servicesRes, tasksRes, materialsRes, attachmentsRes, commentsRes] = await Promise.allSettled(requests);
+        const [
+          servicesRes,
+          tasksRes,
+          materialsRes,
+          attachmentsRes,
+          commentsRes,
+        ] = await Promise.allSettled(requests);
 
         return {
-          services: servicesRes.status === 'fulfilled' ? extractEntries(servicesRes.value) : [],
-          servicesError: servicesRes.status === 'rejected' ? getErrorMessage(servicesRes.reason) : null,
-          tasks: tasksRes.status === 'fulfilled' ? extractEntries(tasksRes.value) : [],
-          tasksError: tasksRes.status === 'rejected' ? getErrorMessage(tasksRes.reason) : null,
-          materials: materialsRes.status === 'fulfilled' ? extractEntries(materialsRes.value) : [],
-          materialsError: materialsRes.status === 'rejected' ? getErrorMessage(materialsRes.reason) : null,
-          attachments: attachmentsRes.status === 'fulfilled' ? extractEntries(attachmentsRes.value) : [],
-          attachmentsError: attachmentsRes.status === 'rejected' ? getErrorMessage(attachmentsRes.reason) : null,
-          comments: commentsRes.status === 'fulfilled' ? extractEntries(commentsRes.value) : [],
-          commentsError: commentsRes.status === 'rejected' ? getErrorMessage(commentsRes.reason) : null
+          services:
+            servicesRes.status === "fulfilled"
+              ? extractEntries(servicesRes.value)
+              : [],
+          servicesError:
+            servicesRes.status === "rejected"
+              ? getErrorMessage(servicesRes.reason)
+              : null,
+          tasks:
+            tasksRes.status === "fulfilled"
+              ? extractEntries(tasksRes.value)
+              : [],
+          tasksError:
+            tasksRes.status === "rejected"
+              ? getErrorMessage(tasksRes.reason)
+              : null,
+          materials:
+            materialsRes.status === "fulfilled"
+              ? extractEntries(materialsRes.value)
+              : [],
+          materialsError:
+            materialsRes.status === "rejected"
+              ? getErrorMessage(materialsRes.reason)
+              : null,
+          attachments:
+            attachmentsRes.status === "fulfilled"
+              ? extractEntries(attachmentsRes.value)
+              : [],
+          attachmentsError:
+            attachmentsRes.status === "rejected"
+              ? getErrorMessage(attachmentsRes.reason)
+              : null,
+          comments:
+            commentsRes.status === "fulfilled"
+              ? extractEntries(commentsRes.value)
+              : [],
+          commentsError:
+            commentsRes.status === "rejected"
+              ? getErrorMessage(commentsRes.reason)
+              : null,
         };
       }
 
@@ -867,9 +1026,15 @@
           buildSummarySection(order),
           buildServicesSection(details.services || [], details.servicesError),
           buildTasksSection(details.tasks || [], details.tasksError),
-          buildMaterialsSection(details.materials || [], details.materialsError),
-          buildAttachmentsSection(details.attachments || [], details.attachmentsError),
-          buildCommentsSection(details.comments || [], details.commentsError)
+          buildMaterialsSection(
+            details.materials || [],
+            details.materialsError,
+          ),
+          buildAttachmentsSection(
+            details.attachments || [],
+            details.attachmentsError,
+          ),
+          buildCommentsSection(details.comments || [], details.commentsError),
         ];
       }
 
@@ -877,27 +1042,27 @@
         const sections = getDetailSections(order, details);
         sections.forEach((section) => {
           switch (section.title) {
-            case 'Summary':
+            case "Summary":
               summaryStatus.textContent = section.status;
               summaryList.innerHTML = section.html;
               break;
-            case 'Services':
+            case "Services":
               servicesStatus.textContent = section.status;
               servicesList.innerHTML = section.html;
               break;
-            case 'Tasks':
+            case "Tasks":
               tasksStatus.textContent = section.status;
               tasksList.innerHTML = section.html;
               break;
-            case 'Materials':
+            case "Materials":
               materialsStatus.textContent = section.status;
               materialsList.innerHTML = section.html;
               break;
-            case 'Attachments':
+            case "Attachments":
               attachmentsStatus.textContent = section.status;
               attachmentsList.innerHTML = section.html;
               break;
-            case 'Comments':
+            case "Comments":
               commentsStatus.textContent = section.status;
               commentsList.innerHTML = section.html;
               break;
@@ -911,8 +1076,8 @@
         const fragment = document.createDocumentFragment();
         const sections = getDetailSections(order, details);
         sections.forEach((section) => {
-          const card = document.createElement('article');
-          card.className = 'detail-card';
+          const card = document.createElement("article");
+          card.className = "detail-card";
           card.innerHTML = `
             <div class="detail-head">
               <h3>${section.title}</h3>
@@ -929,157 +1094,260 @@
 
       function buildSummarySection(order) {
         const items = [
-          { label: 'Patient', value: `${order.Patient_FirstName || ''} ${order.Patient_LastName || ''}`.trim() || '—' },
-          { label: 'Patient ID', value: order.Patient_PersonID || '—' },
-          { label: 'Clinic', value: order.ClinicName || '—' },
-          { label: 'Lab', value: order.Lab_Name || '—' },
-          { label: 'Department', value: order.DepartmentName || '—' },
-          { label: 'Status', value: order.StatusName || '—' },
-          { label: 'Created', value: formatDate(order['Create Date']) },
-          { label: 'Updated', value: formatDate(order['Modified Date']) },
-          { label: 'Total price', value: formatMoney(order.OrderPrice, order.Currency || 'SEK', order.PriceInSek) },
-          { label: 'Description', value: order.Order_Description || '—' }
+          {
+            label: "Patient",
+            value:
+              `${order.Patient_FirstName || ""} ${order.Patient_LastName || ""}`.trim() ||
+              "—",
+          },
+          { label: "Patient ID", value: order.Patient_PersonID || "—" },
+          { label: "Clinic", value: order.ClinicName || "—" },
+          { label: "Lab", value: order.Lab_Name || "—" },
+          { label: "Department", value: order.DepartmentName || "—" },
+          { label: "Status", value: order.StatusName || "—" },
+          { label: "Created", value: formatDate(order["Create Date"]) },
+          { label: "Updated", value: formatDate(order["Modified Date"]) },
+          {
+            label: "Total price",
+            value: formatMoney(
+              order.OrderPrice,
+              order.Currency || "SEK",
+              order.PriceInSek,
+            ),
+          },
+          { label: "Description", value: order.Order_Description || "—" },
         ];
 
         const html = `
           <div class="summary-grid">
             ${items
-              .map((item) => `
+              .map(
+                (item) => `
                 <div>
                   <span>${item.label}</span>
                   <strong style="display:block; margin-top:0.2rem; font-size:0.95rem;">${item.value}</strong>
                 </div>
-              `)
-              .join('')}
+              `,
+              )
+              .join("")}
           </div>
         `;
-        return { title: 'Summary', status: 'Loaded', html };
+        return { title: "Summary", status: "Loaded", html };
       }
 
       function buildServicesSection(services, error) {
         if (error) {
-          return { title: 'Services', status: 'Error', html: `<p class="empty-state">${error}</p>` };
+          return {
+            title: "Services",
+            status: "Error",
+            html: `<p class="empty-state">${error}</p>`,
+          };
         }
         if (!services.length) {
-          return { title: 'Services', status: 'No services', html: '<p class="empty-state">No services found.</p>' };
+          return {
+            title: "Services",
+            status: "No services",
+            html: '<p class="empty-state">No services found.</p>',
+          };
         }
         const html = services
-          .map((service) => `
+          .map(
+            (service) => `
             <div class="detail-item">
               <div>
-                <strong>${service.ServiceName || 'Service'}</strong>
-                <p>${service.ServiceDescription || ''}</p>
+                <strong>${service.ServiceName || "Service"}</strong>
+                <p>${service.ServiceDescription || ""}</p>
               </div>
               <div style="text-align:right;">
                 <strong>${formatAmount(service.Amount, service.Unit)}</strong>
                 <p>${formatMoney(service.Price, service.Currency)}</p>
               </div>
             </div>
-          `)
-          .join('');
-        return { title: 'Services', status: `${services.length} service(s)`, html };
+          `,
+          )
+          .join("");
+        return {
+          title: "Services",
+          status: `${services.length} service(s)`,
+          html,
+        };
       }
 
       function buildTasksSection(tasks, error) {
         if (error) {
-          return { title: 'Tasks', status: 'Error', html: `<p class="empty-state">${error}</p>` };
+          return {
+            title: "Tasks",
+            status: "Error",
+            html: `<p class="empty-state">${error}</p>`,
+          };
         }
         if (!tasks.length) {
-          return { title: 'Tasks', status: 'No tasks', html: '<p class="empty-state">No active tasks.</p>' };
+          return {
+            title: "Tasks",
+            status: "No tasks",
+            html: '<p class="empty-state">No active tasks.</p>',
+          };
         }
         const sorted = [...tasks].sort((a, b) => {
-          const sortA = Number(a.SortOrder ?? a['Sort Order'] ?? Infinity);
-          const sortB = Number(b.SortOrder ?? b['Sort Order'] ?? Infinity);
+          const sortA = Number(a.SortOrder ?? a["Sort Order"] ?? Infinity);
+          const sortB = Number(b.SortOrder ?? b["Sort Order"] ?? Infinity);
           if (sortA !== sortB) return sortA - sortB;
-          const reqA = (a['Request ID'] || a.RequestID || '').toString();
-          const reqB = (b['Request ID'] || b.RequestID || '').toString();
+          const reqA = (a["Request ID"] || a.RequestID || "").toString();
+          const reqB = (b["Request ID"] || b.RequestID || "").toString();
           return reqA.localeCompare(reqB);
         });
         const html = sorted
-          .map((task) => `
+          .map(
+            (task) => `
             <div class="detail-item">
               <div>
-                <strong>${task.TaskName || 'Task'}</strong>
-                <p>${task.DepartmentName || '—'}</p>
+                <strong>${task.TaskName || "Task"}</strong>
+                <p>${task.DepartmentName || "—"}</p>
               </div>
               <div style="text-align:right;">
-                <span class="order-status-pill" style="margin-bottom:0.35rem; display:inline-flex;">${task.StatusTask || '—'}</span>
-                <p>${task.AssigneeFullName || ''}</p>
+                <span class="order-status-pill" style="margin-bottom:0.35rem; display:inline-flex;">${task.StatusTask || "—"}</span>
+                <p>${task.AssigneeFullName || ""}</p>
               </div>
             </div>
-          `)
-          .join('');
-        return { title: 'Tasks', status: `${tasks.length} task(s)`, html };
+          `,
+          )
+          .join("");
+        return { title: "Tasks", status: `${tasks.length} task(s)`, html };
       }
 
       function buildMaterialsSection(materials, error) {
         if (error) {
-          return { title: 'Materials', status: 'Error', html: `<p class="empty-state">${error}</p>` };
+          return {
+            title: "Materials",
+            status: "Error",
+            html: `<p class="empty-state">${error}</p>`,
+          };
         }
         if (!materials.length) {
-          return { title: 'Materials', status: 'No materials', html: '<p class="empty-state">No materials logged.</p>' };
+          return {
+            title: "Materials",
+            status: "No materials",
+            html: '<p class="empty-state">No materials logged.</p>',
+          };
         }
         const html = materials
           .map((material) => {
-            const batch = material.BatchNumber ? `Batch ${material.BatchNumber}` : '';
+            const batch = material.BatchNumber
+              ? `Batch ${material.BatchNumber}`
+              : "";
             return `
               <div class="detail-item">
                 <div>
-                  <strong>${material.MaterialCode || 'Material'} · ${material.MaterialName || ''}</strong>
+                  <strong>${material.MaterialCode || "Material"} · ${material.MaterialName || ""}</strong>
                   <p>${batch}</p>
                 </div>
                 <div style="text-align:right;">
                   <strong>${formatAmount(material.AmountMaterial, material.UnitMaterial)}</strong>
-                  <p>${formatMoney(material.PriceMaterial, material.Currency || 'SEK', material.PriceInSek)}</p>
+                  <p>${formatMoney(material.PriceMaterial, material.Currency || "SEK", material.PriceInSek)}</p>
                 </div>
               </div>
             `;
           })
-          .join('');
-        return { title: 'Materials', status: `${materials.length} item(s)`, html };
+          .join("");
+        return {
+          title: "Materials",
+          status: `${materials.length} item(s)`,
+          html,
+        };
       }
 
       function buildAttachmentsSection(attachments, error) {
         if (error) {
-          return { title: 'Attachments', status: 'Error', html: `<p class="empty-state">${error}</p>` };
+          return {
+            title: "Attachments",
+            status: "Error",
+            html: `<p class="empty-state">${error}</p>`,
+          };
         }
         if (!attachments.length) {
-          return { title: 'Attachments', status: 'No attachments', html: '<p class="empty-state">No attachments uploaded.</p>' };
+          return {
+            title: "Attachments",
+            status: "No attachments",
+            html: '<p class="empty-state">No attachments uploaded.</p>',
+          };
         }
         const html = attachments
           .map((attachment) => {
-            const requestId = attachment['Request ID'] || attachment.RequestID || attachment.Request_Id;
-            const created = formatDate(attachment['Create Date']);
+            const requestId =
+              attachment["Request ID"] ||
+              attachment.RequestID ||
+              attachment.Request_Id;
+            const created = formatDate(attachment["Create Date"]);
             const fileName = getAttachmentName(attachment.Attachment_File);
-            const disabled = requestId ? '' : 'disabled';
+            const disabled = requestId ? "" : "disabled";
             return `
               <div class="detail-item">
                 <div>
                   <strong>${fileName}</strong>
                   <p>${created}</p>
                 </div>
-                <button type="button" class="download-btn" data-attachment-id="${requestId || ''}" data-file-name="${fileName}" ${disabled}>
-                  ${requestId ? 'Download' : 'Unavailable'}
+                <button type="button" class="download-btn" data-attachment-id="${requestId || ""}" data-file-name="${fileName}" ${disabled}>
+                  ${requestId ? "Download" : "Unavailable"}
                 </button>
               </div>
             `;
           })
-          .join('');
-        return { title: 'Attachments', status: `${attachments.length} attachment(s)`, html };
+          .join("");
+        return {
+          title: "Attachments",
+          status: `${attachments.length} attachment(s)`,
+          html,
+        };
       }
 
       function buildCommentsSection(comments, error) {
         if (error) {
-          return { title: 'Comments', status: 'Error', html: `<p class="empty-state">${error}</p>` };
+          return {
+            title: "Comments",
+            status: "Error",
+            html: `<p class="empty-state">${error}</p>`,
+          };
         }
         if (!comments.length) {
-          return { title: 'Comments', status: 'No comments', html: '<p class="empty-state">No chat history.</p>' };
+          return {
+            title: "Comments",
+            status: "No comments",
+            html: '<p class="empty-state">No chat history.</p>',
+          };
         }
         const html = comments
           .map((comment) => {
-            const text = pickField(comment, ['Comment_Text', 'CommentText', 'Comment', 'Comments', 'OrderComment', 'Description'], '(no text)');
-            const author = pickField(comment, ['Author', 'AuthorName', 'FullName', 'Created By', 'Last Modified By'], 'Unknown user');
-            const timestamp = formatDate(pickField(comment, ['Create Date', 'Modified Date', 'Last Modified Date', 'CreateDate']));
+            const text = pickField(
+              comment,
+              [
+                "Comment_Text",
+                "CommentText",
+                "Comment",
+                "Comments",
+                "OrderComment",
+                "Description",
+              ],
+              "(no text)",
+            );
+            const author = pickField(
+              comment,
+              [
+                "Author",
+                "AuthorName",
+                "FullName",
+                "Created By",
+                "Last Modified By",
+              ],
+              "Unknown user",
+            );
+            const timestamp = formatDate(
+              pickField(comment, [
+                "Create Date",
+                "Modified Date",
+                "Last Modified Date",
+                "CreateDate",
+              ]),
+            );
             return `
               <div class="detail-item" style="flex-direction: column;">
                 <div style="display:flex; justify-content:space-between; gap:0.5rem;">
@@ -1090,16 +1358,24 @@
               </div>
             `;
           })
-          .join('');
-        return { title: 'Comments', status: `${comments.length} message(s)`, html };
+          .join("");
+        return {
+          title: "Comments",
+          status: `${comments.length} message(s)`,
+          html,
+        };
       }
 
       function scrollToDetail(orderId) {
         if (isDesktopView()) {
-          document.getElementById('detail-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+          document
+            .getElementById("detail-panel")
+            .scrollIntoView({ behavior: "smooth", block: "start" });
         } else {
-          const inline = ordersList.querySelector(`.order-detail[data-order-id="${orderId}"]`);
-          inline?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          const inline = ordersList.querySelector(
+            `.order-detail[data-order-id="${orderId}"]`,
+          );
+          inline?.scrollIntoView({ behavior: "smooth", block: "start" });
         }
       }
 
@@ -1109,16 +1385,16 @@
       }
 
       function formatAmount(amount, unit) {
-        const value = amount == null ? '—' : Number(amount).toString();
-        return `${value} ${unit || ''}`.trim();
+        const value = amount == null ? "—" : Number(amount).toString();
+        return `${value} ${unit || ""}`.trim();
       }
 
       function formatMoney(value, currency, fallbackSek) {
-        if (value == null || value === '') {
-          if (fallbackSek != null && fallbackSek !== '') {
+        if (value == null || value === "") {
+          if (fallbackSek != null && fallbackSek !== "") {
             return `${fallbackSek} SEK`;
           }
-          return '—';
+          return "—";
         }
         return currency ? `${value} ${currency}` : `${value}`;
       }
@@ -1127,10 +1403,10 @@
         try {
           localStorage.setItem(
             SESSION_KEY,
-            JSON.stringify({ token, username, savedAt: Date.now() })
+            JSON.stringify({ token, username, savedAt: Date.now() }),
           );
         } catch (error) {
-          console.warn('Unable to persist session', error);
+          console.warn("Unable to persist session", error);
         }
       }
 
@@ -1146,7 +1422,7 @@
           }
           return stored;
         } catch (error) {
-          console.warn('Unable to load persisted session', error);
+          console.warn("Unable to load persisted session", error);
           return null;
         }
       }
@@ -1155,10 +1431,10 @@
         try {
           localStorage.removeItem(SESSION_KEY);
         } catch (error) {
-          console.warn('Unable to clear persisted session', error);
+          console.warn("Unable to clear persisted session", error);
         }
-        state.token = '';
-        state.user = '';
+        state.token = "";
+        state.user = "";
         state.selectedOrderId = null;
         state.details = {};
         state.loadingDetails = {};
@@ -1168,8 +1444,8 @@
 
       function handleSessionExpired() {
         clearSession();
-        loginPanel.classList.remove('hidden');
-        statusMsg.textContent = 'Session expired. Please sign in again.';
+        loginPanel.classList.remove("hidden");
+        statusMsg.textContent = "Session expired. Please sign in again.";
       }
 
       async function restoreSession() {
@@ -1180,18 +1456,18 @@
         userNameEl.textContent = stored.username;
         signOutBtn.disabled = false;
         refreshAppBtn.disabled = false;
-        loginPanel.classList.add('hidden');
-        statusMsg.textContent = 'Restoring session…';
+        loginPanel.classList.add("hidden");
+        statusMsg.textContent = "Restoring session…";
         try {
           await fetchOrders();
-          statusMsg.textContent = '';
+          statusMsg.textContent = "";
         } catch (error) {
-          statusMsg.textContent = error.message || 'Unable to restore session.';
+          statusMsg.textContent = error.message || "Unable to restore session.";
         }
       }
 
       function formatDate(value) {
-        if (!value) return '—';
+        if (!value) return "—";
         const date = new Date(value);
         if (Number.isNaN(date.getTime())) {
           return value;
@@ -1200,18 +1476,18 @@
       }
 
       function getAttachmentName(field) {
-        if (!field) return 'Attachment';
-        if (typeof field === 'string') return field;
-        return field.name || field.fileName || 'Attachment';
+        if (!field) return "Attachment";
+        if (typeof field === "string") return field;
+        return field.name || field.fileName || "Attachment";
       }
 
       function getErrorMessage(error) {
-        if (!error) return 'Unknown error';
-        if (typeof error === 'string') return error;
-        return error.message || 'Unknown error';
+        if (!error) return "Unknown error";
+        if (typeof error === "string") return error;
+        return error.message || "Unknown error";
       }
 
-      function pickField(obj, keys, fallback = '') {
+      function pickField(obj, keys, fallback = "") {
         for (const key of keys) {
           if (obj && obj[key]) {
             return obj[key];
@@ -1220,55 +1496,65 @@
         return fallback;
       }
 
-      async function downloadAttachment(attachmentId, fileName = 'attachment', button) {
+      async function downloadAttachment(
+        attachmentId,
+        fileName = "attachment",
+        button,
+      ) {
         if (!attachmentId || !state.token) return;
         if (button) {
           button.disabled = true;
-          button.textContent = 'Downloading…';
+          button.textContent = "Downloading…";
         }
         try {
-          const response = await fetch(`${API_BASE}/api/order-attachment-file`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token: state.token, attachmentId })
-          });
+          const response = await fetch(
+            `${API_BASE}/api/order-attachment-file`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ token: state.token, attachmentId }),
+            },
+          );
           if (!response.ok) {
             throw new Error(`Download failed (${response.status})`);
           }
           const blob = await response.blob();
           const url = URL.createObjectURL(blob);
-          const anchor = document.createElement('a');
+          const anchor = document.createElement("a");
           anchor.href = url;
-          anchor.download = fileName || 'attachment';
+          anchor.download = fileName || "attachment";
           document.body.appendChild(anchor);
           anchor.click();
           anchor.remove();
           URL.revokeObjectURL(url);
         } catch (error) {
-          alert(error.message || 'Download failed');
+          alert(error.message || "Download failed");
         } finally {
           if (button) {
             button.disabled = false;
-            button.textContent = 'Download';
+            button.textContent = "Download";
           }
         }
       }
 
-      async function post(path, payload, { expect = 'json' } = {}) {
+      async function post(path, payload, { expect = "json" } = {}) {
         const response = await fetch(`${API_BASE}${path}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
         });
         if (!response.ok) {
           const text = await response.text();
-          if (response.status === 401 || text.includes('Message number = 623')) {
+          if (
+            response.status === 401 ||
+            text.includes("Message number = 623")
+          ) {
             handleSessionExpired();
-            throw new Error('Session expired. Please sign in again.');
+            throw new Error("Session expired. Please sign in again.");
           }
           throw new Error(text || `Request failed (${response.status})`);
         }
-        if (expect === 'text') {
+        if (expect === "text") {
           return response.text();
         }
         return response.json();
@@ -1276,45 +1562,47 @@
 
       async function forceRefresh() {
         refreshAppBtn.disabled = true;
-        refreshAppBtn.textContent = 'Refreshing…';
+        refreshAppBtn.textContent = "Refreshing…";
         try {
-          if ('caches' in window) {
+          if ("caches" in window) {
             const names = await caches.keys();
             await Promise.all(names.map((name) => caches.delete(name)));
           }
-          if ('serviceWorker' in navigator) {
+          if ("serviceWorker" in navigator) {
             const regs = await navigator.serviceWorker.getRegistrations();
             await Promise.all(regs.map((reg) => reg.unregister()));
           }
         } catch (error) {
-          console.warn('Force refresh failed', error);
+          console.warn("Force refresh failed", error);
         } finally {
           window.location.reload();
         }
       }
 
       function isDesktopView() {
-        return window.matchMedia(`(min-width: ${DESKTOP_BREAKPOINT}px)`).matches;
+        return window.matchMedia(`(min-width: ${DESKTOP_BREAKPOINT}px)`)
+          .matches;
       }
 
-      function resetDetailPanel(message = 'Choose an order to load services, tasks, materials, attachments, and comments.') {
-        detailTitle.textContent = 'Select an order';
+      function resetDetailPanel(
+        message = "Choose an order to load services, tasks, materials, attachments, and comments.",
+      ) {
+        detailTitle.textContent = "Select an order";
         detailSubtitle.textContent = message;
-        summaryStatus.textContent = 'Awaiting selection';
-        summaryList.innerHTML = '';
+        summaryStatus.textContent = "Awaiting selection";
+        summaryList.innerHTML = "";
         const sections = [
           { statusEl: servicesStatus, listEl: servicesList },
           { statusEl: tasksStatus, listEl: tasksList },
           { statusEl: materialsStatus, listEl: materialsList },
           { statusEl: attachmentsStatus, listEl: attachmentsList },
-          { statusEl: commentsStatus, listEl: commentsList }
+          { statusEl: commentsStatus, listEl: commentsList },
         ];
         sections.forEach(({ statusEl, listEl }) => {
-          statusEl.textContent = 'Awaiting selection';
-          listEl.innerHTML = '';
+          statusEl.textContent = "Awaiting selection";
+          listEl.innerHTML = "";
         });
       }
     </script>
-
   </body>
 </html>
