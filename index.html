@@ -1064,7 +1064,8 @@
             state.selectedOrderId = null;
             resetDetailPanel(t("detail.selectPrompt"));
           } else {
-            ordersStatus.textContent = `${t("orders.updatedPrefix")} · ${new Date().toLocaleTimeString()}`;
+            state.ordersUpdatedAt = Date.now();
+            updateOrdersStatus();
             const current = state.selectedOrderId
               ? state.orders.find((order) => order.ID === state.selectedOrderId)
               : state.orders[0];
@@ -1338,6 +1339,23 @@
               break;
           }
         });
+      }
+
+      function updateOrdersStatus() {
+        if (!state.token) {
+          ordersStatus.textContent = t("orders.signInPrompt");
+          return;
+        }
+        if (!state.orders.length) {
+          ordersStatus.textContent = t("orders.none");
+          return;
+        }
+        if (state.ordersUpdatedAt) {
+          const time = new Date(state.ordersUpdatedAt).toLocaleTimeString();
+          ordersStatus.textContent = `${t("orders.updatedPrefix")} · ${time}`;
+        } else {
+          ordersStatus.textContent = t("orders.loading");
+        }
       }
 
       function buildInlineDetailContent(order, details = {}) {
@@ -1743,9 +1761,19 @@
         translateStaticText();
         if (!state.user) {
           userNameEl.textContent = t("user.notSigned");
+        } else {
+          userNameEl.textContent = state.user;
         }
-        if (!state.token) {
-          ordersStatus.textContent = t("orders.signInPrompt");
+        updateOrdersStatus();
+        renderOrders();
+        if (state.selectedOrderId && state.details[state.selectedOrderId]) {
+          renderDesktopDetail(
+            state.orders.find((order) => order.ID === state.selectedOrderId) ||
+              {},
+            state.details[state.selectedOrderId],
+          );
+        } else {
+          resetDetailPanel(t("detail.selectPrompt"));
         }
       }
 
