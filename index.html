@@ -233,6 +233,32 @@
         gap: 0.75rem;
       }
 
+      .order-block {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .order-detail {
+        display: none;
+      }
+
+      .order-detail.is-open {
+        display: block;
+      }
+
+      @media (max-width: 1023px) {
+        #detail-panel {
+          display: none;
+        }
+      }
+
+      @media (min-width: 1024px) {
+        .order-detail {
+          display: none !important;
+        }
+      }
+
       @media (max-width: 640px) {
         .order-card {
           padding: 0.8rem;
@@ -503,6 +529,13 @@
             </article>
             <article class="detail-card">
               <div class="detail-head">
+                <h3>Materials</h3>
+                <span class="section-status" id="materials-status">Awaiting selection</span>
+              </div>
+              <div id="materials-list" class="detail-items"></div>
+            </article>
+            <article class="detail-card">
+              <div class="detail-head">
                 <h3>Attachments</h3>
                 <span class="section-status" id="attachments-status">Awaiting selection</span>
               </div>
@@ -520,16 +553,20 @@
       </div>
     </main>
 
+
     <script>
       const API_BASE = window.location.hostname === 'localhost'
         ? ''
         : 'https://lexicostatistical-seamanly-elle.ngrok-free.dev';
+      const DESKTOP_BREAKPOINT = 1024;
 
       const state = {
         token: '',
         user: '',
         orders: [],
-        selectedOrderId: null
+        selectedOrderId: null,
+        details: {},
+        loadingDetails: {}
       };
 
       const form = document.getElementById('login-form');
@@ -551,6 +588,8 @@
       const servicesList = document.getElementById('services-list');
       const tasksStatus = document.getElementById('tasks-status');
       const tasksList = document.getElementById('tasks-list');
+      const materialsStatus = document.getElementById('materials-status');
+      const materialsList = document.getElementById('materials-list');
       const attachmentsStatus = document.getElementById('attachments-status');
       const attachmentsList = document.getElementById('attachments-list');
       const commentsStatus = document.getElementById('comments-status');
@@ -569,10 +608,11 @@
           selectOrder(order);
         }
       });
-      attachmentsList.addEventListener('click', (event) => {
+      document.addEventListener('click', (event) => {
         const btn = event.target.closest('.download-btn');
         if (!btn) return;
         const attachmentId = btn.dataset.attachmentId;
+        if (!attachmentId) return;
         const fileName = btn.dataset.fileName;
         downloadAttachment(attachmentId, fileName, btn);
       });
@@ -626,6 +666,13 @@
           const data = await post('/api/orders', { token: state.token });
           const entries = Array.isArray(data?.entries) ? data.entries : [];
           state.orders = entries.map((entry) => entry.values || {});
+          const validIds = new Set(state.orders.map((order) => order.ID));
+          Object.keys(state.details).forEach((id) => {
+            if (!validIds.has(id)) {
+              delete state.details[id];
+              delete state.loadingDetails[id];
+            }
+          });
           renderOrders();
           if (!state.orders.length) {
             ordersStatus.textContent = 'No orders returned.';
@@ -655,7 +702,11 @@
         }
 
         state.orders.forEach((order) => {
+          const block = document.createElement('div');
+          block.className = 'order-block';
+
           const button = document.createElement('button');
+          button.type = 'button';
           button.className = `order-card${state.selectedOrderId === order.ID ? ' active' : ''}`;
           button.dataset.orderId = order.ID;
           button.innerHTML = `
@@ -669,32 +720,204 @@
               <span class="order-status-pill">${order.StatusName || 'Unknown'}</span>
             </div>
           `;
-          ordersList.appendChild(button);
+
+          const detail = document.createElement('div');
+          detail.className = 'order-detail';
+          detail.dataset.orderId = order.ID;
+          if (state.selectedOrderId === order.ID) {
+            detail.classList.add('is-open');
+            if (state.loadingDetails[order.ID]) {
+              detail.innerHTML = '<p class="empty-state">Loading details…</p>';
+            } else if (state.details[order.ID]) {
+              detail.innerHTML = '';
+              detail.appendChild(buildInlineDetailContent(order, state.details[order.ID]));
+            } else {
+              detail.innerHTML = '<p class="empty-state">Select the order to load details.</p>';
+            }
+          }
+
+          block.appendChild(button);
+          block.appendChild(detail);
+          ordersList.appendChild(block);
         });
       }
 
       async function selectOrder(order, options = {}) {
+        if (!order) return;
         state.selectedOrderId = order.ID;
         renderOrders();
-        summaryStatus.textContent = 'Loaded';
-        renderSummary(order);
+        renderSummarySection(order);
+
+        if (state.details[order.ID] && !options.forceReload) {
+          renderDesktopDetail(order, state.details[order.ID]);
+          if (!options.preserveScroll) {
+            scrollToDetail(order.ID);
+          }
+          return;
+        }
+
+        setSectionsLoading();
+        state.loadingDetails[order.ID] = true;
+        renderOrders();
+
+        try {
+          const details = await fetchOrderDetails(order);
+          state.details[order.ID] = details;
+          renderDesktopDetail(order, details);
+        } catch (error) {
+          const message = error?.message || 'Failed to load order details.';
+          state.details[order.ID] = {
+            services: [],
+            servicesError: message,
+            tasks: [],
+            tasksError: message,
+            materials: [],
+            materialsError: message,
+            attachments: [],
+            attachmentsError: message,
+            comments: [],
+            commentsError: message
+          };
+          setSectionsError(message);
+        } finally {
+          state.loadingDetails[order.ID] = false;
+          renderOrders();
+          if (!options.preserveScroll) {
+            scrollToDetail(order.ID);
+          }
+        }
+      }
+
+      function renderSummarySection(order) {
         detailTitle.textContent = `Order #${order.OrdernumberShort || order.ID}`;
         const subtitleLab = order.Lab_Name || 'Unknown lab';
         const subtitleClinic = order.ClinicName || 'Unknown clinic';
         const subtitleDept = order.DepartmentName ? ` · ${order.DepartmentName}` : '';
         detailSubtitle.textContent = `${subtitleClinic} · ${subtitleLab}${subtitleDept}`;
-        await Promise.all([
-          loadServices(order),
-          loadTasks(order),
-          loadAttachments(order),
-          loadComments(order)
-        ]);
-        if (!options.preserveScroll) {
-          document.getElementById('detail-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+
+        const summary = buildSummarySection(order);
+        summaryStatus.textContent = summary.status;
+        summaryList.innerHTML = summary.html;
       }
 
-      function renderSummary(order) {
+      function setSectionsLoading() {
+        const sections = [
+          { statusEl: servicesStatus, listEl: servicesList },
+          { statusEl: tasksStatus, listEl: tasksList },
+          { statusEl: materialsStatus, listEl: materialsList },
+          { statusEl: attachmentsStatus, listEl: attachmentsList },
+          { statusEl: commentsStatus, listEl: commentsList }
+        ];
+        sections.forEach(({ statusEl, listEl }) => {
+          statusEl.textContent = 'Loading…';
+          listEl.innerHTML = '';
+        });
+      }
+
+      function setSectionsError(message) {
+        const html = `<p class="empty-state">${message}</p>`;
+        const sections = [
+          { statusEl: servicesStatus, listEl: servicesList },
+          { statusEl: tasksStatus, listEl: tasksList },
+          { statusEl: materialsStatus, listEl: materialsList },
+          { statusEl: attachmentsStatus, listEl: attachmentsList },
+          { statusEl: commentsStatus, listEl: commentsList }
+        ];
+        sections.forEach(({ statusEl, listEl }) => {
+          statusEl.textContent = 'Error';
+          listEl.innerHTML = html;
+        });
+      }
+
+      async function fetchOrderDetails(order) {
+        const requests = [
+          post('/api/order-services', { token: state.token, orderId: order.ID }),
+          post('/api/order-tasks', { token: state.token, orderId: order.ID }),
+          post('/api/order-materials', { token: state.token, orderId: order.ID }),
+          post('/api/order-attachments-list', { token: state.token, orderId: order.ID }),
+          post('/api/order-comments', { token: state.token, orderId: order.ID })
+        ];
+
+        const [servicesRes, tasksRes, materialsRes, attachmentsRes, commentsRes] = await Promise.allSettled(requests);
+
+        return {
+          services: servicesRes.status === 'fulfilled' ? extractEntries(servicesRes.value) : [],
+          servicesError: servicesRes.status === 'rejected' ? getErrorMessage(servicesRes.reason) : null,
+          tasks: tasksRes.status === 'fulfilled' ? extractEntries(tasksRes.value) : [],
+          tasksError: tasksRes.status === 'rejected' ? getErrorMessage(tasksRes.reason) : null,
+          materials: materialsRes.status === 'fulfilled' ? extractEntries(materialsRes.value) : [],
+          materialsError: materialsRes.status === 'rejected' ? getErrorMessage(materialsRes.reason) : null,
+          attachments: attachmentsRes.status === 'fulfilled' ? extractEntries(attachmentsRes.value) : [],
+          attachmentsError: attachmentsRes.status === 'rejected' ? getErrorMessage(attachmentsRes.reason) : null,
+          comments: commentsRes.status === 'fulfilled' ? extractEntries(commentsRes.value) : [],
+          commentsError: commentsRes.status === 'rejected' ? getErrorMessage(commentsRes.reason) : null
+        };
+      }
+
+      function getDetailSections(order, details = {}) {
+        return [
+          buildSummarySection(order),
+          buildServicesSection(details.services || [], details.servicesError),
+          buildTasksSection(details.tasks || [], details.tasksError),
+          buildMaterialsSection(details.materials || [], details.materialsError),
+          buildAttachmentsSection(details.attachments || [], details.attachmentsError),
+          buildCommentsSection(details.comments || [], details.commentsError)
+        ];
+      }
+
+      function renderDesktopDetail(order, details = {}) {
+        const sections = getDetailSections(order, details);
+        sections.forEach((section) => {
+          switch (section.title) {
+            case 'Summary':
+              summaryStatus.textContent = section.status;
+              summaryList.innerHTML = section.html;
+              break;
+            case 'Services':
+              servicesStatus.textContent = section.status;
+              servicesList.innerHTML = section.html;
+              break;
+            case 'Tasks':
+              tasksStatus.textContent = section.status;
+              tasksList.innerHTML = section.html;
+              break;
+            case 'Materials':
+              materialsStatus.textContent = section.status;
+              materialsList.innerHTML = section.html;
+              break;
+            case 'Attachments':
+              attachmentsStatus.textContent = section.status;
+              attachmentsList.innerHTML = section.html;
+              break;
+            case 'Comments':
+              commentsStatus.textContent = section.status;
+              commentsList.innerHTML = section.html;
+              break;
+            default:
+              break;
+          }
+        });
+      }
+
+      function buildInlineDetailContent(order, details = {}) {
+        const fragment = document.createDocumentFragment();
+        const sections = getDetailSections(order, details);
+        sections.forEach((section) => {
+          const card = document.createElement('article');
+          card.className = 'detail-card';
+          card.innerHTML = `
+            <div class="detail-head">
+              <h3>${section.title}</h3>
+              <span class="section-status">${section.status}</span>
+            </div>
+            ${section.html}
+          `;
+          fragment.appendChild(card);
+        });
+        return fragment;
+      }
+
+      function buildSummarySection(order) {
         const items = [
           { label: 'Patient', value: `${order.Patient_FirstName || ''} ${order.Patient_LastName || ''}`.trim() || '—' },
           { label: 'Patient ID', value: order.Patient_PersonID || '—' },
@@ -707,181 +930,211 @@
           { label: 'Description', value: order.Order_Description || '—' }
         ];
 
-        summaryList.innerHTML = items
-          .map((item) => `
-            <div>
-              <span>${item.label}</span>
-              <strong style="display:block; margin-top:0.2rem; font-size:0.95rem;">${item.value}</strong>
+        const html = `
+          <div class="summary-grid">
+            ${items
+              .map((item) => `
+                <div>
+                  <span>${item.label}</span>
+                  <strong style="display:block; margin-top:0.2rem; font-size:0.95rem;">${item.value}</strong>
+                </div>
+              `)
+              .join('')}
+          </div>
+        `;
+        return { title: 'Summary', status: 'Loaded', html };
+      }
+
+      function buildServicesSection(services, error) {
+        if (error) {
+          return { title: 'Services', status: 'Error', html: `<p class="empty-state">${error}</p>` };
+        }
+        if (!services.length) {
+          return { title: 'Services', status: 'No services', html: '<p class="empty-state">No services found.</p>' };
+        }
+        const html = services
+          .map((service) => `
+            <div class="detail-item">
+              <div>
+                <strong>${service.ServiceName || 'Service'}</strong>
+                <p>${service.ServiceDescription || ''}</p>
+              </div>
+              <div style="text-align:right;">
+                <strong>${formatAmount(service.Amount, service.Unit)}</strong>
+                <p>${formatMoney(service.Price)}</p>
+              </div>
             </div>
           `)
           .join('');
+        return { title: 'Services', status: `${services.length} service(s)`, html };
       }
 
-      async function loadServices(order) {
-        servicesStatus.textContent = 'Loading…';
-        servicesList.innerHTML = '';
-        try {
-          const data = await post('/api/order-services', { token: state.token, orderId: order.ID });
-          const entries = Array.isArray(data?.entries) ? data.entries : [];
-          if (!entries.length) {
-            servicesStatus.textContent = 'No services';
-            servicesList.innerHTML = '<p class="empty-state">No services found for this order.</p>';
-            return;
-          }
-          servicesStatus.textContent = `${entries.length} service(s)`;
-          servicesList.innerHTML = entries
-            .map(({ values = {} }) => {
-              const price = values.Price != null ? `${values.Price} ${values.Unit || ''}`.trim() : '—';
-              return `
-                <div class="detail-item">
-                  <div>
-                    <strong>${values.ServiceName || 'Service'}</strong>
-                    <p>${values.ServiceDescription || ''}</p>
-                    <p>${values.Category || ''}</p>
-                  </div>
-                  <div style="text-align:right;">
-                    <strong>${values.Amount || '—'} ${values.Unit || ''}</strong>
-                    <p>${price}</p>
-                  </div>
-                </div>
-              `;
-            })
-            .join('');
-        } catch (error) {
-          servicesStatus.textContent = 'Failed';
-          servicesList.innerHTML = `<p class="empty-state">${error.message || 'Unable to load services.'}</p>`;
+      function buildTasksSection(tasks, error) {
+        if (error) {
+          return { title: 'Tasks', status: 'Error', html: `<p class="empty-state">${error}</p>` };
         }
+        if (!tasks.length) {
+          return { title: 'Tasks', status: 'No tasks', html: '<p class="empty-state">No active tasks.</p>' };
+        }
+        const sorted = [...tasks].sort((a, b) => {
+          const sortA = Number(a.SortOrder ?? a['Sort Order'] ?? Infinity);
+          const sortB = Number(b.SortOrder ?? b['Sort Order'] ?? Infinity);
+          if (sortA !== sortB) return sortA - sortB;
+          const reqA = (a['Request ID'] || a.RequestID || '').toString();
+          const reqB = (b['Request ID'] || b.RequestID || '').toString();
+          return reqA.localeCompare(reqB);
+        });
+        const html = sorted
+          .map((task) => `
+            <div class="detail-item">
+              <div>
+                <strong>${task.TaskName || 'Task'}</strong>
+                <p>${task.DepartmentName || '—'}</p>
+              </div>
+              <div style="text-align:right;">
+                <span class="order-status-pill" style="margin-bottom:0.35rem; display:inline-flex;">${task.StatusTask || '—'}</span>
+                <p>${task.AssigneeFullName || ''}</p>
+              </div>
+            </div>
+          `)
+          .join('');
+        return { title: 'Tasks', status: `${tasks.length} task(s)`, html };
       }
 
-      async function loadTasks(order) {
-        tasksStatus.textContent = 'Loading…';
-        tasksList.innerHTML = '';
-        const labId = order.IDLabCurrent || order.IDLab;
-        const labDepartmentId = order.IDLabDepartment;
-        if (!labId || !labDepartmentId) {
-          tasksStatus.textContent = 'Missing lab info';
-          tasksList.innerHTML = '<p class="empty-state">This order is missing lab identifiers.</p>';
-          return;
+      function buildMaterialsSection(materials, error) {
+        if (error) {
+          return { title: 'Materials', status: 'Error', html: `<p class="empty-state">${error}</p>` };
         }
-        try {
-          const data = await post('/api/order-tasks', {
-            token: state.token,
-            labId,
-            labDepartmentId
-          });
-          const entries = Array.isArray(data?.entries) ? data.entries : [];
-          if (!entries.length) {
-            tasksStatus.textContent = 'No tasks';
-            tasksList.innerHTML = '<p class="empty-state">No active tasks for this order.</p>';
-            return;
-          }
-          tasksStatus.textContent = `${entries.length} task(s)`;
-          tasksList.innerHTML = entries
-            .map(({ values = {} }) => `
+        if (!materials.length) {
+          return { title: 'Materials', status: 'No materials', html: '<p class="empty-state">No materials logged.</p>' };
+        }
+        const html = materials
+          .map((material) => {
+            const batch = material.BatchNumber ? `Batch ${material.BatchNumber}` : '';
+            return `
               <div class="detail-item">
                 <div>
-                  <strong>${values.Order_DepartmentName || 'Task'}</strong>
-                  <p>${values.Order_Description || ''}</p>
+                  <strong>${material.MaterialCode || 'Material'} · ${material.MaterialName || ''}</strong>
+                  <p>${batch}</p>
                 </div>
                 <div style="text-align:right;">
-                  <strong>${values.Task_AssigneeFullName || 'Unassigned'}</strong>
-                  <p>${values.Order_IDLabDepartment || ''}</p>
+                  <strong>${formatAmount(material.AmountMaterial, material.UnitMaterial)}</strong>
+                  <p>${formatMoney(material.PriceMaterial, material.Currency || 'SEK')}</p>
                 </div>
               </div>
-            `)
-            .join('');
-        } catch (error) {
-          tasksStatus.textContent = 'Failed';
-          tasksList.innerHTML = `<p class="empty-state">${error.message || 'Unable to load tasks.'}</p>`;
-        }
+            `;
+          })
+          .join('');
+        return { title: 'Materials', status: `${materials.length} item(s)`, html };
       }
 
-      async function loadAttachments(order) {
-        attachmentsStatus.textContent = 'Loading…';
-        attachmentsList.innerHTML = '';
-        try {
-          const data = await post('/api/order-attachments-list', { token: state.token, orderId: order.ID });
-          const entries = Array.isArray(data?.entries) ? data.entries : [];
-          if (!entries.length) {
-            attachmentsStatus.textContent = 'No attachments';
-            attachmentsList.innerHTML = '<p class="empty-state">No attachments uploaded.</p>';
-            return;
-          }
-          attachmentsStatus.textContent = `${entries.length} attachment(s)`;
-          attachmentsList.innerHTML = entries
-            .map(({ values = {} }) => {
-              const attachmentField = values.Attachment_File;
-              const fileName = getAttachmentName(attachmentField);
-              const requestId = values['Request ID'] || values.RequestID || values.Request_Id;
-              const created = values['Create Date'] || values['Created Date'];
-              const createdBy = values['Created By'] || values.CreatedBy || '';
-              const disabled = requestId ? '' : 'disabled';
-              return `
-                <div class="detail-item">
-                  <div>
-                    <strong>${fileName}</strong>
-                    <p>${formatDate(created)} · ${createdBy || 'Unknown author'}</p>
-                  </div>
-                  <button type="button" class="download-btn" data-attachment-id="${requestId || ''}" data-file-name="${fileName}" ${disabled}>
-                    ${requestId ? 'Download' : 'Unavailable'}
-                  </button>
+      function buildAttachmentsSection(attachments, error) {
+        if (error) {
+          return { title: 'Attachments', status: 'Error', html: `<p class="empty-state">${error}</p>` };
+        }
+        if (!attachments.length) {
+          return { title: 'Attachments', status: 'No attachments', html: '<p class="empty-state">No attachments uploaded.</p>' };
+        }
+        const html = attachments
+          .map((attachment) => {
+            const requestId = attachment['Request ID'] || attachment.RequestID || attachment.Request_Id;
+            const created = formatDate(attachment['Create Date']);
+            const fileName = getAttachmentName(attachment.Attachment_File);
+            const disabled = requestId ? '' : 'disabled';
+            return `
+              <div class="detail-item">
+                <div>
+                  <strong>${fileName}</strong>
+                  <p>${created}</p>
                 </div>
-              `;
-            })
-            .join('');
-        } catch (error) {
-          attachmentsStatus.textContent = 'Failed';
-          attachmentsList.innerHTML = `<p class="empty-state">${error.message || 'Unable to load attachments.'}</p>`;
-        }
+                <button type="button" class="download-btn" data-attachment-id="${requestId || ''}" data-file-name="${fileName}" ${disabled}>
+                  ${requestId ? 'Download' : 'Unavailable'}
+                </button>
+              </div>
+            `;
+          })
+          .join('');
+        return { title: 'Attachments', status: `${attachments.length} attachment(s)`, html };
       }
 
-      async function loadComments(order) {
-        commentsStatus.textContent = 'Loading…';
-        commentsList.innerHTML = '';
-        try {
-          const data = await post('/api/order-comments', { token: state.token, orderId: order.ID });
-          const entries = Array.isArray(data?.entries) ? data.entries : [];
-          if (!entries.length) {
-            commentsStatus.textContent = 'No comments';
-            commentsList.innerHTML = '<p class="empty-state">No chat history for this order.</p>';
-            return;
-          }
-          commentsStatus.textContent = `${entries.length} message(s)`;
-          commentsList.innerHTML = entries
-            .map(({ values = {} }) => {
-              const text = pickField(values, ['Comment_Text', 'CommentText', 'Comment', 'Comments', 'OrderComment', 'Description'], '(no text)');
-              const author = pickField(values, ['Author', 'AuthorName', 'FullName', 'Created By', 'Last Modified By'], 'Unknown user');
-              const timestamp = formatDate(pickField(values, ['Create Date', 'Modified Date', 'Last Modified Date', 'CreateDate']));
-              return `
-                <div class="detail-item" style="flex-direction: column;">
-                  <div style="display:flex; justify-content:space-between; gap:0.5rem;">
-                    <strong>${author}</strong>
-                    <span style="font-size:0.75rem; color:${'var(--muted)'};">${timestamp}</span>
-                  </div>
-                  <p>${text}</p>
+      function buildCommentsSection(comments, error) {
+        if (error) {
+          return { title: 'Comments', status: 'Error', html: `<p class="empty-state">${error}</p>` };
+        }
+        if (!comments.length) {
+          return { title: 'Comments', status: 'No comments', html: '<p class="empty-state">No chat history.</p>' };
+        }
+        const html = comments
+          .map((comment) => {
+            const text = pickField(comment, ['Comment_Text', 'CommentText', 'Comment', 'Comments', 'OrderComment', 'Description'], '(no text)');
+            const author = pickField(comment, ['Author', 'AuthorName', 'FullName', 'Created By', 'Last Modified By'], 'Unknown user');
+            const timestamp = formatDate(pickField(comment, ['Create Date', 'Modified Date', 'Last Modified Date', 'CreateDate']));
+            return `
+              <div class="detail-item" style="flex-direction: column;">
+                <div style="display:flex; justify-content:space-between; gap:0.5rem;">
+                  <strong>${author}</strong>
+                  <span style="font-size:0.75rem; color:var(--muted);">${timestamp}</span>
                 </div>
-              `;
-            })
-            .join('');
-        } catch (error) {
-          commentsStatus.textContent = 'Failed';
-          commentsList.innerHTML = `<p class="empty-state">${error.message || 'Unable to load comments.'}</p>`;
+                <p>${text}</p>
+              </div>
+            `;
+          })
+          .join('');
+        return { title: 'Comments', status: `${comments.length} message(s)`, html };
+      }
+
+      function scrollToDetail(orderId) {
+        if (isDesktopView()) {
+          document.getElementById('detail-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          const inline = ordersList.querySelector(`.order-detail[data-order-id="${orderId}"]`);
+          inline?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       }
 
-      function resetDetailPanel(message = 'Choose an order to load services, tasks, attachments, and comments.') {
-        detailTitle.textContent = 'Select an order';
-        detailSubtitle.textContent = message;
-        summaryStatus.textContent = 'Awaiting selection';
-        servicesStatus.textContent = 'Awaiting selection';
-        tasksStatus.textContent = 'Awaiting selection';
-        attachmentsStatus.textContent = 'Awaiting selection';
-        commentsStatus.textContent = 'Awaiting selection';
-        summaryList.innerHTML = '';
-        servicesList.innerHTML = '';
-        tasksList.innerHTML = '';
-        attachmentsList.innerHTML = '';
-        commentsList.innerHTML = '';
+      function extractEntries(data) {
+        if (!data || !Array.isArray(data.entries)) return [];
+        return data.entries.map((entry) => entry.values || {});
+      }
+
+      function formatAmount(amount, unit) {
+        const value = amount == null ? '—' : Number(amount).toString();
+        return `${value} ${unit || ''}`.trim();
+      }
+
+      function formatMoney(value, currency) {
+        if (value == null || value === '') return '—';
+        return currency ? `${value} ${currency}` : `${value}`;
+      }
+
+      function formatDate(value) {
+        if (!value) return '—';
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) {
+          return value;
+        }
+        return date.toLocaleString();
+      }
+
+      function getAttachmentName(field) {
+        if (!field) return 'Attachment';
+        if (typeof field === 'string') return field;
+        return field.name || field.fileName || 'Attachment';
+      }
+
+      function getErrorMessage(error) {
+        if (!error) return 'Unknown error';
+        if (typeof error === 'string') return error;
+        return error.message || 'Unknown error';
+      }
+
+      function pickField(obj, keys, fallback = '') {
+        for (const key of keys) {
+          if (obj && obj[key]) {
+            return obj[key];
+          }
+        }
+        return fallback;
       }
 
       async function downloadAttachment(attachmentId, fileName = 'attachment', button) {
@@ -934,21 +1187,6 @@
         return response.json();
       }
 
-      function formatDate(value) {
-        if (!value) return '—';
-        const date = new Date(value);
-        if (Number.isNaN(date.getTime())) {
-          return value;
-        }
-        return date.toLocaleString();
-      }
-
-      function getAttachmentName(field) {
-        if (!field) return 'Attachment';
-        if (typeof field === 'string') return field;
-        return field.name || field.fileName || 'Attachment';
-      }
-
       async function forceRefresh() {
         refreshAppBtn.disabled = true;
         refreshAppBtn.textContent = 'Refreshing…';
@@ -968,14 +1206,28 @@
         }
       }
 
-      function pickField(obj, keys, fallback = '') {
-        for (const key of keys) {
-          if (obj && obj[key]) {
-            return obj[key];
-          }
-        }
-        return fallback;
+      function isDesktopView() {
+        return window.matchMedia(`(min-width: ${DESKTOP_BREAKPOINT}px)`).matches;
+      }
+
+      function resetDetailPanel(message = 'Choose an order to load services, tasks, materials, attachments, and comments.') {
+        detailTitle.textContent = 'Select an order';
+        detailSubtitle.textContent = message;
+        summaryStatus.textContent = 'Awaiting selection';
+        summaryList.innerHTML = '';
+        const sections = [
+          { statusEl: servicesStatus, listEl: servicesList },
+          { statusEl: tasksStatus, listEl: tasksList },
+          { statusEl: materialsStatus, listEl: materialsList },
+          { statusEl: attachmentsStatus, listEl: attachmentsList },
+          { statusEl: commentsStatus, listEl: commentsList }
+        ];
+        sections.forEach(({ statusEl, listEl }) => {
+          statusEl.textContent = 'Awaiting selection';
+          listEl.innerHTML = '';
+        });
       }
     </script>
+
   </body>
 </html>
