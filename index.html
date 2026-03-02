@@ -49,10 +49,47 @@
         background-image: var(--bg);
         background-attachment: fixed;
         color: var(--text);
+      }
+
+      /* ── Login screen ─────────────────────────────────────── */
+
+      #login-screen {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: clamp(1.25rem, 4vw, 2.5rem);
+      }
+
+      .login-card {
+        width: min(440px, 100%);
+      }
+
+      .login-brand {
+        text-align: center;
+        margin-bottom: 1.75rem;
+      }
+
+      .login-brand h1 {
+        margin: 0.3rem 0 0.2rem;
+        font-size: clamp(1.9rem, 6vw, 2.6rem);
+        letter-spacing: -0.02em;
+      }
+
+      .login-brand p {
+        color: var(--muted);
+        font-size: 0.95rem;
+        margin: 0;
+      }
+
+      /* ── App screen ───────────────────────────────────────── */
+
+      #app-screen {
         display: flex;
         align-items: stretch;
         justify-content: center;
         padding: clamp(1rem, 3vw, 2.5rem);
+        min-height: 100vh;
       }
 
       main {
@@ -62,6 +99,8 @@
         flex-direction: column;
         gap: 1.25rem;
       }
+
+      /* ── Shared components ────────────────────────────────── */
 
       .panel {
         padding: clamp(1.25rem, 3vw, 2.25rem);
@@ -448,78 +487,61 @@
         color: var(--muted);
       }
 
+      .select-pill {
+        appearance: none;
+        border: 1px solid var(--input-border);
+        background: var(--input-bg);
+        color: var(--text);
+        border-radius: 999px;
+        padding: 0.48rem 2rem 0.48rem 0.8rem;
+        font: inherit;
+        line-height: 1.1;
+        min-height: 36px;
+      }
+
+      #login-form select.select-pill {
+        width: 100%;
+        border-radius: 0.75rem;
+        padding-right: 0.9rem;
+      }
+
+      .user-pill .select-pill {
+        min-width: 120px;
+      }
+
+      select.select-pill:focus {
+        outline: 2px solid color-mix(in oklab, var(--accent), white 25%);
+        outline-offset: 1px;
+      }
+
+      .env-chip {
+        display: inline-block;
+        margin-top: 0.35rem;
+        padding: 0.2rem 0.55rem;
+        border-radius: 999px;
+        background: rgba(126, 249, 194, 0.12);
+        border: 1px solid rgba(126, 249, 194, 0.35);
+        color: var(--text);
+      }
+
       .hidden {
         display: none !important;
       }
     </style>
   </head>
   <body>
-    <main>
-      <section class="panel shell">
-        <div>
-          <span class="eyebrow" data-i18n="app.badge">Tandis AI</span>
-          <h1 data-i18n="app.title">Command center</h1>
-          <p data-i18n="app.subtitle">
-            Track orders, services, tasks, attachments, and comments.
-          </p>
-        </div>
-        <div class="user-pill" style="gap: 0.75rem; flex-wrap: wrap">
-          <div style="min-width: 160px">
-            <p
-              class="label"
-              style="
-                font-size: 0.75rem;
-                text-transform: uppercase;
-                letter-spacing: 0.1em;
-              "
-              data-i18n="user.signedIn"
-            >
-              Signed in as
-            </p>
-            <strong
-              id="user-name"
-              data-i18n-dynamic="true"
-              data-i18n="user.notSigned"
-              >Not signed in</strong
-            >
-          </div>
-          <div
-            style="
-              display: flex;
-              gap: 0.5rem;
-              flex-wrap: wrap;
-              align-items: center;
-            "
-          >
-            <label for="language-select" class="sr-only" data-i18n="lang.label"
-              >Language</label
-            >
-            <select id="language-select" aria-label="Language">
-              <option value="en">English</option>
-              <option value="sv">Svenska</option>
-              <option value="es">Español</option>
-            </select>
-            <button
-              type="button"
-              id="refresh-app-btn"
-              disabled
-              data-i18n="action.refreshApp"
-            >
-              Refresh app
-            </button>
-            <button
-              type="button"
-              id="sign-out-btn"
-              disabled
-              data-i18n="action.signOut"
-            >
-              Sign out
-            </button>
-          </div>
-        </div>
-      </section>
 
-      <section class="panel" id="login-panel">
+    <!-- ═══════════════════════════════════════════════════════
+         LOGIN SCREEN  (shown when not authenticated)
+    ════════════════════════════════════════════════════════ -->
+    <div id="login-screen">
+      <section class="panel login-card" id="login-panel">
+        <div class="login-brand">
+          <span class="eyebrow" data-i18n="app.badge">Tandis AI</span>
+          <h1 data-i18n="app.title">Tandis</h1>
+          <p data-i18n="app.subtitle">Orderhantering</p>
+        </div>
+
         <h2 data-i18n="login.title">Sign in</h2>
         <p data-i18n="login.subtitle">
           Use your BMC Remedy credentials to retrieve a secure token.
@@ -530,14 +552,14 @@
             <input
               id="username"
               name="username"
-              type="email"
+              type="text"
               autocomplete="username"
               placeholder="user@company.com"
               data-i18n-placeholder="login.usernamePlaceholder"
               autocapitalize="none"
               autocorrect="off"
               spellcheck="false"
-              inputmode="email"
+              inputmode="text"
               required
             />
           </div>
@@ -553,6 +575,15 @@
               required
             />
           </div>
+          <div>
+            <label for="environment" data-i18n="login.environment">Environment</label>
+            <select id="environment" class="select-pill" name="environment" required>
+              <option value="test" data-i18n="env.test">Test (saas02.tandis.app)</option>
+              <option value="production" data-i18n="env.production">
+                Production (tandis.app)
+              </option>
+            </select>
+          </div>
           <button
             type="submit"
             id="login-btn"
@@ -564,121 +595,186 @@
           <div class="status" id="status-msg"></div>
         </form>
       </section>
+    </div>
 
-      <div class="workspace">
-        <section class="panel" id="orders-panel">
-          <div class="orders-header">
-            <div>
-              <span class="eyebrow" data-i18n="orders.badge"
-                >Latest 10 orders</span
-              >
-              <h2 data-i18n="orders.title">Orders</h2>
-            </div>
-            <button
-              type="button"
-              id="orders-btn"
-              disabled
-              data-i18n="action.refresh"
-            >
-              Refresh
-            </button>
-          </div>
-          <div
-            class="status"
-            id="orders-status"
-            data-i18n="orders.signInPrompt"
-          >
-            Sign in to load orders.
-          </div>
-          <div class="orders-list" id="orders-list"></div>
-        </section>
+    <!-- ═══════════════════════════════════════════════════════
+         APP SCREEN  (shown after authentication)
+    ════════════════════════════════════════════════════════ -->
+    <div id="app-screen" class="hidden">
+      <main>
 
-        <section class="panel" id="detail-panel">
-          <div class="orders-header">
-            <div>
-              <span class="eyebrow" data-i18n="detail.badge">Order detail</span>
-              <h2
-                id="detail-title"
-                data-i18n-dynamic="true"
-                data-i18n="detail.title"
-              >
-                Select an order
-              </h2>
+        <!-- Header bar -->
+        <section class="panel shell">
+          <div>
+            <span class="eyebrow" data-i18n="app.badge">Tandis AI</span>
+            <h1 data-i18n="app.title">Tandis - Orderhantering</h1>
+            <p data-i18n="app.subtitle">
+              Track orders, services, tasks, attachments, and comments.
+            </p>
+          </div>
+          <div class="user-pill" style="gap: 0.75rem; flex-wrap: wrap">
+            <div style="min-width: 160px">
               <p
-                id="detail-subtitle"
-                data-i18n-dynamic="true"
-                data-i18n="detail.subtitle"
+                class="label"
+                style="
+                  font-size: 0.75rem;
+                  text-transform: uppercase;
+                  letter-spacing: 0.1em;
+                "
+                data-i18n="user.signedIn"
               >
-                Choose an order to load services, tasks, attachments, and
-                comments.
+                Signed in as
               </p>
+              <strong
+                id="user-name"
+                data-i18n-dynamic="true"
+                data-i18n="user.notSigned"
+                >Not signed in</strong
+              >
+              <p
+                id="current-env"
+                class="label env-chip"
+                data-i18n-dynamic="true"
+                style="margin-top: 0.35rem; font-size: 0.75rem"
+              ></p>
+            </div>
+            <div
+              style="
+                display: flex;
+                gap: 0.5rem;
+                flex-wrap: wrap;
+                align-items: center;
+              "
+            >
+              <label for="language-select" class="sr-only" data-i18n="lang.label">Language</label>
+              <select id="language-select" class="select-pill" aria-label="Language">
+                <option value="en">English</option>
+                <option value="sv">Svenska</option>
+                <option value="es">Español</option>
+              </select>
+              <button
+                type="button"
+                id="refresh-app-btn"
+                disabled
+                data-i18n="action.refreshApp"
+              >
+                Refresh app
+              </button>
+              <button
+                type="button"
+                id="sign-out-btn"
+                disabled
+                data-i18n="action.signOut"
+              >
+                Sign out
+              </button>
             </div>
           </div>
-          <div class="detail-grid">
-            <article class="detail-card">
-              <div class="detail-head">
-                <h3>Summary</h3>
-                <span class="section-status" id="summary-status"
-                  >Awaiting selection</span
-                >
-              </div>
-              <div class="summary-grid" id="summary-list"></div>
-            </article>
-            <article class="detail-card">
-              <div class="detail-head">
-                <h3>Services</h3>
-                <span class="section-status" id="services-status"
-                  >Awaiting selection</span
-                >
-              </div>
-              <div id="services-list" class="detail-items"></div>
-            </article>
-            <article class="detail-card">
-              <div class="detail-head">
-                <h3>Tasks</h3>
-                <span class="section-status" id="tasks-status"
-                  >Awaiting selection</span
-                >
-              </div>
-              <div id="tasks-list" class="detail-items"></div>
-            </article>
-            <article class="detail-card">
-              <div class="detail-head">
-                <h3>Materials</h3>
-                <span class="section-status" id="materials-status"
-                  >Awaiting selection</span
-                >
-              </div>
-              <div id="materials-list" class="detail-items"></div>
-            </article>
-            <article class="detail-card">
-              <div class="detail-head">
-                <h3>Attachments</h3>
-                <span class="section-status" id="attachments-status"
-                  >Awaiting selection</span
-                >
-              </div>
-              <div id="attachments-list" class="detail-items"></div>
-            </article>
-            <article class="detail-card" style="grid-column: 1 / -1">
-              <div class="detail-head">
-                <h3>Comments</h3>
-                <span class="section-status" id="comments-status"
-                  >Awaiting selection</span
-                >
-              </div>
-              <div id="comments-list" class="detail-items"></div>
-            </article>
-          </div>
         </section>
-      </div>
-    </main>
+
+        <!-- Orders + detail workspace -->
+        <div class="workspace">
+          <section class="panel" id="orders-panel">
+            <div class="orders-header">
+              <div>
+                <span class="eyebrow" data-i18n="orders.badge">Latest 10 orders</span>
+                <h2 data-i18n="orders.title">Orders</h2>
+              </div>
+              <button
+                type="button"
+                id="orders-btn"
+                disabled
+                data-i18n="action.refresh"
+              >
+                Refresh
+              </button>
+            </div>
+            <div
+              class="status"
+              id="orders-status"
+              data-i18n="orders.signInPrompt"
+            >
+              Sign in to load orders.
+            </div>
+            <div class="orders-list" id="orders-list"></div>
+          </section>
+
+          <section class="panel" id="detail-panel">
+            <div class="orders-header">
+              <div>
+                <span class="eyebrow" data-i18n="detail.badge">Order detail</span>
+                <h2
+                  id="detail-title"
+                  data-i18n-dynamic="true"
+                  data-i18n="detail.title"
+                >
+                  Select an order
+                </h2>
+                <p
+                  id="detail-subtitle"
+                  data-i18n-dynamic="true"
+                  data-i18n="detail.subtitle"
+                >
+                  Choose an order to load services, tasks, attachments, and
+                  comments.
+                </p>
+              </div>
+            </div>
+            <div class="detail-grid">
+              <article class="detail-card">
+                <div class="detail-head">
+                  <h3 data-i18n="summary.title">Summary</h3>
+                  <span class="section-status" id="summary-status">Awaiting selection</span>
+                </div>
+                <div class="summary-grid" id="summary-list"></div>
+              </article>
+              <article class="detail-card">
+                <div class="detail-head">
+                  <h3 data-i18n="services.title">Services</h3>
+                  <span class="section-status" id="services-status">Awaiting selection</span>
+                </div>
+                <div id="services-list" class="detail-items"></div>
+              </article>
+              <article class="detail-card">
+                <div class="detail-head">
+                  <h3 data-i18n="tasks.title">Tasks</h3>
+                  <span class="section-status" id="tasks-status">Awaiting selection</span>
+                </div>
+                <div id="tasks-list" class="detail-items"></div>
+              </article>
+              <article class="detail-card">
+                <div class="detail-head">
+                  <h3 data-i18n="materials.title">Materials</h3>
+                  <span class="section-status" id="materials-status">Awaiting selection</span>
+                </div>
+                <div id="materials-list" class="detail-items"></div>
+              </article>
+              <article class="detail-card">
+                <div class="detail-head">
+                  <h3 data-i18n="attachments.title">Attachments</h3>
+                  <span class="section-status" id="attachments-status">Awaiting selection</span>
+                </div>
+                <div id="attachments-list" class="detail-items"></div>
+              </article>
+              <article class="detail-card" style="grid-column: 1 / -1">
+                <div class="detail-head">
+                  <h3 data-i18n="comments.title">Comments</h3>
+                  <span class="section-status" id="comments-status">Awaiting selection</span>
+                </div>
+                <div id="comments-list" class="detail-items"></div>
+              </article>
+            </div>
+          </section>
+        </div>
+
+      </main>
+    </div>
 
     <script>
       const API_BASE =
         window.location.hostname === "localhost"
           ? ""
-          : "https://lexicostatistical-seamanly-elle.ngrok-free.dev";
+          : "https://lexicostatistical-seamanly-elle.ngrok-free.dev/mtandis";
       const DESKTOP_BREAKPOINT = 1024;
       const SESSION_KEY = "tandisSession";
       const SESSION_TTL = 60 * 60 * 1000;
@@ -687,7 +783,7 @@
       const translations = {
         en: {
           "app.badge": "Tandis AI",
-          "app.title": "Command center",
+          "app.title": "Tandis - Orderhantering",
           "app.subtitle":
             "Track orders, services, tasks, attachments, and comments.",
           "user.signedIn": "Signed in as",
@@ -705,6 +801,12 @@
           "login.password": "Password",
           "login.passwordPlaceholder": "••••••••",
           "login.submit": "Sign in",
+          "login.environment": "Environment",
+          "env.test": "Test (saas02.tandis.app)",
+          "env.production": "Production (tandis.app)",
+          "env.current": "Environment",
+          "env.testShort": "Test",
+          "env.productionShort": "Production",
           "orders.badge": "Latest 10 orders",
           "orders.title": "Orders",
           "orders.signInPrompt": "Sign in to load orders.",
@@ -721,6 +823,7 @@
           "detail.subtitle":
             "Choose an order to load services, tasks, attachments, and comments.",
           "detail.selectPrompt": "Select an order to see its details.",
+          "summary.title": "Summary",
           "summary.patient": "Patient",
           "summary.patientId": "Patient ID",
           "summary.clinic": "Clinic",
@@ -784,6 +887,12 @@
           "login.password": "Lösenord",
           "login.passwordPlaceholder": "••••••••",
           "login.submit": "Logga in",
+          "login.environment": "Miljö",
+          "env.test": "Test (saas02.tandis.app)",
+          "env.production": "Produktion (tandis.app)",
+          "env.current": "Miljö",
+          "env.testShort": "Test",
+          "env.productionShort": "Produktion",
           "orders.badge": "Senaste 10 order",
           "orders.title": "Order",
           "orders.signInPrompt": "Logga in för att ladda order.",
@@ -800,6 +909,7 @@
           "detail.subtitle":
             "Välj en order för att visa tjänster, uppgifter, bilagor och kommentarer.",
           "detail.selectPrompt": "Välj en order för att se detaljer.",
+          "summary.title": "Sammanfattning",
           "summary.patient": "Patient",
           "summary.patientId": "Personnummer",
           "summary.clinic": "Klinik",
@@ -863,6 +973,12 @@
           "login.password": "Contraseña",
           "login.passwordPlaceholder": "••••••••",
           "login.submit": "Iniciar sesión",
+          "login.environment": "Entorno",
+          "env.test": "Test (saas02.tandis.app)",
+          "env.production": "Producción (tandis.app)",
+          "env.current": "Entorno",
+          "env.testShort": "Test",
+          "env.productionShort": "Producción",
           "orders.badge": "Últimos 10 pedidos",
           "orders.title": "Pedidos",
           "orders.signInPrompt": "Inicia sesión para cargar pedidos.",
@@ -880,6 +996,7 @@
           "detail.subtitle":
             "Selecciona un pedido para ver servicios, tareas, adjuntos y comentarios.",
           "detail.selectPrompt": "Selecciona un pedido para ver los detalles.",
+          "summary.title": "Resumen",
           "summary.patient": "Paciente",
           "summary.patientId": "ID del paciente",
           "summary.clinic": "Clínica",
@@ -928,6 +1045,7 @@
       const state = {
         token: "",
         user: "",
+        environment: "test",
         orders: [],
         selectedOrderId: null,
         details: {},
@@ -935,33 +1053,49 @@
         language: loadLanguage(),
       };
 
-      const form = document.getElementById("login-form");
-      const loginPanel = document.getElementById("login-panel");
-      const statusMsg = document.getElementById("status-msg");
-      const loginBtn = document.getElementById("login-btn");
-      const ordersBtn = document.getElementById("orders-btn");
-      const ordersStatus = document.getElementById("orders-status");
-      const ordersList = document.getElementById("orders-list");
-      const userNameEl = document.getElementById("user-name");
-      const signOutBtn = document.getElementById("sign-out-btn");
-      const refreshAppBtn = document.getElementById("refresh-app-btn");
-      const languageSelect = document.getElementById("language-select");
-      const tip = document.getElementById("tip");
+      // ── Screen refs ──────────────────────────────────────────
+      const loginScreen  = document.getElementById("login-screen");
+      const appScreen    = document.getElementById("app-screen");
 
-      const detailTitle = document.getElementById("detail-title");
+      function showLoginScreen(msg = "") {
+        appScreen.classList.add("hidden");
+        loginScreen.classList.remove("hidden");
+        if (msg) statusMsg.textContent = msg;
+      }
+
+      function showAppScreen() {
+        loginScreen.classList.add("hidden");
+        appScreen.classList.remove("hidden");
+      }
+
+      // ── DOM refs ─────────────────────────────────────────────
+      const form           = document.getElementById("login-form");
+      const statusMsg      = document.getElementById("status-msg");
+      const loginBtn       = document.getElementById("login-btn");
+      const ordersBtn      = document.getElementById("orders-btn");
+      const ordersStatus   = document.getElementById("orders-status");
+      const ordersList     = document.getElementById("orders-list");
+      const userNameEl     = document.getElementById("user-name");
+      const currentEnvEl   = document.getElementById("current-env");
+      const environmentSelect = document.getElementById("environment");
+      const signOutBtn     = document.getElementById("sign-out-btn");
+      const refreshAppBtn  = document.getElementById("refresh-app-btn");
+      const languageSelect = document.getElementById("language-select");
+
+      const detailTitle    = document.getElementById("detail-title");
       const detailSubtitle = document.getElementById("detail-subtitle");
-      const summaryStatus = document.getElementById("summary-status");
-      const summaryList = document.getElementById("summary-list");
+      const summaryStatus  = document.getElementById("summary-status");
+      const summaryList    = document.getElementById("summary-list");
       const servicesStatus = document.getElementById("services-status");
-      const servicesList = document.getElementById("services-list");
-      const tasksStatus = document.getElementById("tasks-status");
-      const tasksList = document.getElementById("tasks-list");
-      const materialsStatus = document.getElementById("materials-status");
-      const materialsList = document.getElementById("materials-list");
+      const servicesList   = document.getElementById("services-list");
+      const tasksStatus    = document.getElementById("tasks-status");
+      const tasksList      = document.getElementById("tasks-list");
+      const materialsStatus   = document.getElementById("materials-status");
+      const materialsList     = document.getElementById("materials-list");
       const attachmentsStatus = document.getElementById("attachments-status");
-      const attachmentsList = document.getElementById("attachments-list");
-      const commentsStatus = document.getElementById("comments-status");
-      const commentsList = document.getElementById("comments-list");
+      const attachmentsList   = document.getElementById("attachments-list");
+      const commentsStatus    = document.getElementById("comments-status");
+      const commentsList      = document.getElementById("comments-list");
 
       setLanguage(state.language || "en");
       resetDetailPanel();
@@ -1000,6 +1134,7 @@
         const formData = new FormData(form);
         const username = formData.get("username");
         const password = formData.get("password");
+        const environment = formData.get("environment") || "test";
 
         if (!username || !password) {
           statusMsg.textContent = t("status.requireCreds");
@@ -1012,7 +1147,7 @@
         try {
           const token = await post(
             "/api/bmc-token",
-            { username, password },
+            { username, password, environment },
             { expect: "text" },
           );
           const trimmed = token.trim();
@@ -1021,11 +1156,14 @@
           }
           state.token = trimmed;
           state.user = username;
+          state.environment = environment;
+          environmentSelect.value = environment;
           userNameEl.textContent = username;
+          currentEnvEl.textContent = `${t("env.current")}: ${formatEnvironmentLabel(environment)}`;
           signOutBtn.disabled = false;
           refreshAppBtn.disabled = false;
-          saveSession(trimmed, username);
-          loginPanel.classList.add("hidden");
+          saveSession(trimmed, username, environment);
+          showAppScreen();
           statusMsg.textContent = t("status.signedInFetching");
           ordersBtn.disabled = false;
           await fetchOrders();
@@ -1048,7 +1186,7 @@
         ordersList.innerHTML = "";
 
         try {
-          const data = await post("/api/orders", { token: state.token });
+          const data = await post("/api/orders", { token: state.token, environment: state.environment });
           const entries = Array.isArray(data?.entries) ? data.entries : [];
           state.orders = entries.map((entry) => entry.values || {});
           const validIds = new Set(state.orders.map((order) => order.ID));
@@ -1224,19 +1362,23 @@
           post("/api/order-services", {
             token: state.token,
             orderId: order.ID,
+            environment: state.environment,
           }),
-          post("/api/order-tasks", { token: state.token, orderId: order.ID }),
+          post("/api/order-tasks", { token: state.token, orderId: order.ID, environment: state.environment }),
           post("/api/order-materials", {
             token: state.token,
             orderId: order.ID,
+            environment: state.environment,
           }),
           post("/api/order-attachments-list", {
             token: state.token,
             orderId: order.ID,
+            environment: state.environment,
           }),
           post("/api/order-comments", {
             token: state.token,
             orderId: order.ID,
+            environment: state.environment,
           }),
         ];
 
@@ -1247,6 +1389,8 @@
           attachmentsRes,
           commentsRes,
         ] = await Promise.allSettled(requests);
+
+        const envLabel = formatEnvironmentLabel(state.environment);
 
         return {
           services:
@@ -1279,7 +1423,7 @@
               : [],
           attachmentsError:
             attachmentsRes.status === "rejected"
-              ? getErrorMessage(attachmentsRes.reason)
+              ? `Attachments (${envLabel}): ${getErrorMessage(attachmentsRes.reason)}`
               : null,
           comments:
             commentsRes.status === "fulfilled"
@@ -1287,7 +1431,7 @@
               : [],
           commentsError:
             commentsRes.status === "rejected"
-              ? getErrorMessage(commentsRes.reason)
+              ? `Comments (${envLabel}): ${getErrorMessage(commentsRes.reason)}`
               : null,
         };
       }
@@ -1351,7 +1495,7 @@
           return;
         }
         if (state.ordersUpdatedAt) {
-          const time = new Date(state.ordersUpdatedAt).toLocaleTimeString();
+          const time = new Date(state.ordersUpdatedAt).toLocaleTimeString(getLangLocale());
           ordersStatus.textContent = `${t("orders.updatedPrefix")} · ${time}`;
         } else {
           ordersStatus.textContent = t("orders.loading");
@@ -1579,17 +1723,21 @@
             const requestId =
               attachment["Request ID"] ||
               attachment.RequestID ||
-              attachment.Request_Id;
+              attachment.Request_Id ||
+              attachment["Entry ID"] ||
+              attachment.EntryID ||
+              attachment.ID ||
+              attachment.id;
             const created = formatDate(attachment["Create Date"]);
             const fileName = getAttachmentName(attachment.Attachment_File);
             const disabled = requestId ? "" : "disabled";
             return `
           <div class="detail-item">
             <div>
-              <strong>${fileName}</strong>
-              <p>${created}</p>
+              <strong>${escapeHtml(fileName)}</strong>
+              <p>${escapeHtml(created)}</p>
             </div>
-            <button type="button" class="download-btn" data-attachment-id="${requestId || ""}" data-file-name="${fileName}" ${disabled}>
+            <button type="button" class="download-btn" data-attachment-id="${requestId || ""}" data-file-name="${escapeHtml(fileName)}" ${disabled}>
               ${requestId ? t("attachments.download") : t("attachments.unavailable")}
             </button>
           </div>
@@ -1628,6 +1776,10 @@
                 "Comment",
                 "Comments",
                 "OrderComment",
+                "Order_Comment",
+                "Detailed Description",
+                "Detailed_Description",
+                "Notes",
                 "Description",
               ],
               t("comments.noText"),
@@ -1639,7 +1791,9 @@
                 "AuthorName",
                 "FullName",
                 "Created By",
+                "Created_By",
                 "Last Modified By",
+                "Last_Modified_By",
               ],
               t("comments.unknownUser"),
             );
@@ -1654,10 +1808,10 @@
             return `
           <div class="detail-item" style="flex-direction: column;">
             <div style="display:flex; justify-content:space-between; gap:0.5rem;">
-              <strong>${author}</strong>
-              <span style="font-size:0.75rem; color:var(--muted);">${timestamp}</span>
+              <strong>${escapeHtml(author)}</strong>
+              <span style="font-size:0.75rem; color:var(--muted);">${escapeHtml(timestamp)}</span>
             </div>
-            <p>${textValue}</p>
+            <p>${escapeHtml(textValue)}</p>
           </div>
         `;
           })
@@ -1702,13 +1856,18 @@
         return currency ? `${value} ${currency}` : `${value}`;
       }
 
+      function getLangLocale() {
+        const map = { en: "en-US", sv: "sv-SE", es: "es-ES" };
+        return map[state.language] || state.language;
+      }
+
       function formatDate(value) {
         if (!value) return "—";
         const date = new Date(value);
         if (Number.isNaN(date.getTime())) {
           return value;
         }
-        return date.toLocaleString();
+        return date.toLocaleString(getLangLocale());
       }
 
       function formatCount(key, count) {
@@ -1718,13 +1877,33 @@
       function getAttachmentName(field) {
         if (!field) return "Attachment";
         if (typeof field === "string") return field;
-        return field.name || field.fileName || "Attachment";
+        return field.name || field.fileName || field.filename || field.originalName || "Attachment";
       }
 
       function getErrorMessage(error) {
         if (!error) return t("status.error");
         if (typeof error === "string") return error;
         return error.message || t("status.error");
+      }
+
+      function pickField(source, keys = [], fallback = "") {
+        if (!source || typeof source !== "object") return fallback;
+        for (const key of keys) {
+          const value = source[key];
+          if (value !== undefined && value !== null && `${value}`.trim() !== "") {
+            return value;
+          }
+        }
+        return fallback;
+      }
+
+      function escapeHtml(value) {
+        return String(value ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#39;");
       }
 
       function loadLanguage() {
@@ -1770,8 +1949,10 @@
         translateStaticText();
         if (!state.user) {
           userNameEl.textContent = t("user.notSigned");
+          currentEnvEl.textContent = "";
         } else {
           userNameEl.textContent = state.user;
+          currentEnvEl.textContent = `${t("env.current")}: ${formatEnvironmentLabel(state.environment)}`;
         }
         updateOrdersStatus();
         renderOrders();
@@ -1786,6 +1967,11 @@
         }
       }
 
+      function formatEnvironmentLabel(value) {
+        if (value === "production") return t("env.productionShort", "Production");
+        return t("env.testShort", "Test");
+      }
+
       function t(key, fallback = "") {
         const lang = state.language || "en";
         return (
@@ -1793,11 +1979,11 @@
         );
       }
 
-      function saveSession(token, username) {
+      function saveSession(token, username, environment) {
         try {
           localStorage.setItem(
             SESSION_KEY,
-            JSON.stringify({ token, username, savedAt: Date.now() }),
+            JSON.stringify({ token, username, environment, savedAt: Date.now() }),
           );
         } catch (error) {
           console.warn("Unable to persist session", error);
@@ -1829,10 +2015,13 @@
         }
         state.token = "";
         state.user = "";
+        state.environment = "test";
+        environmentSelect.value = "test";
         state.selectedOrderId = null;
         state.details = {};
         state.loadingDetails = {};
         userNameEl.textContent = t("user.notSigned");
+        currentEnvEl.textContent = "";
         ordersStatus.textContent = t("orders.signInPrompt");
         signOutBtn.disabled = true;
         refreshAppBtn.disabled = true;
@@ -1840,8 +2029,7 @@
 
       function handleSessionExpired() {
         clearSession();
-        loginPanel.classList.remove("hidden");
-        statusMsg.textContent = t("status.sessionExpired");
+        showLoginScreen(t("status.sessionExpired"));
       }
 
       async function restoreSession() {
@@ -1849,10 +2037,13 @@
         if (!stored) return;
         state.token = stored.token;
         state.user = stored.username;
+        state.environment = stored.environment || "test";
+        environmentSelect.value = state.environment;
         userNameEl.textContent = stored.username;
+        currentEnvEl.textContent = `${t("env.current")}: ${formatEnvironmentLabel(state.environment)}`;
         signOutBtn.disabled = false;
         refreshAppBtn.disabled = false;
-        loginPanel.classList.add("hidden");
+        showAppScreen();
         statusMsg.textContent = t("status.restoringSession");
         try {
           await fetchOrders();
@@ -1878,7 +2069,7 @@
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ token: state.token, attachmentId }),
+              body: JSON.stringify({ token: state.token, attachmentId, environment: state.environment }),
             },
           );
           if (!response.ok) {
@@ -1905,6 +2096,23 @@
         }
       }
 
+      function formatApiErrorPayload(payload, fallback) {
+        const list = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.errors)
+            ? payload.errors
+            : payload
+              ? [payload]
+              : [];
+
+        const first = list.find((item) => item && (item.messageText || item.message || item.error));
+        if (!first) return fallback;
+
+        const text = first.messageText || first.message || first.error || fallback;
+        const number = first.messageNumber ?? first.code;
+        return number != null ? `${text} (code ${number})` : text;
+      }
+
       async function post(path, payload, { expect = "json" } = {}) {
         const response = await fetch(`${API_BASE}${path}`, {
           method: "POST",
@@ -1913,14 +2121,28 @@
         });
         if (!response.ok) {
           const text = await response.text();
+          let parsed = null;
+          try {
+            parsed = JSON.parse(text);
+          } catch (_error) {
+            parsed = null;
+          }
+
+          const formatted = formatApiErrorPayload(
+            parsed,
+            text || `Request failed (${response.status})`,
+          );
+
           if (
             response.status === 401 ||
-            text.includes("Message number = 623")
+            formatted.includes("Message number = 623") ||
+            formatted.includes("code 623")
           ) {
             handleSessionExpired();
             throw new Error(t("status.sessionExpired"));
           }
-          throw new Error(text || `Request failed (${response.status})`);
+
+          throw new Error(formatted || `Request failed (${response.status})`);
         }
         if (expect === "text") {
           return response.text();
@@ -1972,6 +2194,7 @@
 
       function translateInitialUI() {
         translateStaticText();
+        environmentSelect.value = state.environment || "test";
         if (!state.user) {
           userNameEl.textContent = t("user.notSigned");
         }
