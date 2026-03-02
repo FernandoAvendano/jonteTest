@@ -8,17 +8,58 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const app = express();
 const PORT = process.env.PORT || 4173;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const BMC_BASE = 'https://saas02.tandis.app:8443/api';
+const ENVIRONMENT_BASES = {
+  production: 'https://tandis.app:8443/api',
+  test: 'https://saas02.tandis.app:8443/api'
+};
+
+function resolveBase(environment = 'test') {
+  return ENVIRONMENT_BASES[environment] || ENVIRONMENT_BASES.test;
+}
+
+
+const REST_DEBUG = process.env.MTANDIS_REST_DEBUG !== '0';
+
+function logRest(event, details = {}) {
+  if (!REST_DEBUG) return;
+  const payload = Object.entries(details)
+    .map(([k, v]) => `${k}=${typeof v === 'string' ? v : JSON.stringify(v)}`)
+    .join(' ');
+  console.log(`[REST] ${event}${payload ? ' ' + payload : ''}`);
+}
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-async function proxyFetch(res, url, options = {}) {
+async function proxyFetch(res, url, options = {}, meta = {}) {
+  const start = Date.now();
+  const method = options.method || 'GET';
+  logRest('REQ', { route: meta.route || '-', environment: meta.environment || '-', method, url });
+
   try {
     const response = await fetch(url, options);
     const contentType = response.headers.get('content-type') || '';
     const body = await (contentType.includes('application/json') ? response.json() : response.text());
+
+    let messageNumber = null;
+    if (Array.isArray(body) && body[0]?.messageNumber != null) {
+      messageNumber = body[0].messageNumber;
+    } else if (Array.isArray(body?.errors) && body.errors[0]?.messageNumber != null) {
+      messageNumber = body.errors[0].messageNumber;
+    } else if (body?.messageNumber != null) {
+      messageNumber = body.messageNumber;
+    }
+
+    logRest('RES', {
+      route: meta.route || '-',
+      environment: meta.environment || '-',
+      status: response.status,
+      durationMs: Date.now() - start,
+      messageNumber,
+      bodyType: typeof body,
+    });
+
     res.status(response.status);
     if (typeof body === 'string') {
       res.send(body);
@@ -26,10 +67,17 @@ async function proxyFetch(res, url, options = {}) {
       res.json(body);
     }
   } catch (error) {
+    logRest('ERR', {
+      route: meta.route || '-',
+      environment: meta.environment || '-',
+      durationMs: Date.now() - start,
+      error: error?.message || String(error),
+    });
     console.error('Proxy error:', error);
     res.status(500).json({ error: 'Failed to reach Tandis API.' });
   }
 }
+
 
 function encodeFields(fields) {
   return encodeURIComponent(`values(${fields.join(',')})`);
@@ -40,7 +88,7 @@ function encodeQuery(query) {
 }
 
 app.post('/api/bmc-token', async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, environment } = req.body;
   if (!username || !password) {
     return res.status(400).json({ error: 'Missing username or password' });
   }
@@ -49,7 +97,9 @@ app.post('/api/bmc-token', async (req, res) => {
   params.append('username', username);
   params.append('password', password);
 
-  await proxyFetch(res, `${BMC_BASE}/jwt/login`, {
+  const base = resolveBase(environment);
+
+  await proxyFetch(res, `${base}/jwt/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: params
@@ -57,7 +107,7 @@ app.post('/api/bmc-token', async (req, res) => {
 });
 
 app.post('/api/orders', async (req, res) => {
-  const { token, limit = 10 } = req.body;
+  const { token, limit = 10, environment } = req.body;
   if (!token) {
     return res.status(400).json({ error: 'Missing AR-JWT token' });
   }
@@ -83,15 +133,16 @@ app.post('/api/orders', async (req, res) => {
     'PriceInSek',
     'OrderPrice'
   ]);
-  const url = `${BMC_BASE}/arsys/v1/entry/BTS:SOT:Order?fields=${fields}&limit=${limit}`;
+  const base = resolveBase(environment);
+  const url = `${base}/arsys/v1/entry/BTS:SOT:Order?fields=${fields}&limit=${limit}`;
 
   await proxyFetch(res, url, {
     headers: { Authorization: `AR-JWT ${token}`, Accept: 'application/json' }
-  });
+  }, { route: '/api/orders', environment });
 });
 
 app.post('/api/order-services', async (req, res) => {
-  const { token, orderId } = req.body;
+  const { token, orderId, environment } = req.body;
   if (!token || !orderId) {
     return res.status(400).json({ error: 'Missing token or orderId' });
   }
@@ -107,15 +158,16 @@ app.post('/api/order-services', async (req, res) => {
     'Currency'
   ]);
   const query = encodeQuery(`'IDOrder'="${orderId}"`);
-  const url = `${BMC_BASE}/arsys/v1/entry/BTS:SOT:Order:Service?fields=${fields}&q=${query}`;
+  const base = resolveBase(environment);
+  const url = `${base}/arsys/v1/entry/BTS:SOT:Order:Service?fields=${fields}&q=${query}`;
 
   await proxyFetch(res, url, {
     headers: { Authorization: `AR-JWT ${token}`, Accept: 'application/json' }
-  });
+  }, { route: '/api/order-services', environment });
 });
 
 app.post('/api/order-tasks', async (req, res) => {
-  const { token, orderId } = req.body;
+  const { token, orderId, environment } = req.body;
   if (!token || !orderId) {
     return res.status(400).json({ error: 'Missing token or orderId' });
   }
@@ -129,15 +181,16 @@ app.post('/api/order-tasks', async (req, res) => {
     'AssigneeFullName'
   ]);
   const query = encodeQuery(`'IDOrder'="${orderId}"`);
-  const url = `${BMC_BASE}/arsys/v1/entry/BTS:SOT:Order:ServiceTask?fields=${fields}&q=${query}`;
+  const base = resolveBase(environment);
+  const url = `${base}/arsys/v1/entry/BTS:SOT:Order:ServiceTask?fields=${fields}&q=${query}`;
 
   await proxyFetch(res, url, {
     headers: { Authorization: `AR-JWT ${token}`, Accept: 'application/json' }
-  });
+  }, { route: '/api/order-tasks', environment });
 });
 
 app.post('/api/order-materials', async (req, res) => {
-  const { token, orderId } = req.body;
+  const { token, orderId, environment } = req.body;
   if (!token || !orderId) {
     return res.status(400).json({ error: 'Missing token or orderId' });
   }
@@ -155,35 +208,41 @@ app.post('/api/order-materials', async (req, res) => {
     'PriceInSek'
   ]);
   const query = encodeQuery(`'IDOrder'="${orderId}"`);
-  const url = `${BMC_BASE}/arsys/v1/entry/BTS:SOT:Order:Material?limit=100&fields=${fields}&q=${query}`;
+  const base = resolveBase(environment);
+  const url = `${base}/arsys/v1/entry/BTS:SOT:Order:Material?limit=100&fields=${fields}&q=${query}`;
 
   await proxyFetch(res, url, {
     headers: { Authorization: `AR-JWT ${token}`, Accept: 'application/json' }
-  });
+  }, { route: '/api/order-materials', environment });
 });
 
 app.post('/api/order-attachments-list', async (req, res) => {
-  const { token, orderId } = req.body;
+  const { token, orderId, environment } = req.body;
   if (!token || !orderId) {
     return res.status(400).json({ error: 'Missing token or orderId' });
   }
 
   const fields = encodeFields(['Attachment_File', 'Request ID', 'Create Date']);
   const query = encodeQuery(`'IDOrder'="${orderId}"`);
-  const url = `${BMC_BASE}/arsys/v1/entry/BTS:SOT:Order:Attachments?limit=100&q=${query}&fields=${fields}`;
+  const base = resolveBase(environment);
+  const url = `${base}/arsys/v1/entry/BTS:SOT:Order:Attachments?limit=100&q=${query}&fields=${fields}`;
 
   await proxyFetch(res, url, {
     headers: { Authorization: `AR-JWT ${token}`, Accept: 'application/json' }
-  });
+  }, { route: '/api/order-attachments-list', environment });
 });
 
 app.post('/api/order-attachment-file', async (req, res) => {
-  const { token, attachmentId } = req.body;
+  const { token, attachmentId, environment } = req.body;
   if (!token || !attachmentId) {
     return res.status(400).json({ error: 'Missing token or attachmentId' });
   }
 
-  const url = `${BMC_BASE}/arsys/v1/entry/BTS:SOT:Order:Attachments/${attachmentId}/attach/Attachment_File`;
+  const base = resolveBase(environment);
+  const url = `${base}/arsys/v1/entry/BTS:SOT:Order:Attachments/${attachmentId}/attach/Attachment_File`;
+
+  const start = Date.now();
+  logRest('REQ', { route: '/api/order-attachment-file', environment, method: 'GET', url });
 
   try {
     const response = await fetch(url, {
@@ -192,6 +251,7 @@ app.post('/api/order-attachment-file', async (req, res) => {
 
     if (!response.ok) {
       const text = await response.text();
+      logRest('RES', { route: '/api/order-attachment-file', environment, status: response.status, durationMs: Date.now() - start, bodyType: 'string', sample: text.slice(0, 180) });
       return res.status(response.status).send(text);
     }
 
@@ -202,28 +262,35 @@ app.post('/api/order-attachment-file', async (req, res) => {
         res.setHeader(header, value);
       }
     });
+    logRest('RES', { route: '/api/order-attachment-file', environment, status: 200, durationMs: Date.now() - start, bodyType: 'binary', bytes: buffer.length });
     res.status(200).send(buffer);
   } catch (error) {
+    logRest('ERR', { route: '/api/order-attachment-file', environment, durationMs: Date.now() - start, error: error?.message || String(error) });
     console.error('Attachment download error:', error);
     res.status(500).json({ error: 'Failed to download attachment.' });
   }
 });
 
 app.post('/api/order-comments', async (req, res) => {
-  const { token, orderId } = req.body;
+  const { token, orderId, environment } = req.body;
   if (!token || !orderId) {
     return res.status(400).json({ error: 'Missing token or orderId' });
   }
 
   const query = encodeQuery(`'IDOrder'="${orderId}"`);
-  const url = `${BMC_BASE}/arsys/v1/entry/BTS:SOT:OrderComment?limit=100&q=${query}`;
+  const base = resolveBase(environment);
+  const url = `${base}/arsys/v1/entry/BTS:SOT:OrderComment?limit=100&q=${query}`;
 
   await proxyFetch(res, url, {
     headers: { Authorization: `AR-JWT ${token}`, Accept: 'application/json' }
-  });
+  }, { route: '/api/order-comments', environment });
 });
 
 app.use(express.static(__dirname));
+
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

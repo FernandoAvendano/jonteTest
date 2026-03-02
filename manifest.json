@@ -4,8 +4,8 @@
   "description": "A polished hello world splash that feels native on mobile.",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#0f2027",
-  "theme_color": "#0f2027",
+  "background_color": "#1a4a5c",
+  "theme_color": "#1a4a5c",
   "icons": [
     {
       "src": "icons/icon-192.png",

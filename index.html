@@ -3,13 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#0f2027" />
+    <meta name="theme-color" content="#1a4a5c" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta
       name="apple-mobile-web-app-status-bar-style"
       content="black-translucent"
     />
     <title>Tandis AI</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="icon" sizes="192x192" href="icons/icon-192.png" />
     <link rel="apple-touch-icon" href="icons/icon-192.png" />
     <link rel="manifest" href="manifest.json" />
@@ -22,15 +23,15 @@
     <style>
       :root {
         color-scheme: light dark;
-        --bg: radial-gradient(circle at top, #192734, #0f2027 55%);
-        --panel: rgba(13, 25, 34, 0.65);
-        --panel-border: rgba(255, 255, 255, 0.08);
-        --text: #f8fbff;
-        --muted: rgba(248, 251, 255, 0.72);
-        --accent: #7ef9c2;
-        --shadow: rgba(0, 0, 0, 0.25);
-        --input-bg: rgba(255, 255, 255, 0.08);
-        --input-border: rgba(255, 255, 255, 0.15);
+        --bg: radial-gradient(circle at top, #1a4a5c, #0a1e2a 55%);
+        --panel: rgba(10, 31, 42, 0.65);
+        --panel-border: rgba(74, 180, 210, 0.12);
+        --text: #f0f8fc;
+        --muted: rgba(210, 240, 248, 0.72);
+        --accent: #4dd9c0;
+        --shadow: rgba(0, 0, 0, 0.3);
+        --input-bg: rgba(74, 180, 210, 0.07);
+        --input-border: rgba(74, 180, 210, 0.2);
       }
 
       * {
@@ -88,7 +89,7 @@
         display: flex;
         align-items: stretch;
         justify-content: center;
-        padding: clamp(1rem, 3vw, 2.5rem);
+        padding: clamp(0.75rem, 2vw, 1.25rem) clamp(1rem, 3vw, 2.5rem) clamp(1rem, 3vw, 2.5rem);
         min-height: 100vh;
       }
 
@@ -98,6 +99,7 @@
         display: flex;
         flex-direction: column;
         gap: 1.25rem;
+        padding-top: 0.75rem;
       }
 
       /* ── Shared components ────────────────────────────────── */
@@ -226,13 +228,13 @@
         font-size: 1rem;
         font-weight: 600;
         font-family: inherit;
-        color: #041018;
+        color: #041a22;
         background: var(--accent);
         cursor: pointer;
         transition:
           transform 0.2s ease,
           box-shadow 0.2s ease;
-        box-shadow: 0 18px 35px rgba(126, 249, 194, 0.35);
+        box-shadow: 0 18px 35px rgba(77, 217, 192, 0.35);
       }
 
       button.primary:disabled {
@@ -255,6 +257,7 @@
         display: flex;
         flex-direction: column;
         gap: 1.25rem;
+        margin-top: 0.5rem;
       }
 
       @media (min-width: 1024px) {
@@ -318,6 +321,73 @@
         .order-detail {
           display: none !important;
         }
+      }
+
+      /* ── Mobile detail screen ─────────────────────────────── */
+      #mobile-detail-screen {
+        position: fixed;
+        inset: 0;
+        z-index: 150;
+        overflow-y: auto;
+        background-image: var(--bg);
+        background-attachment: fixed;
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+        padding: clamp(1rem, 3vw, 2.5rem);
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        pointer-events: none;
+      }
+
+      #mobile-detail-screen.is-open {
+        transform: translateX(0);
+        pointer-events: auto;
+      }
+
+      @media (min-width: 1024px) {
+        #mobile-detail-screen {
+          display: none !important;
+        }
+      }
+
+      .mobile-detail-header {
+        display: grid;
+        grid-template-columns: auto 1fr 1fr auto;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .mobile-detail-header #mobile-detail-title {
+        margin: 0;
+        font-size: 1rem;
+      }
+
+      .mobile-detail-header .detail-department {
+        text-align: center;
+      }
+
+      .mobile-detail-header .order-status-pill {
+        justify-self: end;
+      }
+
+      #mobile-back-btn {
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: transparent;
+        color: var(--text);
+        border-radius: 999px;
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        font: inherit;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+      }
+
+      #mobile-detail-body {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding-bottom: 2rem;
       }
 
       @media (max-width: 640px) {
@@ -527,6 +597,164 @@
       .hidden {
         display: none !important;
       }
+
+      /* ── App header (compact, sticky) ──────────────────────── */
+      .app-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.55rem 1.1rem;
+      }
+
+      .app-header-title {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        min-width: 0;
+        overflow: hidden;
+      }
+
+      .app-header-title h1 {
+        font-size: clamp(0.95rem, 3vw, 1.2rem);
+        letter-spacing: -0.01em;
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .app-header-title .eyebrow {
+        margin: 0;
+        flex-shrink: 0;
+      }
+
+      .user-menu-wrap {
+        position: relative;
+        flex-shrink: 0;
+      }
+
+      .user-avatar-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 999px;
+        padding: 0.3rem 0.8rem 0.3rem 0.35rem;
+        color: var(--text);
+        font: inherit;
+        font-size: 0.88rem;
+        cursor: pointer;
+        transition: background 0.15s;
+        max-width: 220px;
+      }
+
+      .user-avatar-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .user-avatar-btn #user-name {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .avatar-circle {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: var(--accent);
+        color: #041018;
+        font-weight: 700;
+        font-size: 0.72rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        letter-spacing: 0.02em;
+      }
+
+      .user-dropdown {
+        position: absolute;
+        top: calc(100% + 0.5rem);
+        right: 0;
+        min-width: 210px;
+        background: rgba(13, 25, 36, 0.96);
+        border: 1px solid var(--panel-border);
+        border-radius: 16px;
+        padding: 0.85rem;
+        backdrop-filter: blur(24px) saturate(150%);
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+        z-index: 200;
+      }
+
+      .dropdown-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--muted);
+      }
+
+      .user-dropdown .select-pill {
+        width: 100%;
+        border-radius: 10px;
+        padding-right: 0.9rem;
+      }
+
+      .user-dropdown button {
+        width: 100%;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: transparent;
+        color: var(--text);
+        border-radius: 999px;
+        padding: 0.42rem 0.9rem;
+        font: inherit;
+        font-size: 0.85rem;
+        cursor: pointer;
+      }
+
+      .user-dropdown button:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      .user-dropdown .env-chip {
+        margin: 0;
+      }
+
+      /* ── Department in detail header ──────────────────────── */
+      .detail-department {
+        font-size: 0.95rem;
+        color: var(--muted);
+        margin: 0;
+        min-width: 0;
+        word-break: break-word;
+        overflow-wrap: break-word;
+      }
+
+      /* ── Detail header: title left | dept center | status right ── */
+      .detail-header {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .detail-header .detail-department {
+        text-align: center;
+      }
+
+      .detail-header .order-status-pill {
+        justify-self: end;
+      }
     </style>
   </head>
   <body>
@@ -603,71 +831,28 @@
     <div id="app-screen" class="hidden">
       <main>
 
-        <!-- Header bar -->
-        <section class="panel shell">
-          <div>
+        <!-- Header bar (compact) -->
+        <section class="panel app-header">
+          <div class="app-header-title">
             <span class="eyebrow" data-i18n="app.badge">Tandis AI</span>
             <h1 data-i18n="app.title">Tandis - Orderhantering</h1>
-            <p data-i18n="app.subtitle">
-              Track orders, services, tasks, attachments, and comments.
-            </p>
           </div>
-          <div class="user-pill" style="gap: 0.75rem; flex-wrap: wrap">
-            <div style="min-width: 160px">
-              <p
-                class="label"
-                style="
-                  font-size: 0.75rem;
-                  text-transform: uppercase;
-                  letter-spacing: 0.1em;
-                "
-                data-i18n="user.signedIn"
-              >
-                Signed in as
-              </p>
-              <strong
-                id="user-name"
-                data-i18n-dynamic="true"
-                data-i18n="user.notSigned"
-                >Not signed in</strong
-              >
-              <p
-                id="current-env"
-                class="label env-chip"
-                data-i18n-dynamic="true"
-                style="margin-top: 0.35rem; font-size: 0.75rem"
-              ></p>
-            </div>
-            <div
-              style="
-                display: flex;
-                gap: 0.5rem;
-                flex-wrap: wrap;
-                align-items: center;
-              "
-            >
+          <div class="user-menu-wrap">
+            <button class="user-avatar-btn" id="user-avatar-btn" type="button" aria-haspopup="true" aria-expanded="false">
+              <span class="avatar-circle" id="avatar-initials">?</span>
+              <span id="user-name" data-i18n-dynamic="true" data-i18n="user.notSigned">Not signed in</span>
+            </button>
+            <div class="user-dropdown hidden" id="user-dropdown">
+              <p id="current-env" class="env-chip" data-i18n-dynamic="true" style="font-size:0.75rem; margin:0;"></p>
+              <span class="dropdown-label" data-i18n="lang.label">Language</span>
               <label for="language-select" class="sr-only" data-i18n="lang.label">Language</label>
               <select id="language-select" class="select-pill" aria-label="Language">
                 <option value="en">English</option>
                 <option value="sv">Svenska</option>
                 <option value="es">Español</option>
               </select>
-              <button
-                type="button"
-                id="refresh-app-btn"
-                disabled
-                data-i18n="action.refreshApp"
-              >
-                Refresh app
-              </button>
-              <button
-                type="button"
-                id="sign-out-btn"
-                disabled
-                data-i18n="action.signOut"
-              >
-                Sign out
-              </button>
+              <button type="button" id="refresh-app-btn" disabled data-i18n="action.refreshApp">Refresh app</button>
+              <button type="button" id="sign-out-btn" disabled data-i18n="action.signOut">Sign out</button>
             </div>
           </div>
         </section>
@@ -700,7 +885,7 @@
           </section>
 
           <section class="panel" id="detail-panel">
-            <div class="orders-header">
+            <div class="orders-header detail-header">
               <div>
                 <span class="eyebrow" data-i18n="detail.badge">Order detail</span>
                 <h2
@@ -719,6 +904,8 @@
                   comments.
                 </p>
               </div>
+              <p id="detail-department" class="detail-department hidden"></p>
+              <span id="detail-order-status" class="order-status-pill hidden"></span>
             </div>
             <div class="detail-grid">
               <article class="detail-card">
@@ -768,6 +955,17 @@
         </div>
 
       </main>
+
+      <!-- Mobile full-screen detail view (shown on narrow screens) -->
+      <div id="mobile-detail-screen" aria-hidden="true">
+        <section class="panel mobile-detail-header">
+          <button type="button" id="mobile-back-btn">&#8592; <span data-i18n="orders.title">Orders</span></button>
+          <h2 id="mobile-detail-title" data-i18n-dynamic="true"></h2>
+          <p id="mobile-detail-department" class="detail-department hidden"></p>
+          <span id="mobile-order-status" class="order-status-pill hidden"></span>
+        </section>
+        <div id="mobile-detail-body"></div>
+      </div>
     </div>
 
     <script>
@@ -869,7 +1067,7 @@
         },
         sv: {
           "app.badge": "Tandis AI",
-          "app.title": "Kontrollcenter",
+          "app.title": "Order Management",
           "app.subtitle":
             "Följ order, tjänster, uppgifter, bilagor och kommentarer.",
           "user.signedIn": "Inloggad som",
@@ -894,7 +1092,7 @@
           "env.testShort": "Test",
           "env.productionShort": "Produktion",
           "orders.badge": "Senaste 10 order",
-          "orders.title": "Order",
+          "orders.title": "Lista",
           "orders.signInPrompt": "Logga in för att ladda order.",
           "orders.loading": "Laddar order…",
           "orders.refreshing": "Uppdaterar order…",
@@ -1081,9 +1279,21 @@
       const signOutBtn     = document.getElementById("sign-out-btn");
       const refreshAppBtn  = document.getElementById("refresh-app-btn");
       const languageSelect = document.getElementById("language-select");
+      const userAvatarBtn  = document.getElementById("user-avatar-btn");
+      const userDropdown   = document.getElementById("user-dropdown");
+      const avatarInitials = document.getElementById("avatar-initials");
 
-      const detailTitle    = document.getElementById("detail-title");
-      const detailSubtitle = document.getElementById("detail-subtitle");
+      const mobileDetailScreen     = document.getElementById("mobile-detail-screen");
+      const mobileDetailTitle      = document.getElementById("mobile-detail-title");
+      const mobileDetailBody       = document.getElementById("mobile-detail-body");
+      const mobileBackBtn          = document.getElementById("mobile-back-btn");
+      const mobileDetailDepartment = document.getElementById("mobile-detail-department");
+
+      const detailTitle       = document.getElementById("detail-title");
+      const detailSubtitle    = document.getElementById("detail-subtitle");
+      const detailDepartment  = document.getElementById("detail-department");
+      const detailOrderStatus = document.getElementById("detail-order-status");
+      const mobileOrderStatus = document.getElementById("mobile-order-status");
       const summaryStatus  = document.getElementById("summary-status");
       const summaryList    = document.getElementById("summary-list");
       const servicesStatus = document.getElementById("services-status");
@@ -1096,6 +1306,8 @@
       const attachmentsList   = document.getElementById("attachments-list");
       const commentsStatus    = document.getElementById("comments-status");
       const commentsList      = document.getElementById("comments-list");
+
+      mobileBackBtn.addEventListener("click", hideMobileDetail);
 
       setLanguage(state.language || "en");
       resetDetailPanel();
@@ -1120,6 +1332,23 @@
           selectOrder(order);
         }
       });
+      // Avatar dropdown toggle
+      userAvatarBtn.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const isOpen = !userDropdown.classList.contains("hidden");
+        userDropdown.classList.toggle("hidden", isOpen);
+        userAvatarBtn.setAttribute("aria-expanded", String(!isOpen));
+      });
+
+      document.addEventListener("click", (event) => {
+        if (!userDropdown.classList.contains("hidden") &&
+            !userAvatarBtn.contains(event.target) &&
+            !userDropdown.contains(event.target)) {
+          userDropdown.classList.add("hidden");
+          userAvatarBtn.setAttribute("aria-expanded", "false");
+        }
+      });
+
       document.addEventListener("click", (event) => {
         const btn = event.target.closest(".download-btn");
         if (!btn) return;
@@ -1159,6 +1388,7 @@
           state.environment = environment;
           environmentSelect.value = environment;
           userNameEl.textContent = username;
+          updateAvatarInitials(username);
           currentEnvEl.textContent = `${t("env.current")}: ${formatEnvironmentLabel(environment)}`;
           signOutBtn.disabled = false;
           refreshAppBtn.disabled = false;
@@ -1179,6 +1409,7 @@
 
       async function fetchOrders(manual = false) {
         if (!state.token) return;
+        hideMobileDetail();
         ordersBtn.disabled = true;
         ordersStatus.textContent = manual
           ? t("orders.refreshing")
@@ -1206,7 +1437,7 @@
             updateOrdersStatus();
             const current = state.selectedOrderId
               ? state.orders.find((order) => order.ID === state.selectedOrderId)
-              : state.orders[0];
+              : null;
             if (current) {
               await selectOrder(current, { preserveScroll: true });
             }
@@ -1248,19 +1479,7 @@
           const detail = document.createElement("div");
           detail.className = "order-detail";
           detail.dataset.orderId = order.ID;
-          if (state.selectedOrderId === order.ID) {
-            detail.classList.add("is-open");
-            if (state.loadingDetails[order.ID]) {
-              detail.innerHTML = `<p class="empty-state">${t("orders.loadingDetails")}</p>`;
-            } else if (state.details[order.ID]) {
-              detail.innerHTML = "";
-              detail.appendChild(
-                buildInlineDetailContent(order, state.details[order.ID]),
-              );
-            } else {
-              detail.innerHTML = `<p class="empty-state">${t("orders.selectForDetails")}</p>`;
-            }
-          }
+          // Inline expansion no longer used — mobile uses #mobile-detail-screen
 
           block.appendChild(button);
           block.appendChild(detail);
@@ -1272,24 +1491,44 @@
         if (!order) return;
         state.selectedOrderId = order.ID;
         renderOrders();
-        renderSummarySection(order);
+
+        const mobile = !isDesktopView();
+
+        if (!mobile) {
+          renderSummarySection(order);
+        }
 
         if (state.details[order.ID] && !options.forceReload) {
-          renderDesktopDetail(order, state.details[order.ID]);
-          if (!options.preserveScroll) {
-            scrollToDetail(order.ID);
+          if (mobile) {
+            showMobileDetail(order, state.details[order.ID]);
+          } else {
+            renderDesktopDetail(order, state.details[order.ID]);
+            if (!options.preserveScroll) {
+              scrollToDetail(order.ID);
+            }
           }
           return;
         }
 
-        setSectionsLoading();
+        if (!mobile) {
+          setSectionsLoading();
+        }
         state.loadingDetails[order.ID] = true;
+
+        if (mobile) {
+          showMobileDetailLoading(order);
+        }
+
         renderOrders();
 
         try {
           const details = await fetchOrderDetails(order);
           state.details[order.ID] = details;
-          renderDesktopDetail(order, details);
+          if (mobile) {
+            showMobileDetail(order, details);
+          } else {
+            renderDesktopDetail(order, details);
+          }
         } catch (error) {
           const message = error?.message || t("status.error");
           state.details[order.ID] = {
@@ -1304,24 +1543,69 @@
             comments: [],
             commentsError: message,
           };
-          setSectionsError(message);
+          if (mobile) {
+            showMobileDetail(order, state.details[order.ID]);
+          } else {
+            setSectionsError(message);
+          }
         } finally {
           state.loadingDetails[order.ID] = false;
           renderOrders();
-          if (!options.preserveScroll) {
+          if (!mobile && !options.preserveScroll) {
             scrollToDetail(order.ID);
           }
         }
+      }
+
+      function showMobileDetail(order, details = {}) {
+        mobileDetailTitle.textContent = `#${order.OrdernumberShort || order.ID}`;
+        const statusName = order.StatusName || "";
+        mobileOrderStatus.textContent = statusName;
+        mobileOrderStatus.classList.toggle("hidden", !statusName);
+        const deptName = order.DepartmentName || "";
+        mobileDetailDepartment.textContent = deptName;
+        mobileDetailDepartment.classList.toggle("hidden", !deptName);
+        mobileDetailBody.innerHTML = "";
+        const fragment = buildInlineDetailContent(order, details);
+        mobileDetailBody.appendChild(fragment);
+        mobileDetailScreen.classList.add("is-open");
+        mobileDetailScreen.setAttribute("aria-hidden", "false");
+        mobileDetailScreen.scrollTop = 0;
+      }
+
+      function showMobileDetailLoading(order) {
+        mobileDetailTitle.textContent = `#${order.OrdernumberShort || order.ID}`;
+        const deptName = order.DepartmentName || "";
+        mobileDetailDepartment.textContent = deptName;
+        mobileDetailDepartment.classList.toggle("hidden", !deptName);
+        mobileDetailBody.innerHTML = `<p class="empty-state">${t("orders.loadingDetails")}</p>`;
+        mobileDetailScreen.classList.add("is-open");
+        mobileDetailScreen.setAttribute("aria-hidden", "false");
+        mobileDetailScreen.scrollTop = 0;
+      }
+
+      function hideMobileDetail() {
+        mobileDetailScreen.classList.remove("is-open");
+        mobileDetailScreen.setAttribute("aria-hidden", "true");
+        mobileOrderStatus.textContent = "";
+        mobileOrderStatus.classList.add("hidden");
+        mobileDetailDepartment.textContent = "";
+        mobileDetailDepartment.classList.add("hidden");
       }
 
       function renderSummarySection(order) {
         detailTitle.textContent = `#${order.OrdernumberShort || order.ID}`;
         const subtitleLab = order.Lab_Name || "—";
         const subtitleClinic = order.ClinicName || "—";
-        const subtitleDept = order.DepartmentName
-          ? ` · ${order.DepartmentName}`
-          : "";
-        detailSubtitle.textContent = `${subtitleClinic} · ${subtitleLab}${subtitleDept}`;
+        detailSubtitle.textContent = `${subtitleClinic} · ${subtitleLab}`;
+
+        const deptName = order.DepartmentName || "";
+        detailDepartment.textContent = deptName;
+        detailDepartment.classList.toggle("hidden", !deptName);
+
+        const statusName = order.StatusName || "";
+        detailOrderStatus.textContent = statusName;
+        detailOrderStatus.classList.toggle("hidden", !statusName);
 
         const summary = buildSummarySection(order);
         summaryStatus.textContent = summary.status;
@@ -1535,11 +1819,6 @@
           { label: t("summary.clinic"), value: order.ClinicName || "—" },
           { label: t("summary.lab"), value: order.Lab_Name || "—" },
           {
-            label: t("summary.department"),
-            value: order.DepartmentName || "—",
-          },
-          { label: t("summary.status"), value: order.StatusName || "—" },
-          {
             label: t("summary.created"),
             value: formatDate(order["Create Date"]),
           },
@@ -1561,16 +1840,23 @@
           },
         ];
 
+        const descriptionLabels = [
+          t("summary.description"),
+        ];
+
         const html = `
       <div class="summary-grid">
         ${items
           .map(
-            (item) => `
-            <div>
+            (item) => {
+              const isDescription = descriptionLabels.includes(item.label);
+              return `
+            <div${isDescription ? ' style="grid-column: 1 / -1;"' : ''}>
               <span>${item.label}</span>
-              <strong style="display:block; margin-top:0.2rem; font-size:0.95rem;">${item.value}</strong>
+              <strong style="display:block; margin-top:0.2rem; font-size:0.95rem;${isDescription ? ' white-space: pre-wrap; word-break: break-word;' : ''}">${item.value}</strong>
             </div>
-          `,
+          `;
+            },
           )
           .join("")}
       </div>
@@ -1967,6 +2253,16 @@
         }
       }
 
+      function updateAvatarInitials(username) {
+        if (!avatarInitials) return;
+        if (!username) { avatarInitials.textContent = "?"; return; }
+        const parts = username.split(/[@.\s_\-]+/).filter(Boolean);
+        const initials = parts.length >= 2
+          ? parts[0][0] + parts[1][0]
+          : (parts[0]?.slice(0, 2) || "?");
+        avatarInitials.textContent = initials.toUpperCase();
+      }
+
       function formatEnvironmentLabel(value) {
         if (value === "production") return t("env.productionShort", "Production");
         return t("env.testShort", "Test");
@@ -2021,6 +2317,7 @@
         state.details = {};
         state.loadingDetails = {};
         userNameEl.textContent = t("user.notSigned");
+        updateAvatarInitials("");
         currentEnvEl.textContent = "";
         ordersStatus.textContent = t("orders.signInPrompt");
         signOutBtn.disabled = true;
@@ -2040,6 +2337,7 @@
         state.environment = stored.environment || "test";
         environmentSelect.value = state.environment;
         userNameEl.textContent = stored.username;
+        updateAvatarInitials(stored.username);
         currentEnvEl.textContent = `${t("env.current")}: ${formatEnvironmentLabel(state.environment)}`;
         signOutBtn.disabled = false;
         refreshAppBtn.disabled = false;
@@ -2177,6 +2475,10 @@
       function resetDetailPanel(message = t("detail.selectPrompt")) {
         detailTitle.textContent = t("detail.title");
         detailSubtitle.textContent = message;
+        detailOrderStatus.textContent = "";
+        detailOrderStatus.classList.add("hidden");
+        detailDepartment.textContent = "";
+        detailDepartment.classList.add("hidden");
         summaryStatus.textContent = t("detail.badge");
         summaryList.innerHTML = "";
         const sections = [
