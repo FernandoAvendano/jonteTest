@@ -303,23 +303,9 @@
         gap: 0.5rem;
       }
 
-      .order-detail {
-        display: none;
-      }
-
-      .order-detail.is-open {
-        display: block;
-      }
-
       @media (max-width: 1023px) {
         #detail-panel {
           display: none;
-        }
-      }
-
-      @media (min-width: 1024px) {
-        .order-detail {
-          display: none !important;
         }
       }
 
@@ -454,6 +440,38 @@
         text-transform: uppercase;
         background: rgba(126, 249, 194, 0.18);
         border: 1px solid rgba(126, 249, 194, 0.4);
+      }
+
+      /* ── Status pill colour variants ──────────────────────── */
+      .status--green {
+        background: rgba(77, 217, 141, 0.2);
+        border-color: rgba(77, 217, 141, 0.55);
+        color: #7fffc0;
+      }
+      .status--amber {
+        background: rgba(255, 185, 60, 0.18);
+        border-color: rgba(255, 185, 60, 0.5);
+        color: #ffd07a;
+      }
+      .status--red {
+        background: rgba(255, 80, 80, 0.18);
+        border-color: rgba(255, 80, 80, 0.5);
+        color: #ff9898;
+      }
+      .status--blue {
+        background: rgba(77, 175, 255, 0.18);
+        border-color: rgba(77, 175, 255, 0.5);
+        color: #93d5ff;
+      }
+      .status--purple {
+        background: rgba(180, 120, 255, 0.18);
+        border-color: rgba(180, 120, 255, 0.5);
+        color: #d5b0ff;
+      }
+      .status--gray {
+        background: rgba(200, 200, 200, 0.12);
+        border-color: rgba(200, 200, 200, 0.3);
+        color: rgba(210, 240, 248, 0.6);
       }
 
       #detail-panel {
@@ -730,6 +748,29 @@
         margin: 0;
       }
 
+      /* ── Role badge in avatar dropdown ────────────────────── */
+      .role-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.22rem 0.8rem;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .role-badge--dentist {
+        background: rgba(77, 175, 255, 0.18);
+        border: 1px solid rgba(77, 175, 255, 0.5);
+        color: #93d5ff;
+      }
+      .role-badge--technician {
+        background: rgba(77, 217, 192, 0.18);
+        border: 1px solid rgba(77, 217, 192, 0.5);
+        color: #7de8d0;
+      }
+
       /* ── Department in detail header ──────────────────────── */
       .detail-department {
         font-size: 0.95rem;
@@ -844,6 +885,7 @@
             </button>
             <div class="user-dropdown hidden" id="user-dropdown">
               <p id="current-env" class="env-chip" data-i18n-dynamic="true" style="font-size:0.75rem; margin:0;"></p>
+              <span id="user-role-badge" class="role-badge hidden"></span>
               <span class="dropdown-label" data-i18n="lang.label">Language</span>
               <label for="language-select" class="sr-only" data-i18n="lang.label">Language</label>
               <select id="language-select" class="select-pill" aria-label="Language">
@@ -852,10 +894,23 @@
                 <option value="es">Español</option>
               </select>
               <button type="button" id="refresh-app-btn" disabled data-i18n="action.refreshApp">Refresh app</button>
+              <button type="button" id="change-location-btn" class="hidden"></button>
               <button type="button" id="sign-out-btn" disabled data-i18n="action.signOut">Sign out</button>
             </div>
           </div>
         </section>
+
+        <!-- Location selector (shown when multiple clinics/labs are available) -->
+        <div id="location-selector" class="hidden">
+          <section class="panel">
+            <div>
+              <span class="eyebrow" id="location-eyebrow"></span>
+              <h2 id="location-title" style="margin-top:0.5rem;"></h2>
+              <p id="location-subtitle" style="margin-top:0.35rem;"></p>
+            </div>
+            <div id="location-list" class="orders-list" style="margin-top:1.25rem;"></div>
+          </section>
+        </div>
 
         <!-- Orders + detail workspace -->
         <div class="workspace">
@@ -1064,6 +1119,15 @@
           "comments.noText": "(no text)",
           "comments.unknownUser": "Unknown user",
           "orders.listEmpty": "Nothing to show yet.",
+          "role.dentist": "Dentist",
+          "role.technician": "Technician",
+          "role.unknown": "Unknown role",
+          "location.clinicBadge": "Clinics",
+          "location.labBadge": "Labs",
+          "location.selectClinic": "Select a Clinic",
+          "location.selectLab": "Select a Lab",
+          "location.selectPrompt": "Choose where to load orders from.",
+          "location.change": "Change",
         },
         sv: {
           "app.badge": "Tandis AI",
@@ -1150,6 +1214,15 @@
           "comments.noText": "(inget meddelande)",
           "comments.unknownUser": "Okänd användare",
           "orders.listEmpty": "Inget att visa ännu.",
+          "role.dentist": "Tandläkare",
+          "role.technician": "Tekniker",
+          "role.unknown": "Okänd roll",
+          "location.clinicBadge": "Kliniker",
+          "location.labBadge": "Labbar",
+          "location.selectClinic": "Välj en klinik",
+          "location.selectLab": "Välj ett lab",
+          "location.selectPrompt": "Välj varifrån du vill ladda ordrar.",
+          "location.change": "Ändra",
         },
         es: {
           "app.badge": "Tandis AI",
@@ -1237,6 +1310,15 @@
           "comments.noText": "(sin texto)",
           "comments.unknownUser": "Usuario desconocido",
           "orders.listEmpty": "Nada que mostrar aún.",
+          "role.dentist": "Dentista",
+          "role.technician": "Técnico",
+          "role.unknown": "Rol desconocido",
+          "location.clinicBadge": "Clínicas",
+          "location.labBadge": "Laboratorios",
+          "location.selectClinic": "Seleccionar clínica",
+          "location.selectLab": "Seleccionar laboratorio",
+          "location.selectPrompt": "Elige desde dónde cargar los pedidos.",
+          "location.change": "Cambiar",
         },
       };
 
@@ -1249,6 +1331,11 @@
         details: {},
         loadingDetails: {},
         language: loadLanguage(),
+        clinics: [],           // populated after role detection for dentist users
+        labs: [],              // populated after role detection for technician users
+        userRole: null,        // 'dentist' | 'technician' | 'unknown' | null
+        selectedClinicId: null, // the single clinic chosen from the selector
+        selectedLabId: null,    // the single lab chosen from the selector
       };
 
       // ── Screen refs ──────────────────────────────────────────
@@ -1309,6 +1396,41 @@
 
       mobileBackBtn.addEventListener("click", hideMobileDetail);
 
+      // ── Swipe-right to go back ─────────────────────────────────
+      (function () {
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let dragging = false;
+
+        mobileDetailScreen.addEventListener("touchstart", function (e) {
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
+          dragging = false;
+        }, { passive: true });
+
+        mobileDetailScreen.addEventListener("touchmove", function (e) {
+          const dx = e.touches[0].clientX - touchStartX;
+          const dy = e.touches[0].clientY - touchStartY;
+          // Only track as a horizontal swipe if mostly horizontal
+          if (!dragging && Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
+            dragging = true;
+          }
+          if (dragging && dx > 0) {
+            mobileDetailScreen.style.transform = `translateX(${dx}px)`;
+          }
+        }, { passive: true });
+
+        mobileDetailScreen.addEventListener("touchend", function (e) {
+          const dx = e.changedTouches[0].clientX - touchStartX;
+          mobileDetailScreen.style.transform = "";
+          if (dragging && dx > 80) {
+            hideMobileDetail();
+          }
+          dragging = false;
+        }, { passive: true });
+      })();
+      // ────────────────────────────────────────────────────────────
+
       setLanguage(state.language || "en");
       resetDetailPanel();
       restoreSession();
@@ -1323,6 +1445,14 @@
       languageSelect.addEventListener("change", (event) =>
         setLanguage(event.target.value),
       );
+      document.getElementById("change-location-btn").addEventListener("click", () => {
+        userDropdown.classList.add("hidden");
+        userAvatarBtn.setAttribute("aria-expanded", "false");
+        state.selectedClinicId = null;
+        state.selectedLabId    = null;
+        showLocationSelector();
+      });
+
       ordersList.addEventListener("click", (event) => {
         const card = event.target.closest(".order-card");
         if (!card) return;
@@ -1396,10 +1526,9 @@
           showAppScreen();
           statusMsg.textContent = t("status.signedInFetching");
           ordersBtn.disabled = false;
-          await fetchOrders();
-          document
-            .getElementById("orders-panel")
-            .scrollIntoView({ behavior: "smooth", block: "start" });
+          await detectUserRole();
+          updateRoleBadge();
+          await autoSelectOrShowSelector();
         } catch (error) {
           statusMsg.textContent = error.message || t("status.loginFailed");
         } finally {
@@ -1417,9 +1546,20 @@
         ordersList.innerHTML = "";
 
         try {
-          const data = await post("/api/orders", { token: state.token, environment: state.environment });
+          // Build order filter based on detected role and selected location
+          const orderBody = { token: state.token, environment: state.environment };
+          if (state.userRole === 'dentist' && state.selectedClinicId) {
+            orderBody.clinicIds = [state.selectedClinicId];
+          } else if (state.userRole === 'technician' && state.selectedLabId) {
+            orderBody.labIds = [state.selectedLabId];
+          }
+
+          const data = await post("/api/orders", orderBody);
           const entries = Array.isArray(data?.entries) ? data.entries : [];
-          state.orders = entries.map((entry) => entry.values || {});
+          state.orders = entries
+            .map((entry) => entry.values || {})
+            .filter((order) => order.ID);
+
           const validIds = new Set(state.orders.map((order) => order.ID));
           Object.keys(state.details).forEach((id) => {
             if (!validIds.has(id)) {
@@ -1472,17 +1612,11 @@
         </div>
         <div class="order-meta-row" style="justify-content: space-between;">
           <span title="${t("summary.created")}">${formatDate(order["Create Date"])}</span>
-          <span class="order-status-pill">${order.StatusName || "Unknown"}</span>
+          <span class="order-status-pill ${getStatusClass(order.StatusName)}">${order.StatusName || "Unknown"}</span>
         </div>
       `;
 
-          const detail = document.createElement("div");
-          detail.className = "order-detail";
-          detail.dataset.orderId = order.ID;
-          // Inline expansion no longer used — mobile uses #mobile-detail-screen
-
           block.appendChild(button);
-          block.appendChild(detail);
           ordersList.appendChild(block);
         });
       }
@@ -1495,6 +1629,7 @@
         const mobile = !isDesktopView();
 
         if (!mobile) {
+          document.getElementById("detail-panel")?.classList.remove("hidden");
           renderSummarySection(order);
         }
 
@@ -1561,6 +1696,7 @@
         mobileDetailTitle.textContent = `#${order.OrdernumberShort || order.ID}`;
         const statusName = order.StatusName || "";
         mobileOrderStatus.textContent = statusName;
+        mobileOrderStatus.className = `order-status-pill ${getStatusClass(statusName)}${!statusName ? " hidden" : ""}`;
         mobileOrderStatus.classList.toggle("hidden", !statusName);
         const deptName = order.DepartmentName || "";
         mobileDetailDepartment.textContent = deptName;
@@ -1605,6 +1741,7 @@
 
         const statusName = order.StatusName || "";
         detailOrderStatus.textContent = statusName;
+        detailOrderStatus.className = `order-status-pill ${getStatusClass(statusName)}${!statusName ? " hidden" : ""}`;
         detailOrderStatus.classList.toggle("hidden", !statusName);
 
         const summary = buildSummarySection(order);
@@ -1639,6 +1776,186 @@
           statusEl.textContent = t("status.error");
           listEl.innerHTML = html;
         });
+      }
+
+      /**
+       * Fetch clinics associated with the logged-in user (dentist path).
+       */
+      async function fetchUserClinics() {
+        try {
+          const data = await post('/api/user-clinics', { token: state.token, environment: state.environment });
+          state.clinics = Array.isArray(data?.entries) ? data.entries.map((e) => e.values || {}) : [];
+        } catch (error) {
+          console.warn('Could not fetch user clinics:', error?.message);
+          state.clinics = [];
+        }
+      }
+
+      /**
+       * Fetch labs associated with the logged-in user (technician path).
+       */
+      async function fetchUserLabs() {
+        try {
+          const data = await post('/api/user-labs', { token: state.token, environment: state.environment });
+          state.labs = Array.isArray(data?.entries) ? data.entries.map((e) => e.values || {}) : [];
+        } catch (error) {
+          console.warn('Could not fetch user labs:', error?.message);
+          state.labs = [];
+        }
+      }
+
+      /**
+       * Detect user role by probing clinic and lab associations.
+       * Sets state.userRole ('dentist' | 'technician' | 'unknown').
+       */
+      async function detectUserRole() {
+        state.clinics = [];
+        state.labs = [];
+        await fetchUserClinics();
+        if (state.clinics.length > 0) {
+          state.userRole = 'dentist';
+          return;
+        }
+        await fetchUserLabs();
+        if (state.labs.length > 0) {
+          state.userRole = 'technician';
+          return;
+        }
+        state.userRole = 'unknown';
+      }
+
+      /**
+       * Update the role badge in the avatar dropdown.
+       */
+      function updateRoleBadge() {
+        const badge = document.getElementById('user-role-badge');
+        if (!badge) return;
+        if (!state.userRole || state.userRole === 'unknown') {
+          badge.classList.add('hidden');
+          return;
+        }
+        const roleKey = state.userRole === 'dentist' ? 'role.dentist' : 'role.technician';
+        badge.textContent = t(roleKey);
+        badge.className = `role-badge role-badge--${state.userRole}`;
+      }
+
+      /**
+       * Decide: if only one clinic/lab, auto-select and fetch orders.
+       * If multiple, show the selector panel.
+       * If none / unknown role, fetch orders directly.
+       */
+      async function autoSelectOrShowSelector() {
+        const isDentist = state.userRole === 'dentist';
+        const isTech    = state.userRole === 'technician';
+
+        if (isDentist) {
+          if (state.clinics.length === 1) {
+            state.selectedClinicId = state.clinics[0].IDClinic;
+            saveSession(state.token, state.user, state.environment, state.selectedClinicId, null);
+            updateLocationDisplay();
+            await fetchOrders();
+          } else if (state.clinics.length > 1) {
+            showLocationSelector();
+          } else {
+            await fetchOrders();
+          }
+        } else if (isTech) {
+          if (state.labs.length === 1) {
+            state.selectedLabId = state.labs[0].IDLab;
+            saveSession(state.token, state.user, state.environment, null, state.selectedLabId);
+            updateLocationDisplay();
+            await fetchOrders();
+          } else if (state.labs.length > 1) {
+            showLocationSelector();
+          } else {
+            await fetchOrders();
+          }
+        } else {
+          await fetchOrders();
+        }
+      }
+
+      /**
+       * Render the location selector panel and hide the workspace.
+       */
+      function showLocationSelector() {
+        const selector  = document.getElementById('location-selector');
+        const workspace = document.querySelector('.workspace');
+        const eyebrow   = document.getElementById('location-eyebrow');
+        const title     = document.getElementById('location-title');
+        const subtitle  = document.getElementById('location-subtitle');
+        const list      = document.getElementById('location-list');
+
+        const isDentist = state.userRole === 'dentist';
+        const items     = isDentist ? state.clinics : state.labs;
+
+        eyebrow.textContent  = isDentist ? t('location.clinicBadge') : t('location.labBadge');
+        title.textContent    = isDentist ? t('location.selectClinic') : t('location.selectLab');
+        subtitle.textContent = t('location.selectPrompt');
+
+        list.innerHTML = items.map((item) => {
+          const id   = isDentist ? item.IDClinic : item.IDLab;
+          const name = isDentist
+            ? (item.ClinicName || id || '—')
+            : (item.LabName   || id || '—');
+          return `
+            <button type="button" class="order-card" data-location-id="${escapeHtml(String(id ?? ''))}">
+              <strong>${escapeHtml(name)}</strong>
+              <div class="order-meta-row"><span>${escapeHtml(String(id ?? '—'))}</span></div>
+            </button>
+          `;
+        }).join('');
+
+        selector.classList.remove('hidden');
+        workspace.classList.add('hidden');
+
+        list.querySelectorAll('[data-location-id]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const id = btn.dataset.locationId;
+            if (isDentist) {
+              state.selectedClinicId = id;
+              state.selectedLabId    = null;
+            } else {
+              state.selectedLabId    = id;
+              state.selectedClinicId = null;
+            }
+            saveSession(state.token, state.user, state.environment, state.selectedClinicId, state.selectedLabId);
+            hideLocationSelector();
+            updateLocationDisplay();
+            fetchOrders();
+          });
+        });
+      }
+
+      /**
+       * Hide the location selector and reveal the workspace.
+       */
+      function hideLocationSelector() {
+        document.getElementById('location-selector').classList.add('hidden');
+        document.querySelector('.workspace').classList.remove('hidden');
+      }
+
+      /**
+       * Update the "Change clinic/lab" button in the user dropdown.
+       */
+      function updateLocationDisplay() {
+        const changeBtn = document.getElementById('change-location-btn');
+        if (!changeBtn) return;
+
+        const hasSelected = state.selectedClinicId || state.selectedLabId;
+        const hasMultiple = (state.userRole === 'dentist' && state.clinics.length > 1) ||
+                            (state.userRole === 'technician' && state.labs.length > 1);
+
+        if (hasSelected && hasMultiple) {
+          const id    = state.selectedClinicId || state.selectedLabId;
+          const items = state.userRole === 'dentist' ? state.clinics : state.labs;
+          const item  = items.find((i) => (i.IDClinic || i.IDLab) === id);
+          const name  = item ? (item.ClinicName || item.LabName || id) : id;
+          changeBtn.textContent = `${t('location.change')}: ${name}`;
+          changeBtn.classList.remove('hidden');
+        } else {
+          changeBtn.classList.add('hidden');
+        }
       }
 
       async function fetchOrderDetails(order) {
@@ -1779,7 +2096,7 @@
           return;
         }
         if (state.ordersUpdatedAt) {
-          const time = new Date(state.ordersUpdatedAt).toLocaleTimeString(getLangLocale());
+          const time = new Date(state.ordersUpdatedAt).toLocaleTimeString(getLangLocale(), { hour: "2-digit", minute: "2-digit" });
           ordersStatus.textContent = `${t("orders.updatedPrefix")} · ${time}`;
         } else {
           ordersStatus.textContent = t("orders.loading");
@@ -1934,7 +2251,7 @@
             <p>${task.DepartmentName || "—"}</p>
           </div>
           <div style="text-align:right;">
-            <span class="order-status-pill" style="margin-bottom:0.35rem; display:inline-flex;">${task.StatusTask || "—"}</span>
+            <span class="order-status-pill ${getStatusClass(task.StatusTask)}" style="margin-bottom:0.35rem; display:inline-flex;">${task.StatusTask || "—"}</span>
             <p>${task.AssigneeFullName || ""}</p>
           </div>
         </div>
@@ -2109,16 +2426,11 @@
         };
       }
 
-      function scrollToDetail(orderId) {
+      function scrollToDetail() {
         if (isDesktopView()) {
           document
             .getElementById("detail-panel")
             .scrollIntoView({ behavior: "smooth", block: "start" });
-        } else {
-          const inline = ordersList.querySelector(
-            `.order-detail[data-order-id="${orderId}"]`,
-          );
-          inline?.scrollIntoView({ behavior: "smooth", block: "start" });
         }
       }
 
@@ -2151,9 +2463,10 @@
         if (!value) return "—";
         const date = new Date(value);
         if (Number.isNaN(date.getTime())) {
-          return value;
+          // Strip seconds from raw string (e.g. "03/02/2026 19:12:49" → "03/02/2026 19:12")
+          return String(value).replace(/(\d{1,2}:\d{2}):\d{2}(\s*(AM|PM)?)?$/, "$1$2").trim();
         }
-        return date.toLocaleString(getLangLocale());
+        return date.toLocaleString(getLangLocale(), { hour: "2-digit", minute: "2-digit", year: "numeric", month: "2-digit", day: "2-digit" });
       }
 
       function formatCount(key, count) {
@@ -2170,6 +2483,37 @@
         if (!error) return t("status.error");
         if (typeof error === "string") return error;
         return error.message || t("status.error");
+      }
+
+      /**
+       * Maps a status string to a CSS colour class for `.order-status-pill`.
+       * Matches Swedish and English terms used by Tandis / BMC Remedy.
+       */
+      function getStatusClass(status) {
+        if (!status) return "status--gray";
+        const s = status.toLowerCase();
+
+        // Red — cancelled, rejected, error
+        if (/avbruten|makulerad|annullerad|cancel|reject|avvis|error|fel|misslyck|failed|stängd|closed/.test(s))
+          return "status--red";
+
+        // Green — completed, delivered, approved, invoiced
+        if (/klar|slutförd|avslutad|levererad|godkänd|fakturerad|complet|finish|done|delivered|approved|invoiced|closed.*ok/.test(s))
+          return "status--green";
+
+        // Amber — active, in progress, open, processing
+        if (/pågående|aktiv|active|bearbetas|in.?progress|öppen|open|registrerad|mottagen|received|ny|new|skickad|sent|started|igång/.test(s))
+          return "status--amber";
+
+        // Purple — waiting, on hold, paused
+        if (/väntar|wait|hold|parkerad|pausad|pause|pending/.test(s))
+          return "status--purple";
+
+        // Blue — planned, scheduled
+        if (/planerad|plan|schedul|booked|bokad/.test(s))
+          return "status--blue";
+
+        return "status--gray";
       }
 
       function pickField(source, keys = [], fallback = "") {
@@ -2241,6 +2585,7 @@
           currentEnvEl.textContent = `${t("env.current")}: ${formatEnvironmentLabel(state.environment)}`;
         }
         updateOrdersStatus();
+        updateRoleBadge();
         renderOrders();
         if (state.selectedOrderId && state.details[state.selectedOrderId]) {
           renderDesktopDetail(
@@ -2275,11 +2620,11 @@
         );
       }
 
-      function saveSession(token, username, environment) {
+      function saveSession(token, username, environment, selectedClinicId = null, selectedLabId = null) {
         try {
           localStorage.setItem(
             SESSION_KEY,
-            JSON.stringify({ token, username, environment, savedAt: Date.now() }),
+            JSON.stringify({ token, username, environment, selectedClinicId, selectedLabId, savedAt: Date.now() }),
           );
         } catch (error) {
           console.warn("Unable to persist session", error);
@@ -2316,9 +2661,19 @@
         state.selectedOrderId = null;
         state.details = {};
         state.loadingDetails = {};
+        state.userRole = null;
+        state.clinics = [];
+        state.labs = [];
+        state.selectedClinicId = null;
+        state.selectedLabId = null;
         userNameEl.textContent = t("user.notSigned");
         updateAvatarInitials("");
         currentEnvEl.textContent = "";
+        updateRoleBadge();
+        updateLocationDisplay();
+        // Ensure the selector is hidden and workspace is visible on sign-out
+        document.getElementById('location-selector')?.classList.add('hidden');
+        document.querySelector('.workspace')?.classList.remove('hidden');
         ordersStatus.textContent = t("orders.signInPrompt");
         signOutBtn.disabled = true;
         refreshAppBtn.disabled = true;
@@ -2344,7 +2699,20 @@
         showAppScreen();
         statusMsg.textContent = t("status.restoringSession");
         try {
-          await fetchOrders();
+          await detectUserRole();
+          updateRoleBadge();
+          // Restore saved location selection if still valid
+          if (stored.selectedClinicId && state.clinics.some((c) => c.IDClinic === stored.selectedClinicId)) {
+            state.selectedClinicId = stored.selectedClinicId;
+            updateLocationDisplay();
+            await fetchOrders();
+          } else if (stored.selectedLabId && state.labs.some((l) => l.IDLab === stored.selectedLabId)) {
+            state.selectedLabId = stored.selectedLabId;
+            updateLocationDisplay();
+            await fetchOrders();
+          } else {
+            await autoSelectOrShowSelector();
+          }
           statusMsg.textContent = "";
         } catch (error) {
           statusMsg.textContent = error.message || t("status.restoreFailed");
@@ -2492,6 +2860,10 @@
           statusEl.textContent = t("status.loading");
           listEl.innerHTML = "";
         });
+        // Hide the detail panel on desktop when no order is selected
+        if (!state.selectedOrderId) {
+          document.getElementById("detail-panel")?.classList.add("hidden");
+        }
       }
 
       function translateInitialUI() {
