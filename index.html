@@ -94,7 +94,7 @@
       }
 
       main {
-        width: min(960px, 100%);
+        width: min(1400px, 100%);
         margin: 0 auto;
         display: flex;
         flex-direction: column;
@@ -1583,7 +1583,7 @@
         selectedLabId: null,    // the single lab chosen from the selector
         detailScrollPinned: false, // when true, switching orders doesn't reset detail scroll
         selectedStatuses: new Set(), // active status filter; empty = show all
-        filterDateFrom: (() => { const d = new Date(); d.setMonth(d.getMonth() - 3); return d.toISOString().slice(0,10); })(),
+        filterDateFrom: "",
         filterDateTo: "",             // ISO date string "YYYY-MM-DD" or ""
         filterLimit: 0,               // 0 = All
       };
