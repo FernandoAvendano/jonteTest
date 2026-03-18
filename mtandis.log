@@ -1,0 +1,175 @@
+Server running on http://localhost:4173
+[REST] REQ route=- environment=- method=POST url=https://saas02.tandis.app:8443/api/jwt/login
+[REST] RES route=- environment=- status=200 durationMs=138 messageNumber=null bodyType=string
+[REST] REQ route=/api/orders environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order?fields=values(ID%2COrdernumberShort%2CStatusID%2CStatusName%2CPatient_PersonID%2CPatient_FirstName%2CPatient_LastName%2CClinicName%2CLab_Name%2COrder_Description%2CCreate%20Date%2CModified%20Date%2CIDLab%2CIDLabDepartment%2CIDLabCurrent%2CDepartmentName%2CCurrency%2CPriceInSek%2COrderPrice)&limit=10
+[REST] RES route=/api/orders environment=test status=200 durationMs=101 messageNumber=null bodyType=object
+[REST] REQ route=/api/order-services environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Service?fields=values(IDOrder%2CServiceName%2CServiceDescription%2CCategory%2CAmount%2CUnit%2CPrice%2CCurrency)&q='IDOrder'%3D%22IDGACTM7CUXVLATJ7178TI54GSU1Z5%22
+[REST] REQ route=/api/order-tasks environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:ServiceTask?fields=values(ID%2CIDOrder%2CTaskName%2CDepartmentName%2CStatusTask%2CAssigneeFullName)&q='IDOrder'%3D%22IDGACTM7CUXVLATJ7178TI54GSU1Z5%22
+[REST] REQ route=/api/order-materials environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Material?limit=100&fields=values(IDOrder%2CMaterialName%2CMaterialCode%2CBatchNumber%2CAmountMaterial%2CUnitMaterial%2CMaterialUnitPrice%2CPriceMaterial%2CCurrency%2CPriceInSek)&q='IDOrder'%3D%22IDGACTM7CUXVLATJ7178TI54GSU1Z5%22
+[REST] REQ route=/api/order-attachments-list environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Attachments?limit=100&q='IDOrder'%3D%22IDGACTM7CUXVLATJ7178TI54GSU1Z5%22&fields=values(Attachment_File%2CRequest%20ID%2CCreate%20Date)
+[REST] REQ route=/api/order-comments environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:OrderComment?limit=100&q='IDOrder'%3D%22IDGACTM7CUXVLATJ7178TI54GSU1Z5%22
+[REST] RES route=/api/order-services environment=test status=200 durationMs=14 messageNumber=null bodyType=object
+[REST] RES route=/api/order-materials environment=test status=200 durationMs=34 messageNumber=null bodyType=object
+[REST] RES route=/api/order-comments environment=test status=200 durationMs=38 messageNumber=null bodyType=object
+[REST] RES route=/api/order-tasks environment=test status=200 durationMs=43 messageNumber=null bodyType=object
+[REST] RES route=/api/order-attachments-list environment=test status=200 durationMs=41 messageNumber=null bodyType=object
+[REST] REQ route=/api/order-materials environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Material?limit=100&fields=values(IDOrder%2CMaterialName%2CMaterialCode%2CBatchNumber%2CAmountMaterial%2CUnitMaterial%2CMaterialUnitPrice%2CPriceMaterial%2CCurrency%2CPriceInSek)&q='IDOrder'%3D%22IDGACTM7CUXVLARLB2KHRKBN1D5OB2%22
+[REST] REQ route=/api/order-services environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Service?fields=values(IDOrder%2CServiceName%2CServiceDescription%2CCategory%2CAmount%2CUnit%2CPrice%2CCurrency)&q='IDOrder'%3D%22IDGACTM7CUXVLARLB2KHRKBN1D5OB2%22
+[REST] REQ route=/api/order-tasks environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:ServiceTask?fields=values(ID%2CIDOrder%2CTaskName%2CDepartmentName%2CStatusTask%2CAssigneeFullName)&q='IDOrder'%3D%22IDGACTM7CUXVLARLB2KHRKBN1D5OB2%22
+[REST] REQ route=/api/order-attachments-list environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Attachments?limit=100&q='IDOrder'%3D%22IDGACTM7CUXVLARLB2KHRKBN1D5OB2%22&fields=values(Attachment_File%2CRequest%20ID%2CCreate%20Date)
+[REST] REQ route=/api/order-comments environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:OrderComment?limit=100&q='IDOrder'%3D%22IDGACTM7CUXVLARLB2KHRKBN1D5OB2%22
+[REST] RES route=/api/order-services environment=test status=200 durationMs=40 messageNumber=null bodyType=object
+[REST] RES route=/api/order-materials environment=test status=200 durationMs=49 messageNumber=null bodyType=object
+[REST] RES route=/api/order-tasks environment=test status=200 durationMs=39 messageNumber=null bodyType=object
+[REST] RES route=/api/order-attachments-list environment=test status=200 durationMs=38 messageNumber=null bodyType=object
+[REST] RES route=/api/order-comments environment=test status=200 durationMs=36 messageNumber=null bodyType=object
+[REST] REQ route=/api/order-services environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Service?fields=values(IDOrder%2CServiceName%2CServiceDescription%2CCategory%2CAmount%2CUnit%2CPrice%2CCurrency)&q='IDOrder'%3D%22IDGACTM7CUXVLARTMBCYRSLZ69S5SP%22
+[REST] REQ route=/api/order-materials environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Material?limit=100&fields=values(IDOrder%2CMaterialName%2CMaterialCode%2CBatchNumber%2CAmountMaterial%2CUnitMaterial%2CMaterialUnitPrice%2CPriceMaterial%2CCurrency%2CPriceInSek)&q='IDOrder'%3D%22IDGACTM7CUXVLARTMBCYRSLZ69S5SP%22
+[REST] REQ route=/api/order-comments environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:OrderComment?limit=100&q='IDOrder'%3D%22IDGACTM7CUXVLARTMBCYRSLZ69S5SP%22
+[REST] REQ route=/api/order-attachments-list environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Attachments?limit=100&q='IDOrder'%3D%22IDGACTM7CUXVLARTMBCYRSLZ69S5SP%22&fields=values(Attachment_File%2CRequest%20ID%2CCreate%20Date)
+[REST] REQ route=/api/order-tasks environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:ServiceTask?fields=values(ID%2CIDOrder%2CTaskName%2CDepartmentName%2CStatusTask%2CAssigneeFullName)&q='IDOrder'%3D%22IDGACTM7CUXVLARTMBCYRSLZ69S5SP%22
+[REST] RES route=/api/order-services environment=test status=200 durationMs=43 messageNumber=null bodyType=object
+[REST] RES route=/api/order-tasks environment=test status=200 durationMs=35 messageNumber=null bodyType=object
+[REST] RES route=/api/order-comments environment=test status=200 durationMs=40 messageNumber=null bodyType=object
+[REST] RES route=/api/order-attachments-list environment=test status=200 durationMs=39 messageNumber=null bodyType=object
+[REST] RES route=/api/order-materials environment=test status=200 durationMs=45 messageNumber=null bodyType=object
+[REST] REQ route=/api/order-services environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Service?fields=values(IDOrder%2CServiceName%2CServiceDescription%2CCategory%2CAmount%2CUnit%2CPrice%2CCurrency)&q='IDOrder'%3D%22IDGACTM7CUXVLATB98GLTA7V9HQFQW%22
+[REST] REQ route=/api/order-attachments-list environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Attachments?limit=100&q='IDOrder'%3D%22IDGACTM7CUXVLATB98GLTA7V9HQFQW%22&fields=values(Attachment_File%2CRequest%20ID%2CCreate%20Date)
+[REST] REQ route=/api/order-tasks environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:ServiceTask?fields=values(ID%2CIDOrder%2CTaskName%2CDepartmentName%2CStatusTask%2CAssigneeFullName)&q='IDOrder'%3D%22IDGACTM7CUXVLATB98GLTA7V9HQFQW%22
+[REST] REQ route=/api/order-comments environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:OrderComment?limit=100&q='IDOrder'%3D%22IDGACTM7CUXVLATB98GLTA7V9HQFQW%22
+[REST] REQ route=/api/order-materials environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Material?limit=100&fields=values(IDOrder%2CMaterialName%2CMaterialCode%2CBatchNumber%2CAmountMaterial%2CUnitMaterial%2CMaterialUnitPrice%2CPriceMaterial%2CCurrency%2CPriceInSek)&q='IDOrder'%3D%22IDGACTM7CUXVLATB98GLTA7V9HQFQW%22
+[REST] RES route=/api/order-services environment=test status=200 durationMs=35 messageNumber=null bodyType=object
+[REST] RES route=/api/order-attachments-list environment=test status=200 durationMs=37 messageNumber=null bodyType=object
+[REST] RES route=/api/order-tasks environment=test status=200 durationMs=40 messageNumber=null bodyType=object
+[REST] RES route=/api/order-comments environment=test status=200 durationMs=43 messageNumber=null bodyType=object
+[REST] RES route=/api/order-materials environment=test status=200 durationMs=44 messageNumber=null bodyType=object
+[REST] REQ route=- environment=- method=POST url=https://tandis.app:8443/api/jwt/login
+[REST] RES route=- environment=- status=200 durationMs=93 messageNumber=null bodyType=string
+[REST] REQ route=/api/orders environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order?fields=values(ID%2COrdernumberShort%2CStatusID%2CStatusName%2CPatient_PersonID%2CPatient_FirstName%2CPatient_LastName%2CClinicName%2CLab_Name%2COrder_Description%2CCreate%20Date%2CModified%20Date%2CIDLab%2CIDLabDepartment%2CIDLabCurrent%2CDepartmentName%2CCurrency%2CPriceInSek%2COrderPrice)&limit=10
+[REST] RES route=/api/orders environment=production status=200 durationMs=507 messageNumber=null bodyType=object
+[REST] REQ route=/api/order-tasks environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:ServiceTask?fields=values(ID%2CIDOrder%2CTaskName%2CDepartmentName%2CStatusTask%2CAssigneeFullName)&q='IDOrder'%3D%22IDGAAE4GGO75PAOY8XMROXMLKU35DN%22
+[REST] REQ route=/api/order-services environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Service?fields=values(IDOrder%2CServiceName%2CServiceDescription%2CCategory%2CAmount%2CUnit%2CPrice%2CCurrency)&q='IDOrder'%3D%22IDGAAE4GGO75PAOY8XMROXMLKU35DN%22
+[REST] REQ route=/api/order-materials environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Material?limit=100&fields=values(IDOrder%2CMaterialName%2CMaterialCode%2CBatchNumber%2CAmountMaterial%2CUnitMaterial%2CMaterialUnitPrice%2CPriceMaterial%2CCurrency%2CPriceInSek)&q='IDOrder'%3D%22IDGAAE4GGO75PAOY8XMROXMLKU35DN%22
+[REST] REQ route=/api/order-attachments-list environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Attachments?limit=100&q='IDOrder'%3D%22IDGAAE4GGO75PAOY8XMROXMLKU35DN%22&fields=values(Attachment_File%2CRequest%20ID%2CCreate%20Date)
+[REST] REQ route=/api/order-comments environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:OrderComment?limit=100&q='IDOrder'%3D%22IDGAAE4GGO75PAOY8XMROXMLKU35DN%22
+[REST] RES route=/api/order-services environment=production status=500 durationMs=44 messageNumber=9093 bodyType=object
+[REST] RES route=/api/order-materials environment=production status=500 durationMs=59 messageNumber=9093 bodyType=object
+[REST] RES route=/api/order-tasks environment=production status=200 durationMs=79 messageNumber=null bodyType=object
+[REST] RES route=/api/order-comments environment=production status=500 durationMs=54 messageNumber=9093 bodyType=object
+[REST] RES route=/api/order-attachments-list environment=production status=200 durationMs=60 messageNumber=null bodyType=object
+[REST] REQ route=/api/order-comments environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:OrderComment?limit=100&q='IDOrder'%3D%22IDGAAE4GGO75PAP4O1VWP3R47LN2UE%22
+[REST] REQ route=/api/order-materials environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Material?limit=100&fields=values(IDOrder%2CMaterialName%2CMaterialCode%2CBatchNumber%2CAmountMaterial%2CUnitMaterial%2CMaterialUnitPrice%2CPriceMaterial%2CCurrency%2CPriceInSek)&q='IDOrder'%3D%22IDGAAE4GGO75PAP4O1VWP3R47LN2UE%22
+[REST] REQ route=/api/order-tasks environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:ServiceTask?fields=values(ID%2CIDOrder%2CTaskName%2CDepartmentName%2CStatusTask%2CAssigneeFullName)&q='IDOrder'%3D%22IDGAAE4GGO75PAP4O1VWP3R47LN2UE%22
+[REST] REQ route=/api/order-services environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Service?fields=values(IDOrder%2CServiceName%2CServiceDescription%2CCategory%2CAmount%2CUnit%2CPrice%2CCurrency)&q='IDOrder'%3D%22IDGAAE4GGO75PAP4O1VWP3R47LN2UE%22
+[REST] REQ route=/api/order-attachments-list environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Attachments?limit=100&q='IDOrder'%3D%22IDGAAE4GGO75PAP4O1VWP3R47LN2UE%22&fields=values(Attachment_File%2CRequest%20ID%2CCreate%20Date)
+[REST] RES route=/api/order-comments environment=production status=500 durationMs=44 messageNumber=9093 bodyType=object
+[REST] RES route=/api/order-materials environment=production status=500 durationMs=49 messageNumber=9093 bodyType=object
+[REST] RES route=/api/order-attachments-list environment=production status=500 durationMs=50 messageNumber=9093 bodyType=object
+[REST] RES route=/api/order-services environment=production status=500 durationMs=54 messageNumber=9093 bodyType=object
+[REST] RES route=/api/order-tasks environment=production status=500 durationMs=60 messageNumber=9093 bodyType=object
+[REST] REQ route=/api/order-attachments-list environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Attachments?limit=100&q='IDOrder'%3D%22IDGACTN3BVOXTATFTSIBTERZRO4KPO%22&fields=values(Attachment_File%2CRequest%20ID%2CCreate%20Date)
+[REST] REQ route=/api/order-services environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Service?fields=values(IDOrder%2CServiceName%2CServiceDescription%2CCategory%2CAmount%2CUnit%2CPrice%2CCurrency)&q='IDOrder'%3D%22IDGACTN3BVOXTATFTSIBTERZRO4KPO%22
+[REST] REQ route=/api/order-tasks environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:ServiceTask?fields=values(ID%2CIDOrder%2CTaskName%2CDepartmentName%2CStatusTask%2CAssigneeFullName)&q='IDOrder'%3D%22IDGACTN3BVOXTATFTSIBTERZRO4KPO%22
+[REST] REQ route=/api/order-materials environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Material?limit=100&fields=values(IDOrder%2CMaterialName%2CMaterialCode%2CBatchNumber%2CAmountMaterial%2CUnitMaterial%2CMaterialUnitPrice%2CPriceMaterial%2CCurrency%2CPriceInSek)&q='IDOrder'%3D%22IDGACTN3BVOXTATFTSIBTERZRO4KPO%22
+[REST] REQ route=/api/order-comments environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:OrderComment?limit=100&q='IDOrder'%3D%22IDGACTN3BVOXTATFTSIBTERZRO4KPO%22
+[REST] RES route=/api/order-attachments-list environment=production status=200 durationMs=32 messageNumber=null bodyType=object
+[REST] RES route=/api/order-services environment=production status=500 durationMs=30 messageNumber=9093 bodyType=object
+[REST] RES route=/api/order-tasks environment=production status=200 durationMs=36 messageNumber=null bodyType=object
+[REST] RES route=/api/order-comments environment=production status=500 durationMs=36 messageNumber=9093 bodyType=object
+[REST] RES route=/api/order-materials environment=production status=200 durationMs=39 messageNumber=null bodyType=object
+[REST] REQ route=/api/order-tasks environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:ServiceTask?fields=values(ID%2CIDOrder%2CTaskName%2CDepartmentName%2CStatusTask%2CAssigneeFullName)&q='IDOrder'%3D%22IDGACTN3BVOXTATFTS02TERZTZ4KQ3%22
+[REST] REQ route=/api/order-services environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Service?fields=values(IDOrder%2CServiceName%2CServiceDescription%2CCategory%2CAmount%2CUnit%2CPrice%2CCurrency)&q='IDOrder'%3D%22IDGACTN3BVOXTATFTS02TERZTZ4KQ3%22
+[REST] REQ route=/api/order-materials environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Material?limit=100&fields=values(IDOrder%2CMaterialName%2CMaterialCode%2CBatchNumber%2CAmountMaterial%2CUnitMaterial%2CMaterialUnitPrice%2CPriceMaterial%2CCurrency%2CPriceInSek)&q='IDOrder'%3D%22IDGACTN3BVOXTATFTS02TERZTZ4KQ3%22
+[REST] REQ route=/api/order-attachments-list environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Attachments?limit=100&q='IDOrder'%3D%22IDGACTN3BVOXTATFTS02TERZTZ4KQ3%22&fields=values(Attachment_File%2CRequest%20ID%2CCreate%20Date)
+[REST] REQ route=/api/order-comments environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:OrderComment?limit=100&q='IDOrder'%3D%22IDGACTN3BVOXTATFTS02TERZTZ4KQ3%22
+[REST] RES route=/api/order-tasks environment=production status=500 durationMs=47 messageNumber=9093 bodyType=object
+[REST] RES route=/api/order-services environment=production status=500 durationMs=52 messageNumber=9093 bodyType=object
+[REST] RES route=/api/order-materials environment=production status=500 durationMs=38 messageNumber=9093 bodyType=object
+[REST] RES route=/api/order-attachments-list environment=production status=500 durationMs=51 messageNumber=9093 bodyType=object
+[REST] RES route=/api/order-comments environment=production status=200 durationMs=107 messageNumber=null bodyType=object
+[REST] REQ route=/api/order-tasks environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:ServiceTask?fields=values(ID%2CIDOrder%2CTaskName%2CDepartmentName%2CStatusTask%2CAssigneeFullName)&q='IDOrder'%3D%22IDGACTN3BVOXTATFO4VXTEMMK9GUYR%22
+[REST] REQ route=/api/order-attachments-list environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Attachments?limit=100&q='IDOrder'%3D%22IDGACTN3BVOXTATFO4VXTEMMK9GUYR%22&fields=values(Attachment_File%2CRequest%20ID%2CCreate%20Date)
+[REST] REQ route=/api/order-materials environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Material?limit=100&fields=values(IDOrder%2CMaterialName%2CMaterialCode%2CBatchNumber%2CAmountMaterial%2CUnitMaterial%2CMaterialUnitPrice%2CPriceMaterial%2CCurrency%2CPriceInSek)&q='IDOrder'%3D%22IDGACTN3BVOXTATFO4VXTEMMK9GUYR%22
+[REST] REQ route=/api/order-services environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Service?fields=values(IDOrder%2CServiceName%2CServiceDescription%2CCategory%2CAmount%2CUnit%2CPrice%2CCurrency)&q='IDOrder'%3D%22IDGACTN3BVOXTATFO4VXTEMMK9GUYR%22
+[REST] REQ route=/api/order-comments environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:OrderComment?limit=100&q='IDOrder'%3D%22IDGACTN3BVOXTATFO4VXTEMMK9GUYR%22
+[REST] RES route=/api/order-attachments-list environment=production status=500 durationMs=29 messageNumber=9093 bodyType=object
+[REST] RES route=/api/order-tasks environment=production status=500 durationMs=35 messageNumber=9093 bodyType=object
+[REST] RES route=/api/order-materials environment=production status=200 durationMs=45 messageNumber=null bodyType=object
+[REST] RES route=/api/order-comments environment=production status=500 durationMs=46 messageNumber=9093 bodyType=object
+[REST] RES route=/api/order-services environment=production status=500 durationMs=53 messageNumber=9093 bodyType=object
+[REST] REQ route=- environment=- method=POST url=https://tandis.app:8443/api/jwt/login
+[REST] RES route=- environment=- status=200 durationMs=1761 messageNumber=null bodyType=string
+[REST] REQ route=/api/orders environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order?fields=values(ID%2COrdernumberShort%2CStatusID%2CStatusName%2CPatient_PersonID%2CPatient_FirstName%2CPatient_LastName%2CClinicName%2CLab_Name%2COrder_Description%2CCreate%20Date%2CModified%20Date%2CIDLab%2CIDLabDepartment%2CIDLabCurrent%2CDepartmentName%2CCurrency%2CPriceInSek%2COrderPrice)&limit=10
+[REST] RES route=/api/orders environment=production status=200 durationMs=3950 messageNumber=null bodyType=object
+[REST] REQ route=/api/order-services environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Service?fields=values(IDOrder%2CServiceName%2CServiceDescription%2CCategory%2CAmount%2CUnit%2CPrice%2CCurrency)&q='IDOrder'%3D%22IDGAAE4GGO75PAOY8XMROXMLKU35DN%22
+[REST] REQ route=/api/order-tasks environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:ServiceTask?fields=values(ID%2CIDOrder%2CTaskName%2CDepartmentName%2CStatusTask%2CAssigneeFullName)&q='IDOrder'%3D%22IDGAAE4GGO75PAOY8XMROXMLKU35DN%22
+[REST] REQ route=/api/order-comments environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:OrderComment?limit=100&q='IDOrder'%3D%22IDGAAE4GGO75PAOY8XMROXMLKU35DN%22
+[REST] REQ route=/api/order-materials environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Material?limit=100&fields=values(IDOrder%2CMaterialName%2CMaterialCode%2CBatchNumber%2CAmountMaterial%2CUnitMaterial%2CMaterialUnitPrice%2CPriceMaterial%2CCurrency%2CPriceInSek)&q='IDOrder'%3D%22IDGAAE4GGO75PAOY8XMROXMLKU35DN%22
+[REST] REQ route=/api/order-attachments-list environment=production method=GET url=https://tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Attachments?limit=100&q='IDOrder'%3D%22IDGAAE4GGO75PAOY8XMROXMLKU35DN%22&fields=values(Attachment_File%2CRequest%20ID%2CCreate%20Date)
+[REST] RES route=/api/order-services environment=production status=200 durationMs=73 messageNumber=null bodyType=object
+[REST] RES route=/api/order-tasks environment=production status=500 durationMs=129 messageNumber=9093 bodyType=object
+[REST] RES route=/api/order-materials environment=production status=500 durationMs=141 messageNumber=9093 bodyType=object
+[REST] RES route=/api/order-attachments-list environment=production status=500 durationMs=139 messageNumber=9093 bodyType=object
+[REST] RES route=/api/order-comments environment=production status=200 durationMs=748 messageNumber=null bodyType=object
+[REST] REQ route=- environment=- method=POST url=https://saas02.tandis.app:8443/api/jwt/login
+[REST] RES route=- environment=- status=200 durationMs=74 messageNumber=null bodyType=string
+[REST] REQ route=/api/orders environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order?fields=values(ID%2COrdernumberShort%2CStatusID%2CStatusName%2CPatient_PersonID%2CPatient_FirstName%2CPatient_LastName%2CClinicName%2CLab_Name%2COrder_Description%2CCreate%20Date%2CModified%20Date%2CIDLab%2CIDLabDepartment%2CIDLabCurrent%2CDepartmentName%2CCurrency%2CPriceInSek%2COrderPrice)&limit=10
+[REST] RES route=/api/orders environment=test status=200 durationMs=107 messageNumber=null bodyType=object
+[REST] REQ route=/api/order-attachments-list environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Attachments?limit=100&q='IDOrder'%3D%22IDGACTM7CUXVLATJ7178TI54GSU1Z5%22&fields=values(Attachment_File%2CRequest%20ID%2CCreate%20Date)
+[REST] REQ route=/api/order-services environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Service?fields=values(IDOrder%2CServiceName%2CServiceDescription%2CCategory%2CAmount%2CUnit%2CPrice%2CCurrency)&q='IDOrder'%3D%22IDGACTM7CUXVLATJ7178TI54GSU1Z5%22
+[REST] RES route=/api/order-attachments-list environment=test status=200 durationMs=21 messageNumber=null bodyType=object
+[REST] REQ route=/api/order-materials environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Material?limit=100&fields=values(IDOrder%2CMaterialName%2CMaterialCode%2CBatchNumber%2CAmountMaterial%2CUnitMaterial%2CMaterialUnitPrice%2CPriceMaterial%2CCurrency%2CPriceInSek)&q='IDOrder'%3D%22IDGACTM7CUXVLATJ7178TI54GSU1Z5%22
+[REST] REQ route=/api/order-comments environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:OrderComment?limit=100&q='IDOrder'%3D%22IDGACTM7CUXVLATJ7178TI54GSU1Z5%22
+[REST] REQ route=/api/order-tasks environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:ServiceTask?fields=values(ID%2CIDOrder%2CTaskName%2CDepartmentName%2CStatusTask%2CAssigneeFullName)&q='IDOrder'%3D%22IDGACTM7CUXVLATJ7178TI54GSU1Z5%22
+[REST] RES route=/api/order-services environment=test status=200 durationMs=39 messageNumber=null bodyType=object
+[REST] RES route=/api/order-materials environment=test status=200 durationMs=11 messageNumber=null bodyType=object
+[REST] RES route=/api/order-comments environment=test status=200 durationMs=35 messageNumber=null bodyType=object
+[REST] RES route=/api/order-tasks environment=test status=200 durationMs=35 messageNumber=null bodyType=object
+[REST] REQ route=/api/order-attachments-list environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Attachments?limit=100&q='IDOrder'%3D%22IDGACTM7CUXVLARLB2KHRKBN1D5OB2%22&fields=values(Attachment_File%2CRequest%20ID%2CCreate%20Date)
+[REST] REQ route=/api/order-services environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Service?fields=values(IDOrder%2CServiceName%2CServiceDescription%2CCategory%2CAmount%2CUnit%2CPrice%2CCurrency)&q='IDOrder'%3D%22IDGACTM7CUXVLARLB2KHRKBN1D5OB2%22
+[REST] RES route=/api/order-attachments-list environment=test status=200 durationMs=15 messageNumber=null bodyType=object
+[REST] RES route=/api/order-services environment=test status=200 durationMs=15 messageNumber=null bodyType=object
+[REST] REQ route=/api/order-tasks environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:ServiceTask?fields=values(ID%2CIDOrder%2CTaskName%2CDepartmentName%2CStatusTask%2CAssigneeFullName)&q='IDOrder'%3D%22IDGACTM7CUXVLARLB2KHRKBN1D5OB2%22
+[REST] REQ route=/api/order-comments environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:OrderComment?limit=100&q='IDOrder'%3D%22IDGACTM7CUXVLARLB2KHRKBN1D5OB2%22
+[REST] REQ route=/api/order-materials environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Material?limit=100&fields=values(IDOrder%2CMaterialName%2CMaterialCode%2CBatchNumber%2CAmountMaterial%2CUnitMaterial%2CMaterialUnitPrice%2CPriceMaterial%2CCurrency%2CPriceInSek)&q='IDOrder'%3D%22IDGACTM7CUXVLARLB2KHRKBN1D5OB2%22
+[REST] RES route=/api/order-tasks environment=test status=200 durationMs=22 messageNumber=null bodyType=object
+[REST] RES route=/api/order-comments environment=test status=200 durationMs=23 messageNumber=null bodyType=object
+[REST] RES route=/api/order-materials environment=test status=200 durationMs=22 messageNumber=null bodyType=object
+[REST] REQ route=- environment=- method=POST url=https://saas02.tandis.app:8443/api/jwt/login
+[REST] RES route=- environment=- status=200 durationMs=87 messageNumber=null bodyType=string
+[REST] REQ route=/api/orders environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order?fields=values(ID%2COrdernumberShort%2CStatusID%2CStatusName%2CPatient_PersonID%2CPatient_FirstName%2CPatient_LastName%2CClinicName%2CLab_Name%2COrder_Description%2CCreate%20Date%2CModified%20Date%2CIDLab%2CIDLabDepartment%2CIDLabCurrent%2CDepartmentName%2CCurrency%2CPriceInSek%2COrderPrice)&limit=10
+[REST] RES route=/api/orders environment=test status=200 durationMs=89 messageNumber=null bodyType=object
+[REST] REQ route=/api/order-services environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Service?fields=values(IDOrder%2CServiceName%2CServiceDescription%2CCategory%2CAmount%2CUnit%2CPrice%2CCurrency)&q='IDOrder'%3D%22IDGACTM7CUXVLATJ7178TI54GSU1Z5%22
+[REST] REQ route=/api/order-attachments-list environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Attachments?limit=100&q='IDOrder'%3D%22IDGACTM7CUXVLATJ7178TI54GSU1Z5%22&fields=values(Attachment_File%2CRequest%20ID%2CCreate%20Date)
+[REST] REQ route=/api/order-materials environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Material?limit=100&fields=values(IDOrder%2CMaterialName%2CMaterialCode%2CBatchNumber%2CAmountMaterial%2CUnitMaterial%2CMaterialUnitPrice%2CPriceMaterial%2CCurrency%2CPriceInSek)&q='IDOrder'%3D%22IDGACTM7CUXVLATJ7178TI54GSU1Z5%22
+[REST] REQ route=/api/order-tasks environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:ServiceTask?fields=values(ID%2CIDOrder%2CTaskName%2CDepartmentName%2CStatusTask%2CAssigneeFullName)&q='IDOrder'%3D%22IDGACTM7CUXVLATJ7178TI54GSU1Z5%22
+[REST] RES route=/api/order-services environment=test status=200 durationMs=12 messageNumber=null bodyType=object
+[REST] REQ route=/api/order-comments environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:OrderComment?limit=100&q='IDOrder'%3D%22IDGACTM7CUXVLATJ7178TI54GSU1Z5%22
+[REST] RES route=/api/order-attachments-list environment=test status=200 durationMs=36 messageNumber=null bodyType=object
+[REST] RES route=/api/order-comments environment=test status=200 durationMs=17 messageNumber=null bodyType=object
+[REST] RES route=/api/order-tasks environment=test status=200 durationMs=39 messageNumber=null bodyType=object
+[REST] RES route=/api/order-materials environment=test status=200 durationMs=41 messageNumber=null bodyType=object
+[REST] REQ route=/api/orders environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order?fields=values(ID%2COrdernumberShort%2CStatusID%2CStatusName%2CPatient_PersonID%2CPatient_FirstName%2CPatient_LastName%2CClinicName%2CLab_Name%2COrder_Description%2CCreate%20Date%2CModified%20Date%2CIDLab%2CIDLabDepartment%2CIDLabCurrent%2CDepartmentName%2CCurrency%2CPriceInSek%2COrderPrice)&limit=10
+[REST] RES route=/api/orders environment=test status=200 durationMs=107 messageNumber=null bodyType=object
+[REST] REQ route=/api/order-services environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Service?fields=values(IDOrder%2CServiceName%2CServiceDescription%2CCategory%2CAmount%2CUnit%2CPrice%2CCurrency)&q='IDOrder'%3D%22IDGACTM7CUXVLATJ7178TI54GSU1Z5%22
+[REST] REQ route=/api/order-tasks environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:ServiceTask?fields=values(ID%2CIDOrder%2CTaskName%2CDepartmentName%2CStatusTask%2CAssigneeFullName)&q='IDOrder'%3D%22IDGACTM7CUXVLATJ7178TI54GSU1Z5%22
+[REST] RES route=/api/order-services environment=test status=200 durationMs=11 messageNumber=null bodyType=object
+[REST] REQ route=/api/order-comments environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:OrderComment?limit=100&q='IDOrder'%3D%22IDGACTM7CUXVLATJ7178TI54GSU1Z5%22
+[REST] REQ route=/api/order-materials environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Material?limit=100&fields=values(IDOrder%2CMaterialName%2CMaterialCode%2CBatchNumber%2CAmountMaterial%2CUnitMaterial%2CMaterialUnitPrice%2CPriceMaterial%2CCurrency%2CPriceInSek)&q='IDOrder'%3D%22IDGACTM7CUXVLATJ7178TI54GSU1Z5%22
+[REST] RES route=/api/order-tasks environment=test status=200 durationMs=28 messageNumber=null bodyType=object
+[REST] REQ route=/api/order-attachments-list environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Attachments?limit=100&q='IDOrder'%3D%22IDGACTM7CUXVLATJ7178TI54GSU1Z5%22&fields=values(Attachment_File%2CRequest%20ID%2CCreate%20Date)
+[REST] RES route=/api/order-comments environment=test status=200 durationMs=9 messageNumber=null bodyType=object
+[REST] RES route=/api/order-materials environment=test status=200 durationMs=30 messageNumber=null bodyType=object
+[REST] RES route=/api/order-attachments-list environment=test status=200 durationMs=27 messageNumber=null bodyType=object
+[REST] REQ route=/api/orders environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order?fields=values(ID%2COrdernumberShort%2CStatusID%2CStatusName%2CPatient_PersonID%2CPatient_FirstName%2CPatient_LastName%2CClinicName%2CLab_Name%2COrder_Description%2CCreate%20Date%2CModified%20Date%2CIDLab%2CIDLabDepartment%2CIDLabCurrent%2CDepartmentName%2CCurrency%2CPriceInSek%2COrderPrice)&limit=10
+[REST] RES route=/api/orders environment=test status=200 durationMs=119 messageNumber=null bodyType=object
+[REST] REQ route=/api/order-services environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Service?fields=values(IDOrder%2CServiceName%2CServiceDescription%2CCategory%2CAmount%2CUnit%2CPrice%2CCurrency)&q='IDOrder'%3D%22IDGACTM7CUXVLATJ7178TI54GSU1Z5%22
+[REST] REQ route=/api/order-tasks environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:ServiceTask?fields=values(ID%2CIDOrder%2CTaskName%2CDepartmentName%2CStatusTask%2CAssigneeFullName)&q='IDOrder'%3D%22IDGACTM7CUXVLATJ7178TI54GSU1Z5%22
+[REST] REQ route=/api/order-materials environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Material?limit=100&fields=values(IDOrder%2CMaterialName%2CMaterialCode%2CBatchNumber%2CAmountMaterial%2CUnitMaterial%2CMaterialUnitPrice%2CPriceMaterial%2CCurrency%2CPriceInSek)&q='IDOrder'%3D%22IDGACTM7CUXVLATJ7178TI54GSU1Z5%22
+[REST] REQ route=/api/order-comments environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:OrderComment?limit=100&q='IDOrder'%3D%22IDGACTM7CUXVLATJ7178TI54GSU1Z5%22
+[REST] REQ route=/api/order-attachments-list environment=test method=GET url=https://saas02.tandis.app:8443/api/arsys/v1/entry/BTS:SOT:Order:Attachments?limit=100&q='IDOrder'%3D%22IDGACTM7CUXVLATJ7178TI54GSU1Z5%22&fields=values(Attachment_File%2CRequest%20ID%2CCreate%20Date)
+[REST] RES route=/api/order-services environment=test status=200 durationMs=12 messageNumber=null bodyType=object
+[REST] RES route=/api/order-materials environment=test status=200 durationMs=32 messageNumber=null bodyType=object
+[REST] RES route=/api/order-tasks environment=test status=200 durationMs=37 messageNumber=null bodyType=object
+[REST] RES route=/api/order-comments environment=test status=200 durationMs=34 messageNumber=null bodyType=object
+[REST] RES route=/api/order-attachments-list environment=test status=200 durationMs=33 messageNumber=null bodyType=object

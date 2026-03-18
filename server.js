@@ -295,3 +295,25 @@ app.get('*', (_req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+
+app.post('/api/user-clinics', async (req, res) => {
+  const { token, environment } = req.body;
+  if (!token) {
+    return res.status(400).json({ error: 'Missing AR-JWT token' });
+  }
+  const fields = encodeFields(['IDClinic', 'IDDentist', 'DentistFullName', 'LoginName', 'StatusDentist']);
+  const base = resolveBase(environment);
+  const url = `${base}/arsys/v1/entry/BTS:SOT:ClinicToDentistRelToDentist_J?fields=${fields}`;
+  await proxyFetch(res, url, {
+    headers: { Authorization: `AR-JWT ${token}`, Accept: 'application/json' }
+  }, { route: '/api/user-clinics', environment });
+});
+
+app.post('/api/user-labs', async (req, res) => {
+  const { token, environment } = req.body;
+  if (!token) {
+    return res.status(400).json({ error: 'Missing AR-JWT token' });
+  }
+  // TODO: correct table name unknown — returns empty until confirmed with BTD
+  res.json({ entries: [] });
+});

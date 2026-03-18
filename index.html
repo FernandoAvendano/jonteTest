@@ -265,6 +265,21 @@
           display: grid;
           grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
           gap: 1.25rem;
+          align-items: start;
+        }
+
+        #detail-panel {
+          position: sticky;
+          top: 5rem; /* sits just below the sticky app-header */
+          max-height: calc(100vh - 6rem);
+          overflow: hidden; /* .detail-panel-body handles scrolling */
+        }
+
+        .detail-panel-body {
+          overflow-y: auto;
+          flex: 1;
+          min-height: 0; /* required for flex scroll */
+          padding-top: 0.5rem;
         }
       }
 
@@ -431,6 +446,26 @@
         color: var(--muted);
       }
 
+      .order-desc {
+        font-size: 0.8rem;
+        color: var(--muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        margin-top: 0.15rem;
+      }
+
+      .order-first-service {
+        font-size: 0.78rem;
+        color: var(--accent);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        margin-top: 0.1rem;
+      }
+
       .order-status-pill {
         display: inline-flex;
         padding: 0.2rem 0.75rem;
@@ -440,6 +475,177 @@
         text-transform: uppercase;
         background: rgba(126, 249, 194, 0.18);
         border: 1px solid rgba(126, 249, 194, 0.4);
+      }
+
+      /* ── Status filter chips (legacy, kept for compatibility) ──── */
+      .status-filter-row {
+        display: none !important;
+      }
+
+      /* ── Filter sidebar ──────────────────────────────────────── */
+      .orders-workspace-row {
+        display: flex;
+        gap: 1.25rem;
+        align-items: start;
+        min-width: 0;
+      }
+
+      .orders-workspace-row > #orders-panel {
+        flex: 1;
+        min-width: 0;
+      }
+
+      #filter-sidebar {
+        width: 220px;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1.1rem 1rem;
+        background: var(--panel);
+        border-radius: 20px;
+        border: 1px solid var(--panel-border);
+        box-shadow: 0 16px 40px var(--shadow);
+        backdrop-filter: blur(20px) saturate(140%);
+        transition: width 0.25s ease, opacity 0.25s ease;
+      }
+
+      #filter-sidebar.sidebar-hidden {
+        display: none;
+      }
+
+      .filter-sidebar-heading {
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--muted);
+        margin: 0.5rem 0 0.3rem;
+      }
+
+      .filter-sidebar-heading:first-child {
+        margin-top: 0;
+      }
+
+      .filter-clear-btn {
+        width: 100%;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: transparent;
+        color: var(--text);
+        border-radius: 999px;
+        padding: 0.38rem 0.9rem;
+        font: inherit;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+
+      .filter-clear-btn:hover {
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .filter-status-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+      }
+
+      .filter-status-label {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        cursor: pointer;
+        font-size: 0.82rem;
+        color: var(--text);
+        user-select: none;
+      }
+
+      .filter-status-label input[type="checkbox"] {
+        appearance: none;
+        width: 15px;
+        height: 15px;
+        border: 1px solid rgba(74, 180, 210, 0.45);
+        border-radius: 4px;
+        background: var(--input-bg);
+        cursor: pointer;
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.15s, border-color 0.15s;
+        padding: 0;
+        margin: 0;
+      }
+
+      .filter-status-label input[type="checkbox"]:checked {
+        background: var(--accent);
+        border-color: var(--accent);
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M1.5 5l2.5 2.5 4.5-4.5' stroke='%23041a22' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 70%;
+      }
+
+      .filter-date-input {
+        width: 100%;
+        border: 1px solid var(--input-border);
+        border-radius: 10px;
+        padding: 0.4rem 0.6rem;
+        font: inherit;
+        font-size: 0.8rem;
+        background: var(--input-bg);
+        color: var(--text);
+        margin-top: 0.25rem;
+      }
+
+      .filter-date-input::-webkit-calendar-picker-indicator {
+        filter: invert(0.8);
+        cursor: pointer;
+      }
+
+      .filter-limit-select {
+        appearance: none;
+        width: 100%;
+        border: 1px solid var(--input-border);
+        background: var(--input-bg);
+        color: var(--text);
+        border-radius: 10px;
+        padding: 0.4rem 0.6rem;
+        font: inherit;
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+        cursor: pointer;
+      }
+
+      .sidebar-toggle-btn {
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: transparent;
+        color: var(--muted);
+        border-radius: 999px;
+        padding: 0.3rem 0.75rem;
+        font: inherit;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s;
+        white-space: nowrap;
+      }
+
+      .sidebar-toggle-btn:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text);
+      }
+
+      @media (max-width: 1023px) {
+        .orders-workspace-row {
+          flex-direction: column;
+        }
+
+        #filter-sidebar {
+          width: 100%;
+        }
+
+        #filter-sidebar.sidebar-hidden {
+          display: none;
+        }
       }
 
       /* ── Status pill colour variants ──────────────────────── */
@@ -781,7 +987,7 @@
         overflow-wrap: break-word;
       }
 
-      /* ── Detail header: title left | dept center | status right ── */
+      /* ── Detail header: title left | dept center | actions right ── */
       .detail-header {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
@@ -793,8 +999,31 @@
         text-align: center;
       }
 
-      .detail-header .order-status-pill {
-        justify-self: end;
+      .detail-header-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.5rem;
+      }
+
+      /* ── Pin button ────────────────────────────────────────── */
+      .detail-pin-btn {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 999px;
+        color: var(--muted);
+        cursor: pointer;
+        font-size: 0.85rem;
+        padding: 0.2rem 0.5rem;
+        line-height: 1;
+        flex-shrink: 0;
+        transition: border-color 0.15s, color 0.15s, background 0.15s;
+      }
+
+      .detail-pin-btn.is-pinned {
+        border-color: var(--accent);
+        color: var(--accent);
+        background: rgba(77, 217, 192, 0.1);
       }
     </style>
   </head>
@@ -914,20 +1143,29 @@
 
         <!-- Orders + detail workspace -->
         <div class="workspace">
+          <!-- Left column: filter sidebar + orders panel -->
+          <div class="orders-workspace-row">
+            <!-- Filter sidebar -->
+            <aside id="filter-sidebar" class="sidebar-hidden"></aside>
+
+            <!-- Orders panel -->
           <section class="panel" id="orders-panel">
             <div class="orders-header">
               <div>
                 <span class="eyebrow" data-i18n="orders.badge">Latest 10 orders</span>
                 <h2 data-i18n="orders.title">Orders</h2>
               </div>
-              <button
-                type="button"
-                id="orders-btn"
-                disabled
-                data-i18n="action.refresh"
-              >
-                Refresh
-              </button>
+              <div style="display:flex;gap:0.5rem;align-items:center;">
+                <button type="button" id="sidebar-toggle-btn" class="sidebar-toggle-btn">⚙ Filters</button>
+                <button
+                  type="button"
+                  id="orders-btn"
+                  disabled
+                  data-i18n="action.refresh"
+                >
+                  Refresh
+                </button>
+              </div>
             </div>
             <div
               class="status"
@@ -936,8 +1174,10 @@
             >
               Sign in to load orders.
             </div>
+            <div class="status-filter-row hidden" id="status-filter-row"></div>
             <div class="orders-list" id="orders-list"></div>
           </section>
+          </div><!-- /.orders-workspace-row -->
 
           <section class="panel" id="detail-panel">
             <div class="orders-header detail-header">
@@ -960,8 +1200,12 @@
                 </p>
               </div>
               <p id="detail-department" class="detail-department hidden"></p>
-              <span id="detail-order-status" class="order-status-pill hidden"></span>
+              <div class="detail-header-actions">
+                <span id="detail-order-status" class="order-status-pill hidden"></span>
+                <button type="button" id="detail-pin-btn" class="detail-pin-btn" title="Nåla fast scroll-position" aria-label="Nåla fast scroll-position">📌</button>
+              </div>
             </div>
+            <div class="detail-panel-body">
             <div class="detail-grid">
               <article class="detail-card">
                 <div class="detail-head">
@@ -1006,6 +1250,7 @@
                 <div id="comments-list" class="detail-items"></div>
               </article>
             </div>
+            </div><!-- /.detail-panel-body -->
           </section>
         </div>
 
@@ -1027,7 +1272,7 @@
       const API_BASE =
         window.location.hostname === "localhost"
           ? ""
-          : "https://lexicostatistical-seamanly-elle.ngrok-free.dev/mtandis";
+          : "https://lexicostatistical-seamanly-elle.ngrok-free.dev";
       const DESKTOP_BREAKPOINT = 1024;
       const SESSION_KEY = "tandisSession";
       const SESSION_TTL = 60 * 60 * 1000;
@@ -1060,7 +1305,7 @@
           "env.current": "Environment",
           "env.testShort": "Test",
           "env.productionShort": "Production",
-          "orders.badge": "Latest 10 orders",
+          "orders.badge": "Orders",
           "orders.title": "Orders",
           "orders.signInPrompt": "Sign in to load orders.",
           "orders.loading": "Loading orders…",
@@ -1155,7 +1400,7 @@
           "env.current": "Miljö",
           "env.testShort": "Test",
           "env.productionShort": "Produktion",
-          "orders.badge": "Senaste 10 order",
+          "orders.badge": "Order",
           "orders.title": "Lista",
           "orders.signInPrompt": "Logga in för att ladda order.",
           "orders.loading": "Laddar order…",
@@ -1250,7 +1495,7 @@
           "env.current": "Entorno",
           "env.testShort": "Test",
           "env.productionShort": "Producción",
-          "orders.badge": "Últimos 10 pedidos",
+          "orders.badge": "Pedidos",
           "orders.title": "Pedidos",
           "orders.signInPrompt": "Inicia sesión para cargar pedidos.",
           "orders.loading": "Cargando pedidos…",
@@ -1336,6 +1581,11 @@
         userRole: null,        // 'dentist' | 'technician' | 'unknown' | null
         selectedClinicId: null, // the single clinic chosen from the selector
         selectedLabId: null,    // the single lab chosen from the selector
+        detailScrollPinned: false, // when true, switching orders doesn't reset detail scroll
+        selectedStatuses: new Set(), // active status filter; empty = show all
+        filterDateFrom: "",           // ISO date string "YYYY-MM-DD" or ""
+        filterDateTo: "",             // ISO date string "YYYY-MM-DD" or ""
+        filterLimit: 100,             // 0 = All
       };
 
       // ── Screen refs ──────────────────────────────────────────
@@ -1437,6 +1687,26 @@
 
       form.addEventListener("submit", handleLogin);
       ordersBtn.addEventListener("click", () => fetchOrders(true));
+
+      // Sidebar toggle
+      document.getElementById("sidebar-toggle-btn")?.addEventListener("click", () => {
+        const sidebar = document.getElementById("filter-sidebar");
+        if (!sidebar) return;
+        const isHidden = sidebar.classList.toggle("sidebar-hidden");
+        const btn = document.getElementById("sidebar-toggle-btn");
+        btn.textContent = isHidden ? "⚙ Filters" : "✕ Filters";
+      });
+
+      // On mobile (< 1024px) sidebar hidden by default (already set via sidebar-hidden class)
+      // On desktop show by default
+      (() => {
+        const sidebar = document.getElementById("filter-sidebar");
+        const btn = document.getElementById("sidebar-toggle-btn");
+        if (sidebar && window.innerWidth >= 1024) {
+          sidebar.classList.remove("sidebar-hidden");
+          if (btn) btn.textContent = "✕ Filters";
+        }
+      })();
       signOutBtn.addEventListener("click", () => {
         clearSession();
         window.location.reload();
@@ -1477,6 +1747,15 @@
           userDropdown.classList.add("hidden");
           userAvatarBtn.setAttribute("aria-expanded", "false");
         }
+      });
+
+      document.getElementById("detail-pin-btn").addEventListener("click", () => {
+        state.detailScrollPinned = !state.detailScrollPinned;
+        const btn = document.getElementById("detail-pin-btn");
+        btn.classList.toggle("is-pinned", state.detailScrollPinned);
+        btn.title = state.detailScrollPinned
+          ? "Scroll-position nålad — klicka för att låsa upp"
+          : "Nåla fast scroll-position";
       });
 
       document.addEventListener("click", (event) => {
@@ -1547,7 +1826,7 @@
 
         try {
           // Build order filter based on detected role and selected location
-          const orderBody = { token: state.token, environment: state.environment };
+          const orderBody = { token: state.token, environment: state.environment, limit: 100 };
           if (state.userRole === 'dentist' && state.selectedClinicId) {
             orderBody.clinicIds = [state.selectedClinicId];
           } else if (state.userRole === 'technician' && state.selectedLabId) {
@@ -1567,6 +1846,12 @@
               delete state.loadingDetails[id];
             }
           });
+          // Reset filters when new data arrives (statuses may have changed)
+          state.selectedStatuses = new Set();
+          state.filterDateFrom = "";
+          state.filterDateTo = "";
+          state.filterLimit = 100;
+          renderFilterSidebar();
           renderOrders();
           if (!state.orders.length) {
             ordersStatus.textContent = t("orders.none");
@@ -1581,6 +1866,8 @@
             if (current) {
               await selectOrder(current, { preserveScroll: true });
             }
+            // Fetch first service name for each order in background
+            fetchFirstServices(state.orders.map((o) => o.ID));
           }
         } catch (error) {
           ordersStatus.textContent = error.message || t("orders.failed");
@@ -1591,12 +1878,34 @@
 
       function renderOrders() {
         ordersList.innerHTML = "";
-        if (!state.orders.length) {
+
+        // Apply filters
+        let filtered = state.orders;
+        if (state.selectedStatuses.size > 0)
+          filtered = filtered.filter((o) => state.selectedStatuses.has(o.StatusName));
+        if (state.filterDateFrom)
+          filtered = filtered.filter((o) => o["Create Date"] && o["Create Date"] >= state.filterDateFrom);
+        if (state.filterDateTo)
+          filtered = filtered.filter((o) => o["Create Date"] && o["Create Date"] <= state.filterDateTo + "T23:59:59");
+        if (state.filterLimit > 0)
+          filtered = filtered.slice(0, state.filterLimit);
+
+        // Update eyebrow badge with counts
+        const eyebrow = document.querySelector("#orders-panel .eyebrow");
+        if (eyebrow) {
+          const total = state.orders.length;
+          const shown = filtered.length;
+          eyebrow.textContent = total
+            ? (shown < total ? `${shown} / ${total}` : `${total}`)
+            : t("orders.badge");
+        }
+
+        if (!filtered.length) {
           ordersList.innerHTML = `<p class="empty">${t("orders.listEmpty")}</p>`;
           return;
         }
 
-        state.orders.forEach((order) => {
+        filtered.forEach((order) => {
           const block = document.createElement("div");
           block.className = "order-block";
 
@@ -1604,6 +1913,9 @@
           button.type = "button";
           button.className = `order-card${state.selectedOrderId === order.ID ? " active" : ""}`;
           button.dataset.orderId = order.ID;
+          const desc = order.Order_Description || "";
+          const descSnippet = desc.length > 100 ? desc.substring(0, 100) + "…" : desc;
+          const firstService = state.firstServices?.[order.ID] || "";
           button.innerHTML = `
         <strong>#${order.OrdernumberShort || order.ID || "—"}</strong>
         <div class="order-meta-row">
@@ -1614,11 +1926,117 @@
           <span title="${t("summary.created")}">${formatDate(order["Create Date"])}</span>
           <span class="order-status-pill ${getStatusClass(order.StatusName)}">${order.StatusName || "Unknown"}</span>
         </div>
+        ${descSnippet ? `<div class="order-desc" title="${desc.replace(/"/g, "&quot;")}">${descSnippet}</div>` : ""}
+        ${firstService ? `<div class="order-first-service">🔧 ${firstService}</div>` : ""}
       `;
 
           block.appendChild(button);
           ordersList.appendChild(block);
         });
+      }
+
+      function renderStatusFilters() {
+        // Legacy stub — delegates to sidebar
+        renderFilterSidebar();
+      }
+
+      function renderFilterSidebar() {
+        const sidebar = document.getElementById("filter-sidebar");
+        if (!sidebar) return;
+
+        // Collect unique statuses from loaded orders
+        const statuses = [...new Set(state.orders.map((o) => o.StatusName).filter(Boolean))].sort();
+        const hasAnyFilter = state.selectedStatuses.size > 0 || state.filterDateFrom || state.filterDateTo || state.filterLimit !== 100;
+
+        sidebar.innerHTML = `
+          <button type="button" class="filter-clear-btn" id="filter-clear-btn">✕ Clear all filters</button>
+
+          <p class="filter-sidebar-heading">Status</p>
+          <div class="filter-status-list" id="filter-status-list">
+            ${statuses.length === 0
+              ? `<span style="font-size:0.8rem;color:var(--muted)">No orders loaded</span>`
+              : statuses.map((s) => `
+                <label class="filter-status-label">
+                  <input type="checkbox" data-status="${escapeHtml(s)}"${state.selectedStatuses.has(s) ? " checked" : ""}>
+                  <span class="order-status-pill ${getStatusClass(s)}" style="font-size:0.72rem;padding:0.15rem 0.6rem;">${escapeHtml(s)}</span>
+                </label>`).join("")
+            }
+          </div>
+
+          <p class="filter-sidebar-heading">Date range</p>
+          <label style="font-size:0.75rem;color:var(--muted);">From</label>
+          <input type="date" id="filter-date-from" class="filter-date-input" value="${state.filterDateFrom}">
+          <label style="font-size:0.75rem;color:var(--muted);margin-top:0.25rem;">To</label>
+          <input type="date" id="filter-date-to" class="filter-date-input" value="${state.filterDateTo}">
+
+          <p class="filter-sidebar-heading">Show</p>
+          <select id="filter-limit" class="filter-limit-select">
+            <option value="10"${state.filterLimit === 10 ? " selected" : ""}>10 orders</option>
+            <option value="25"${state.filterLimit === 25 ? " selected" : ""}>25 orders</option>
+            <option value="50"${state.filterLimit === 50 ? " selected" : ""}>50 orders</option>
+            <option value="100"${state.filterLimit === 100 ? " selected" : ""}>100 orders</option>
+            <option value="0"${state.filterLimit === 0 ? " selected" : ""}>All orders</option>
+          </select>
+        `;
+
+        // Wire status checkboxes
+        sidebar.querySelectorAll("#filter-status-list input[type='checkbox']").forEach((cb) => {
+          cb.addEventListener("change", () => {
+            const s = cb.dataset.status;
+            if (cb.checked) state.selectedStatuses.add(s);
+            else state.selectedStatuses.delete(s);
+            renderOrders();
+          });
+        });
+
+        // Wire date inputs
+        sidebar.querySelector("#filter-date-from")?.addEventListener("change", (e) => {
+          state.filterDateFrom = e.target.value;
+          renderOrders();
+        });
+        sidebar.querySelector("#filter-date-to")?.addEventListener("change", (e) => {
+          state.filterDateTo = e.target.value;
+          renderOrders();
+        });
+
+        // Wire limit select
+        sidebar.querySelector("#filter-limit")?.addEventListener("change", (e) => {
+          state.filterLimit = parseInt(e.target.value, 10);
+          renderOrders();
+        });
+
+        // Wire clear button
+        sidebar.querySelector("#filter-clear-btn")?.addEventListener("click", () => {
+          state.selectedStatuses = new Set();
+          state.filterDateFrom = "";
+          state.filterDateTo = "";
+          state.filterLimit = 100;
+          renderFilterSidebar();
+          renderOrders();
+        });
+      }
+
+      async function fetchFirstServices(orderIds) {
+        if (!state.token || !orderIds.length) return;
+        if (!state.firstServices) state.firstServices = {};
+        await Promise.all(
+          orderIds.map((id) =>
+            post("/api/order-services", {
+              token: state.token,
+              orderId: id,
+              environment: state.environment,
+            })
+              .then((data) => {
+                const entries = Array.isArray(data?.entries) ? data.entries : [];
+                const first = entries[0]?.values;
+                if (first?.ServiceName) {
+                  state.firstServices[id] = first.ServiceName;
+                }
+              })
+              .catch(() => {})
+          )
+        );
+        renderOrders();
       }
 
       async function selectOrder(order, options = {}) {
@@ -1896,8 +2314,8 @@
         list.innerHTML = items.map((item) => {
           const id   = isDentist ? item.IDClinic : item.IDLab;
           const name = isDentist
-            ? (item.ClinicName || id || '—')
-            : (item.LabName   || id || '—');
+            ? (item.ClinicName || item.DentistFullName || id || '—')
+            : (item.LabName || item.TechnicianFullName || id || '—');
           return `
             <button type="button" class="order-card" data-location-id="${escapeHtml(String(id ?? ''))}">
               <strong>${escapeHtml(name)}</strong>
@@ -1950,7 +2368,7 @@
           const id    = state.selectedClinicId || state.selectedLabId;
           const items = state.userRole === 'dentist' ? state.clinics : state.labs;
           const item  = items.find((i) => (i.IDClinic || i.IDLab) === id);
-          const name  = item ? (item.ClinicName || item.LabName || id) : id;
+          const name  = item ? (item.ClinicName || item.DentistFullName || item.LabName || item.TechnicianFullName || id) : id;
           changeBtn.textContent = `${t('location.change')}: ${name}`;
           changeBtn.classList.remove('hidden');
         } else {
@@ -2055,6 +2473,11 @@
       }
 
       function renderDesktopDetail(order, details = {}) {
+        if (!state.detailScrollPinned) {
+          const body = document.querySelector(".detail-panel-body");
+          if (body) body.scrollTop = 0;
+        }
+
         const sections = getDetailSections(order, details);
         sections.forEach((section) => {
           switch (section.title) {
@@ -2426,11 +2849,17 @@
         };
       }
 
-      function scrollToDetail() {
+      function scrollToDetail(orderId) {
         if (isDesktopView()) {
-          document
-            .getElementById("detail-panel")
-            .scrollIntoView({ behavior: "smooth", block: "start" });
+          // On desktop the list and detail panel are side-by-side; scrolling to the
+          // detail panel jumps the page back to the top. Instead, keep the clicked
+          // order card in view so the user stays where they were in the list.
+          const activeCard = orderId
+            ? ordersList.querySelector(`.order-card[data-order-id="${orderId}"]`)
+            : null;
+          if (activeCard) {
+            activeCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          }
         }
       }
 
@@ -2666,6 +3095,13 @@
         state.labs = [];
         state.selectedClinicId = null;
         state.selectedLabId = null;
+        state.selectedStatuses = new Set();
+        state.filterDateFrom = "";
+        state.filterDateTo = "";
+        state.filterLimit = 100;
+        document.getElementById("status-filter-row")?.classList.add("hidden");
+        const sidebarEl = document.getElementById("filter-sidebar");
+        if (sidebarEl) sidebarEl.innerHTML = "";
         userNameEl.textContent = t("user.notSigned");
         updateAvatarInitials("");
         currentEnvEl.textContent = "";
@@ -2812,6 +3248,11 @@
         }
         if (expect === "text") {
           return response.text();
+        }
+        const ct = response.headers.get("content-type") || "";
+        if (!ct.includes("application/json")) {
+          // Non-JSON response (e.g. plain "OK") — return null gracefully
+          return null;
         }
         return response.json();
       }
