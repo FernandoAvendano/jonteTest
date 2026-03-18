@@ -2201,7 +2201,7 @@
        */
       async function fetchUserClinics() {
         try {
-          const data = await post('/api/user-clinics', { token: state.token, environment: state.environment });
+          const data = await post('/api/user-clinics', { token: state.token, environment: state.environment, username: state.user });
           state.clinics = Array.isArray(data?.entries) ? data.entries.map((e) => e.values || {}) : [];
         } catch (error) {
           console.warn('Could not fetch user clinics:', error?.message);
