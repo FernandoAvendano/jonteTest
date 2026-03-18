@@ -2315,7 +2315,12 @@
         const list      = document.getElementById('location-list');
 
         const isDentist = state.userRole === 'dentist';
-        const items     = isDentist ? state.clinics : state.labs;
+        const rawItems  = isDentist ? state.clinics : state.labs;
+        const items     = [...rawItems].sort((a, b) => {
+          const nameA = (isDentist ? (a.ClinicName || a.DentistFullName || '') : (a.LabName || '')).toLowerCase();
+          const nameB = (isDentist ? (b.ClinicName || b.DentistFullName || '') : (b.LabName || '')).toLowerCase();
+          return nameA.localeCompare(nameB, 'sv');
+        });
 
         eyebrow.textContent  = isDentist ? t('location.clinicBadge') : t('location.labBadge');
         title.textContent    = isDentist ? t('location.selectClinic') : t('location.selectLab');
