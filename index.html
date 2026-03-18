@@ -263,7 +263,7 @@
       @media (min-width: 1024px) {
         .workspace {
           display: grid;
-          grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+          grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
           gap: 1.25rem;
           align-items: start;
         }
@@ -1942,8 +1942,16 @@
         const sidebar = document.getElementById("filter-sidebar");
         if (!sidebar) return;
 
-        // Collect unique statuses from loaded orders
-        const statuses = [...new Set(state.orders.map((o) => o.StatusName).filter(Boolean))].sort();
+        // Collect unique statuses sorted by StatusID (numeric)
+        const statusMap = new Map();
+        for (const o of state.orders) {
+          if (o.StatusName && !statusMap.has(o.StatusName)) {
+            statusMap.set(o.StatusName, o.StatusID ?? 9999);
+          }
+        }
+        const statuses = [...statusMap.entries()]
+          .sort((a, b) => Number(a[1]) - Number(b[1]))
+          .map(([name]) => name);
         const hasAnyFilter = state.selectedStatuses.size > 0 || state.filterDateFrom || state.filterDateTo || state.filterLimit !== 100;
 
         sidebar.innerHTML = `
@@ -2321,7 +2329,6 @@
           return `
             <button type="button" class="order-card" data-location-id="${escapeHtml(String(id ?? ''))}">
               <strong>${escapeHtml(name)}</strong>
-              <div class="order-meta-row"><span>${escapeHtml(String(id ?? '—'))}</span></div>
             </button>
           `;
         }).join('');
