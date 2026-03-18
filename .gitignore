@@ -2,3 +2,8 @@
 node_modules/
 server.log
 ngrok.log
+.venv311/
+*.log
+slack-events-server.js
+slack-events.log
+mtandis.log
