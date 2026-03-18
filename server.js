@@ -133,8 +133,18 @@ app.post('/api/orders', async (req, res) => {
     'PriceInSek',
     'OrderPrice'
   ]);
+  const { clinicIds, labIds } = req.body;
+  let queryParam = '';
+  if (Array.isArray(clinicIds) && clinicIds.length > 0) {
+    const clinicFilter = clinicIds.map((id) => `'IDClinic'="${id}"`).join(' OR ');
+    queryParam = `&q=${encodeQuery(clinicFilter)}`;
+  } else if (Array.isArray(labIds) && labIds.length > 0) {
+    const labFilter = labIds.map((id) => `'IDLab'="${id}"`).join(' OR ');
+    queryParam = `&q=${encodeQuery(labFilter)}`;
+  }
+
   const base = resolveBase(environment);
-  const url = `${base}/arsys/v1/entry/BTS:SOT:Order?fields=${fields}&limit=${limit}`;
+  const url = `${base}/arsys/v1/entry/BTS:SOT:Order?fields=${fields}&limit=${limit}${queryParam}`;
 
   await proxyFetch(res, url, {
     headers: { Authorization: `AR-JWT ${token}`, Accept: 'application/json' }
