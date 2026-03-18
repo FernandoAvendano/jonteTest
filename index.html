@@ -2215,7 +2215,11 @@
       async function fetchUserLabs() {
         try {
           const data = await post('/api/user-labs', { token: state.token, environment: state.environment });
-          state.labs = Array.isArray(data?.entries) ? data.entries.map((e) => e.values || {}) : [];
+          state.labs = Array.isArray(data?.entries) ? data.entries.map((e) => {
+            const v = e.values || {};
+            // Normalize field names to match expected IDLab/LabName
+            return { ...v, IDLab: v.IDLab ?? v.ID, LabName: v.LabName ?? v.Name };
+          }) : [];
         } catch (error) {
           console.warn('Could not fetch user labs:', error?.message);
           state.labs = [];

@@ -314,6 +314,11 @@ app.post('/api/user-labs', async (req, res) => {
   if (!token) {
     return res.status(400).json({ error: 'Missing AR-JWT token' });
   }
-  // TODO: correct table name unknown — returns empty until confirmed with BTD
-  res.json({ entries: [] });
+  const fields = encodeFields(['ID', 'Name', 'Status', 'IDParentCompany', 'Type']);
+  const query = encodeQuery(`'Status'="Active"`);
+  const base = resolveBase(environment);
+  const url = `${base}/arsys/v1/entry/BTS:SOT:Lab?fields=${fields}&q=${query}&limit=50`;
+  await proxyFetch(res, url, {
+    headers: { Authorization: `AR-JWT ${token}`, Accept: 'application/json' }
+  }, { route: '/api/user-labs', environment });
 });
