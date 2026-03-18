@@ -543,6 +543,12 @@
         background: rgba(255, 255, 255, 0.08);
       }
 
+      .filter-clear-btn.sort-active {
+        background: rgba(74, 180, 210, 0.2);
+        border-color: rgba(74, 180, 210, 0.6);
+        color: var(--accent);
+      }
+
       .filter-status-list {
         display: flex;
         flex-direction: column;
@@ -1586,6 +1592,8 @@
         filterDateFrom: "",
         filterDateTo: "",             // ISO date string "YYYY-MM-DD" or ""
         filterLimit: 0,               // 0 = All
+        sortField: "date",            // "date" | "order" | "status"
+        sortDir: "desc",              // "asc" | "desc"
       };
 
       // ── Screen refs ──────────────────────────────────────────
@@ -1888,6 +1896,21 @@
         if (state.filterLimit > 0)
           filtered = filtered.slice(0, state.filterLimit);
 
+        // Sort
+        const dir = state.sortDir === "asc" ? 1 : -1;
+        filtered = [...filtered].sort((a, b) => {
+          if (state.sortField === "order") {
+            return dir * ((Number(a.OrdernumberShort) || 0) - (Number(b.OrdernumberShort) || 0));
+          } else if (state.sortField === "status") {
+            return dir * ((Number(a.StatusID) || 0) - (Number(b.StatusID) || 0));
+          } else {
+            // date (default)
+            const da = a["Create Date"] || "";
+            const db = b["Create Date"] || "";
+            return dir * (da < db ? -1 : da > db ? 1 : 0);
+          }
+        });
+
         // Update eyebrow badge with counts
         const eyebrow = document.querySelector("#orders-panel .eyebrow");
         if (eyebrow) {
@@ -1983,6 +2006,17 @@
             <option value="100"${state.filterLimit === 100 ? " selected" : ""}>100 orders</option>
             <option value="0"${state.filterLimit === 0 ? " selected" : ""}>All orders</option>
           </select>
+
+          <p class="filter-sidebar-heading">Sort</p>
+          <select id="filter-sort-field" class="filter-limit-select">
+            <option value="date"${state.sortField === "date" ? " selected" : ""}>Date</option>
+            <option value="order"${state.sortField === "order" ? " selected" : ""}>Order number</option>
+            <option value="status"${state.sortField === "status" ? " selected" : ""}>Status</option>
+          </select>
+          <div style="display:flex;gap:0.4rem;margin-top:0.4rem;">
+            <button type="button" id="sort-asc" class="filter-clear-btn${state.sortDir === "asc" ? " sort-active" : ""}" style="flex:1;padding:0.3rem 0.4rem;font-size:0.78rem;">↑ Asc</button>
+            <button type="button" id="sort-desc" class="filter-clear-btn${state.sortDir === "desc" ? " sort-active" : ""}" style="flex:1;padding:0.3rem 0.4rem;font-size:0.78rem;">↓ Desc</button>
+          </div>
         `;
 
         // Wire status checkboxes
@@ -2008,6 +2042,22 @@
         // Wire limit select
         sidebar.querySelector("#filter-limit")?.addEventListener("change", (e) => {
           state.filterLimit = parseInt(e.target.value, 10);
+          renderOrders();
+        });
+
+        // Wire sort
+        sidebar.querySelector("#filter-sort-field")?.addEventListener("change", (e) => {
+          state.sortField = e.target.value;
+          renderOrders();
+        });
+        sidebar.querySelector("#sort-asc")?.addEventListener("click", () => {
+          state.sortDir = "asc";
+          renderFilterSidebar();
+          renderOrders();
+        });
+        sidebar.querySelector("#sort-desc")?.addEventListener("click", () => {
+          state.sortDir = "desc";
+          renderFilterSidebar();
           renderOrders();
         });
 
