@@ -1272,7 +1272,7 @@
       const API_BASE =
         window.location.hostname === "localhost"
           ? ""
-          : "https://lexicostatistical-seamanly-elle.ngrok-free.dev";
+          : "/mtandis";
       const DESKTOP_BREAKPOINT = 1024;
       const SESSION_KEY = "tandisSession";
       const SESSION_TTL = 60 * 60 * 1000;
@@ -1846,11 +1846,9 @@
               delete state.loadingDetails[id];
             }
           });
-          // Reset filters when new data arrives (statuses may have changed)
+          // Reset status filter when new data arrives (statuses may have changed)
+          // Keep date range and limit as-is so user preferences persist
           state.selectedStatuses = new Set();
-          state.filterDateFrom = "";
-          state.filterDateTo = "";
-          state.filterLimit = 100;
           renderFilterSidebar();
           renderOrders();
           if (!state.orders.length) {
@@ -3260,8 +3258,12 @@
         try {
           return JSON.parse(responseText);
         } catch (_e) {
-          // BMC responses sometimes contain control characters — use a lenient approach
-          return response.json !== undefined ? JSON.parse(responseText.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, "")) : null;
+          try {
+            // BMC responses sometimes contain control characters — strip and retry
+            return JSON.parse(responseText.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, ""));
+          } catch (_e2) {
+            return null;
+          }
         }
       }
 
