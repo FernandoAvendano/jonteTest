@@ -1583,9 +1583,9 @@
         selectedLabId: null,    // the single lab chosen from the selector
         detailScrollPinned: false, // when true, switching orders doesn't reset detail scroll
         selectedStatuses: new Set(), // active status filter; empty = show all
-        filterDateFrom: "",           // ISO date string "YYYY-MM-DD" or ""
+        filterDateFrom: (() => { const d = new Date(); d.setMonth(d.getMonth() - 3); return d.toISOString().slice(0,10); })(),
         filterDateTo: "",             // ISO date string "YYYY-MM-DD" or ""
-        filterLimit: 100,             // 0 = All
+        filterLimit: 0,               // 0 = All
       };
 
       // ── Screen refs ──────────────────────────────────────────
@@ -3253,12 +3253,16 @@
         if (expect === "text") {
           return response.text();
         }
-        const ct = response.headers.get("content-type") || "";
-        if (!ct.includes("application/json")) {
-          // Non-JSON response (e.g. plain "OK") — return null gracefully
+        const responseText = await response.text();
+        if (!responseText || responseText.trim() === "OK" || responseText.trim() === "") {
           return null;
         }
-        return response.json();
+        try {
+          return JSON.parse(responseText);
+        } catch (_e) {
+          // BMC responses sometimes contain control characters — use a lenient approach
+          return response.json !== undefined ? JSON.parse(responseText.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, "")) : null;
+        }
       }
 
       async function forceRefresh() {
