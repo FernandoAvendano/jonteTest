@@ -481,10 +481,7 @@
       .sort-toolbar {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
-        padding: 0.4rem 0;
-        border-bottom: 1px solid var(--panel-border);
-        margin-bottom: 0.25rem;
+        gap: 0.4rem;
       }
 
       .sort-toolbar-label {
@@ -1302,6 +1299,15 @@
                 <h2 data-i18n="orders.title">Orders</h2>
               </div>
               <div style="display:flex;gap:0.5rem;align-items:center;">
+                <div class="sort-toolbar" id="sort-toolbar">
+                  <span class="sort-toolbar-label">Sortera:</span>
+                  <select id="sort-field-select" class="sort-field-select">
+                    <option value="date">Datum</option>
+                    <option value="order">Ordernr</option>
+                    <option value="status">Status</option>
+                  </select>
+                  <button type="button" id="sort-dir-btn" class="sort-dir-btn" title="Byt riktning">↓</button>
+                </div>
                 <button
                   type="button"
                   id="orders-btn"
@@ -1318,15 +1324,6 @@
               data-i18n="orders.signInPrompt"
             >
               Sign in to load orders.
-            </div>
-            <div class="sort-toolbar" id="sort-toolbar">
-              <span class="sort-toolbar-label">Sortera:</span>
-              <select id="sort-field-select" class="sort-field-select">
-                <option value="date">Datum</option>
-                <option value="order">Ordernr</option>
-                <option value="status">Status</option>
-              </select>
-              <button type="button" id="sort-dir-btn" class="sort-dir-btn" title="Byt riktning">↓</button>
             </div>
             <div class="status-filter-row" id="status-filter-row"></div>
             <div class="orders-list" id="orders-list"></div>
