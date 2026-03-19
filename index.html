@@ -508,12 +508,31 @@
         border: 1px solid var(--panel-border);
         border-radius: 20px;
         width: min(900px, 95vw);
-        max-height: 90vh;
+        height: min(82vh, 700px);
+        min-width: 340px;
+        min-height: 300px;
         display: flex;
         flex-direction: column;
         overflow: hidden;
         box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+        user-select: none;
       }
+
+      .modal-resize-handle {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 20px;
+        height: 20px;
+        cursor: se-resize;
+        z-index: 10;
+        opacity: 0.4;
+        background: radial-gradient(circle at 100% 100%, var(--muted) 30%, transparent 31%),
+                    radial-gradient(circle at 100% 100%, var(--muted) 55%, transparent 56%),
+                    radial-gradient(circle at 100% 100%, var(--muted) 80%, transparent 81%);
+        transition: opacity 0.15s;
+      }
+      .modal-resize-handle:hover { opacity: 0.9; }
 
       .attachment-modal-header {
         display: flex;
@@ -551,18 +570,22 @@
         overflow: hidden;
         display: flex;
         flex-direction: column;
-        align-items: stretch;
+        align-items: center;
         justify-content: center;
         padding: 0.75rem;
         min-height: 200px;
+        /* Needed so children with max-height:100% resolve correctly */
+        height: 0;
       }
 
       .attachment-modal-content img {
         max-width: 100%;
-        max-height: 70vh;
+        max-height: 100%;
+        width: auto;
+        height: auto;
         object-fit: contain;
         border-radius: 8px;
-        align-self: center;
+        flex-shrink: 1;
       }
 
       .attachment-modal-content iframe {
@@ -581,6 +604,7 @@
         width: 100%;
         height: 100%;
         gap: 0.5rem;
+        min-height: 0;
       }
 
       .pdf-nav {
@@ -608,7 +632,7 @@
         overflow-y: auto;
         overflow-x: hidden;
         width: 100%;
-        max-height: 65vh;
+        min-height: 0;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -626,13 +650,13 @@
 
       #stl-viewer-canvas {
         width: 100%;
-        height: 65vh;
-        max-height: 65vh;
+        height: 100%;
         border-radius: 8px;
         display: block;
         background: #1a1a2e;
         cursor: grab;
-        flex-shrink: 1;
+        flex: 1;
+        min-height: 0;
       }
 
       #stl-viewer-canvas:active { cursor: grabbing; }
@@ -2124,6 +2148,33 @@
         if (e.target.id === "attachment-modal-close" || e.target.id === "attachment-modal-backdrop") closeAttachmentModal();
       });
 
+      // Modal drag-resize
+      (function() {
+        let resizing = false, startX, startY, startW, startH;
+        document.addEventListener("mousedown", e => {
+          if (e.target.id !== "modal-resize-handle") return;
+          e.preventDefault();
+          resizing = true;
+          const box = document.querySelector(".attachment-modal-box");
+          startX = e.clientX; startY = e.clientY;
+          startW = box.offsetWidth; startH = box.offsetHeight;
+        });
+        document.addEventListener("mousemove", e => {
+          if (!resizing) return;
+          const box = document.querySelector(".attachment-modal-box");
+          const newW = Math.max(340, startW + (e.clientX - startX));
+          const newH = Math.max(300, startH + (e.clientY - startY));
+          box.style.width = newW + "px";
+          box.style.height = newH + "px";
+          // Re-render STL if active
+          const canvas = document.getElementById("stl-viewer-canvas");
+          if (canvas && window._stlRenderer) {
+            window._stlRenderer.setSize(canvas.clientWidth, canvas.clientHeight);
+          }
+        });
+        document.addEventListener("mouseup", () => { resizing = false; });
+      })();
+
       // ── PDF Viewer (PDF.js) ───────────────────────────────────
       let _pdfDoc = null;
       let _pdfPage = 1;
@@ -2279,7 +2330,7 @@
 
           const c2 = getModalContent();
           if (isImage) {
-            if (c2) c2.innerHTML = `<img src="${url}" alt="${escapeHtml(fileName)}">`;
+            if (c2) c2.innerHTML = `<img src="${url}" alt="${escapeHtml(fileName)}" style="width:100%;height:100%;object-fit:contain;">`;
           } else if (isPdf) {
             if (c2) renderPDFViewer(url, c2);
 
@@ -4346,6 +4397,7 @@
         </div>
       </div>
       <div class="attachment-modal-content" id="attachment-modal-content"></div>
+      <div class="modal-resize-handle" id="modal-resize-handle"></div>
     </div>
   </div>
   </body>
