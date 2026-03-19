@@ -478,6 +478,68 @@
       }
 
       /* ── Status filter chips (legacy, kept for compatibility) ──── */
+      /* ── Filter mini-tab (collapsed state on desktop) ──────── */
+      .filter-mini-tab {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        width: 32px;
+        padding: 0.75rem 0;
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+        border-radius: 12px;
+        backdrop-filter: blur(20px) saturate(140%);
+        cursor: pointer;
+        color: var(--muted);
+        transition: color 0.15s, background 0.15s;
+        flex-shrink: 0;
+        align-self: flex-start;
+      }
+
+      .filter-mini-tab:hover {
+        color: var(--accent);
+        background: rgba(74, 180, 210, 0.08);
+      }
+
+      .filter-mini-icon {
+        font-size: 0.9rem;
+      }
+
+      .filter-mini-label {
+        font-size: 0.62rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+      }
+
+      /* Show mini-tab only on desktop when sidebar is hidden */
+      @media (min-width: 1024px) {
+        #filter-sidebar.sidebar-hidden ~ #filter-mini-tab {
+          display: flex;
+        }
+      }
+
+      /* Close button inside sidebar header */
+      .filter-sidebar-close-btn {
+        background: none;
+        border: none;
+        color: var(--muted);
+        cursor: pointer;
+        font-size: 1rem;
+        padding: 0.1rem 0.3rem;
+        border-radius: 6px;
+        line-height: 1;
+        transition: color 0.15s, background 0.15s;
+      }
+
+      .filter-sidebar-close-btn:hover {
+        color: var(--text);
+        background: rgba(255,255,255,0.08);
+      }
+
       .sort-toolbar {
         display: flex;
         align-items: center;
@@ -1290,6 +1352,11 @@
             <div id="filter-sidebar-backdrop"></div>
             <!-- Filter sidebar -->
             <aside id="filter-sidebar" class="sidebar-hidden"></aside>
+            <!-- Minimized filter tab (shown when sidebar is hidden on desktop) -->
+            <button type="button" id="filter-mini-tab" class="filter-mini-tab" title="Öppna filter">
+              <span class="filter-mini-icon">⚙</span>
+              <span class="filter-mini-label">Filter</span>
+            </button>
 
             <!-- Orders panel -->
           <section class="panel" id="orders-panel">
@@ -1866,6 +1933,9 @@
       });
 
       // On mobile (< 1024px) sidebar hidden by default (already set via sidebar-hidden class)
+      // Wire filter mini-tab
+      document.getElementById("filter-mini-tab")?.addEventListener("click", openSidebar);
+
       // Wire sort toolbar
       (() => {
         const fieldSel = document.getElementById("sort-field-select");
@@ -2111,19 +2181,20 @@
           chips.push({ label: `Sort: ${sortLabels[state.sortField] || state.sortField} ${state.sortDir === "asc" ? "↑" : "↓"}`, remove: () => { state.sortField = "date"; state.sortDir = "desc"; renderFilterSidebar(); renderOrders(); } });
         }
 
-        // Always show — add the open-filters button at start
+        if (chips.length === 0) {
+          row.classList.remove("has-active");
+          row.innerHTML = "";
+          return;
+        }
+
         row.classList.add("has-active");
-        const editLabel = chips.length === 0 ? "⚙ Lägg till filter" : "✏ Redigera filter";
         row.innerHTML =
-          `<button class="sidebar-toggle-btn" id="chip-filter-open-btn">${editLabel}</button>` +
           chips.map((c, i) =>
             `<button class="active-filter-chip" data-chip-index="${i}" title="Remove filter">
               ${escapeHtml(c.label)} <span class="chip-remove">✕</span>
             </button>`
           ).join("") +
-          (chips.length > 0 ? `<button class="active-filter-clear-all" id="chip-clear-all">Rensa alla</button>` : "");
-
-        row.querySelector("#chip-filter-open-btn")?.addEventListener("click", toggleSidebar);
+          `<button class="active-filter-clear-all" id="chip-clear-all">Rensa alla</button>`;
 
         row.querySelectorAll(".active-filter-chip").forEach((btn) => {
           btn.addEventListener("click", () => {
@@ -2264,6 +2335,10 @@
           : '';
 
         sidebar.innerHTML = `
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.25rem;">
+            <span style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted);">Filter</span>
+            <button type="button" class="filter-sidebar-close-btn" id="filter-sidebar-close-btn" title="Stäng filter">✕</button>
+          </div>
           <button type="button" class="filter-clear-btn" id="filter-clear-btn">✕ Clear all filters</button>
 
           <p class="filter-sidebar-heading">Status</p>
@@ -2317,6 +2392,9 @@
 
         // Wire sort
 
+
+        // Wire close button
+        sidebar.querySelector("#filter-sidebar-close-btn")?.addEventListener("click", closeSidebar);
 
         // Wire clear button
         sidebar.querySelector("#filter-clear-btn")?.addEventListener("click", () => {
