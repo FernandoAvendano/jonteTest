@@ -315,7 +315,7 @@ app.post('/api/start-task', async (req, res) => {
   await proxyFetch(res, url, {
     method: 'PUT',
     headers: { Authorization: `AR-JWT ${token}`, 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify({ values: { StatusTask: 'Started', zzTriggerAPIUpdate: 'TASKSTART' } })
+    body: JSON.stringify({ values: { StatusTask: 'Planned', zzTriggerAPIUpdate: 'TASKSTART' } })
   }, { route: '/api/start-task', environment });
 });
 
