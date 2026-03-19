@@ -1988,8 +1988,13 @@
           });
           // Reset status filter when new data arrives (statuses may have changed)
           // Keep date range and limit as-is so user preferences persist
-          // Default: no explicit filter (show all non-archived), archived checkboxes start unchecked
-          state.selectedStatuses = new Set();
+          if (state.userRole === 'technician') {
+            // Default statuses for technicians
+            const TECH_DEFAULT_STATUSES = new Set(['Skickad', 'Mottagen', 'Godkänd', 'Pågående', 'Provning klar', 'Packning']);
+            state.selectedStatuses = new Set([...state.orders.map(o => o.StatusName)].filter(s => TECH_DEFAULT_STATUSES.has(s)));
+          } else {
+            state.selectedStatuses = new Set();
+          }
           updateHeaderLabName();
           renderFilterSidebar();
           renderOrders();
