@@ -3818,11 +3818,14 @@
           const reqB = parseInt(b["Request ID"] || b.RequestID || "0", 10);
           return reqA - reqB;
         });
+        let firstPlannedShown = false;
         const html = sorted
           .map((task) => {
             const reqId = task["Request ID"] || task.RequestID || "";
             const status = task.StatusTask || "";
-            const canStart = reqId && status === "Planned";
+            const isFirstPlanned = reqId && status === "Planned" && !firstPlannedShown;
+            if (isFirstPlanned) firstPlannedShown = true;
+            const canStart = isFirstPlanned;
             const canStop  = reqId && (status === "Started" || status === "Paused");
             const startBtn = canStart
               ? `<button type="button" class="task-start-btn" data-task-req-id="${escapeHtml(reqId)}" title="Starta arbetsmoment">▶ Starta</button>`
