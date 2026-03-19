@@ -1780,12 +1780,23 @@
       });
 
       // On mobile (< 1024px) sidebar hidden by default (already set via sidebar-hidden class)
-      // On desktop show by default
+      // On desktop show by default; close on mobile
       (() => {
         if (window.innerWidth >= 1024) {
           openSidebar();
+        } else {
+          closeSidebar();
         }
       })();
+
+      // Handle resize: close on mobile, open on desktop
+      window.addEventListener("resize", () => {
+        if (window.innerWidth >= 1024) {
+          openSidebar();
+        } else {
+          closeSidebar();
+        }
+      });
       signOutBtn.addEventListener("click", () => {
         clearSession();
         window.location.reload();
