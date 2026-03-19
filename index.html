@@ -571,6 +571,24 @@
         background: white;
       }
 
+      #stl-viewer-canvas {
+        width: 100%;
+        height: 65vh;
+        border-radius: 8px;
+        display: block;
+        background: #1a1a2e;
+        cursor: grab;
+      }
+
+      #stl-viewer-canvas:active { cursor: grabbing; }
+
+      .stl-controls-hint {
+        font-size: 0.72rem;
+        color: var(--muted);
+        text-align: center;
+        margin-top: 0.4rem;
+      }
+
       .preview-btn {
         background: none;
         border: 1px solid var(--panel-border);
@@ -2048,6 +2066,82 @@
         if (e.target.id === "attachment-modal-close" || e.target.id === "attachment-modal-backdrop") closeAttachmentModal();
       });
 
+      // ── STL 3D Viewer (Three.js) ──────────────────────────────
+      let _stlRenderer = null; // keep ref to dispose previous scene
+
+      function renderSTLViewer(blobUrl, canvas) {
+        // Dispose previous renderer if any
+        if (_stlRenderer) { try { _stlRenderer.dispose(); } catch(_){} _stlRenderer = null; }
+
+        window._loadThree(() => {
+          const THREE = window.THREE;
+          const w = canvas.clientWidth || 800;
+          const h = canvas.clientHeight || Math.round(w * 0.6);
+
+          const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+          renderer.setPixelRatio(window.devicePixelRatio);
+          renderer.setSize(w, h);
+          renderer.setClearColor(0x1a1a2e);
+          _stlRenderer = renderer;
+
+          const scene = new THREE.Scene();
+          const camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 10000);
+          camera.position.set(0, 0, 200);
+
+          // Lights
+          scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+          const dl = new THREE.DirectionalLight(0xffffff, 1);
+          dl.position.set(1, 2, 3);
+          scene.add(dl);
+          const dl2 = new THREE.DirectionalLight(0x8888ff, 0.4);
+          dl2.position.set(-2, -1, -1);
+          scene.add(dl2);
+
+          // OrbitControls
+          const controls = new THREE.OrbitControls(camera, renderer.domElement);
+          controls.enableDamping = true;
+          controls.dampingFactor = 0.1;
+
+          // Load STL
+          const loader = new THREE.STLLoader();
+          loader.load(blobUrl, (geometry) => {
+            geometry.computeVertexNormals();
+            geometry.center();
+
+            const material = new THREE.MeshPhongMaterial({
+              color: 0x4ab4d2, specular: 0x888888, shininess: 60, side: THREE.DoubleSide
+            });
+            const mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
+
+            // Fit camera to model
+            const box = new THREE.Box3().setFromObject(mesh);
+            const size = box.getSize(new THREE.Vector3()).length();
+            camera.position.set(0, 0, size * 1.5);
+            camera.far = size * 100;
+            camera.updateProjectionMatrix();
+            controls.target.set(0, 0, 0);
+            controls.update();
+
+            let animId;
+            function animate() {
+              animId = requestAnimationFrame(animate);
+              controls.update();
+              renderer.render(scene, camera);
+            }
+            animate();
+
+            // Stop animation when modal closes
+            const stopAnim = () => { cancelAnimationFrame(animId); renderer.dispose(); };
+            document.getElementById("attachment-modal-close")?.addEventListener("click", stopAnim, { once: true });
+            document.getElementById("attachment-modal-backdrop")?.addEventListener("click", stopAnim, { once: true });
+          }, undefined, (err) => {
+            const c = getModalContent();
+            if (c) c.innerHTML = `<p style="color:#ff9898">Kunde inte ladda STL: ${err?.message || err}</p>`;
+          });
+        });
+      }
+
       async function openAttachmentPreview(attachmentId, fileName, ext) {
         const modal = getModal();
         if (!modal) return;
@@ -2076,6 +2170,11 @@
             if (c2) c2.innerHTML = `<img src="${url}" alt="${escapeHtml(fileName)}">`;
           } else if (isPdf || ext === "html" || ext === "htm") {
             if (c2) c2.innerHTML = `<iframe src="${url}" title="${escapeHtml(fileName)}"></iframe>`;
+          } else if (ext === "stl") {
+            if (c2) {
+              c2.innerHTML = `<canvas id="stl-viewer-canvas"></canvas><p class="stl-controls-hint">🖱 Dra för att rotera &nbsp;·&nbsp; Scroll för att zooma &nbsp;·&nbsp; Högerklick/två fingrar för att panorera</p>`;
+              renderSTLViewer(url, c2.querySelector("#stl-viewer-canvas"));
+            }
           } else {
             if (c2) c2.innerHTML = `<p style="color:var(--muted)">Förhandsvisning ej tillgänglig för .${ext}-filer. Ladda ned filen för att öppna.</p>`;
           }
@@ -3477,7 +3576,8 @@
             const isImage = ["jpg","jpeg","png","gif","webp","bmp","svg"].includes(ext);
             const isPdf = ext === "pdf";
             const isHtml = ["html","htm"].includes(ext);
-            const canPreview = isImage || isPdf || isHtml;
+            const isStl = ext === "stl";
+            const canPreview = isImage || isPdf || isHtml || isStl;
             const previewBtn = canPreview && requestId
               ? `<button type="button" class="preview-btn" data-attachment-id="${requestId}" data-file-name="${escapeHtml(fileName)}" data-ext="${ext}" title="Förhandsgranska">👁</button>`
               : "";
@@ -4057,6 +4157,28 @@
       translateInitialUI();
     </script>
   <!-- Attachment preview modal -->
+  <!-- Three.js + STL viewer (loaded once, lazy) -->
+  <script>
+    window._threeReady = false;
+    window._loadThree = function(cb) {
+      if (window._threeReady) { cb(); return; }
+      const s1 = document.createElement('script');
+      s1.src = 'https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.min.js';
+      s1.onload = function() {
+        const s2 = document.createElement('script');
+        s2.src = 'https://cdn.jsdelivr.net/npm/three@0.162.0/examples/js/loaders/STLLoader.js';
+        s2.onload = function() {
+          const s3 = document.createElement('script');
+          s3.src = 'https://cdn.jsdelivr.net/npm/three@0.162.0/examples/js/controls/OrbitControls.js';
+          s3.onload = function() { window._threeReady = true; cb(); };
+          document.head.appendChild(s3);
+        };
+        document.head.appendChild(s2);
+      };
+      document.head.appendChild(s1);
+    };
+  </script>
+
   <div id="attachment-preview-modal" class="attachment-modal hidden">
     <div class="attachment-modal-backdrop" id="attachment-modal-backdrop"></div>
     <div class="attachment-modal-box">
