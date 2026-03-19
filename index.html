@@ -1299,15 +1299,6 @@
                 <h2 data-i18n="orders.title">Orders</h2>
               </div>
               <div style="display:flex;gap:0.5rem;align-items:center;">
-                <div class="sort-toolbar" id="sort-toolbar">
-                  <span class="sort-toolbar-label">Sortera:</span>
-                  <select id="sort-field-select" class="sort-field-select">
-                    <option value="date">Datum</option>
-                    <option value="order">Ordernr</option>
-                    <option value="status">Status</option>
-                  </select>
-                  <button type="button" id="sort-dir-btn" class="sort-dir-btn" title="Byt riktning">↓</button>
-                </div>
                 <button
                   type="button"
                   id="orders-btn"
@@ -1318,12 +1309,17 @@
                 </button>
               </div>
             </div>
-            <div
-              class="status"
-              id="orders-status"
-              data-i18n="orders.signInPrompt"
-            >
-              Sign in to load orders.
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;">
+              <div class="status" id="orders-status" data-i18n="orders.signInPrompt">Sign in to load orders.</div>
+              <div class="sort-toolbar" id="sort-toolbar">
+                <span class="sort-toolbar-label">Sortera:</span>
+                <select id="sort-field-select" class="sort-field-select">
+                  <option value="date">Datum</option>
+                  <option value="order">Ordernr</option>
+                  <option value="status">Status</option>
+                </select>
+                <button type="button" id="sort-dir-btn" class="sort-dir-btn" title="Byt riktning">↓</button>
+              </div>
             </div>
             <div class="status-filter-row" id="status-filter-row"></div>
             <div class="orders-list" id="orders-list"></div>
