@@ -2205,10 +2205,34 @@
             commentText: text,
             submitter: state.user
           });
+          const savedText = text;
           commentInput.value = "";
-          // Reload comments
-          const order = state.orders.find(o => o.ID === state.selectedOrderId);
-          if (order) await fetchOrderDetails(order);
+
+          // Optimistic update — add comment immediately to UI
+          const now = new Date().toISOString();
+          const optimistic = {
+            Submitter: state.user,
+            CommentText: savedText,
+            "Create Date": now,
+          };
+          const prevEntries = state._lastComments || [];
+          const optimisticEntries = [...prevEntries, optimistic];
+          const optSection = buildCommentsSection(optimisticEntries, null);
+          if (commentsStatus) commentsStatus.textContent = optSection.status;
+          if (commentsList) commentsList.innerHTML = optSection.html;
+
+          // Then reload from server in background
+          post("/api/order-comments", {
+            token: state.token,
+            orderId: state.selectedOrderId,
+            environment: state.environment,
+          }).then(commentsRes => {
+            const entries = (commentsRes?.entries ?? []).map(e => e.values);
+            state._lastComments = entries;
+            const section = buildCommentsSection(entries, null);
+            if (commentsStatus) commentsStatus.textContent = section.status;
+            if (commentsList) commentsList.innerHTML = section.html;
+          }).catch(() => {});
         } catch (err) {
           commentError.textContent = err.message || "Kunde inte skicka kommentar.";
           commentError.style.display = "block";
@@ -2827,6 +2851,7 @@
         try {
           const details = await fetchOrderDetails(order);
           state.details[order.ID] = details;
+          state._lastComments = details.comments || [];
           if (mobile) {
             showMobileDetail(order, details);
           } else {
