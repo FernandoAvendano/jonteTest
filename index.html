@@ -2475,7 +2475,7 @@
           if (item) {
             const pill = item.querySelector(".order-status-pill");
             if (isStart) {
-              if (pill) { pill.textContent = "Planned"; pill.className = `order-status-pill ${getStatusClass("Planned")}`; }
+              if (pill) { pill.textContent = "Started"; pill.className = `order-status-pill ${getStatusClass("Started")}`; }
               btn.remove();
               // Add stop button
               const btnWrap = item.querySelector("div[style*='flex-direction:column']");
@@ -3824,8 +3824,8 @@
           .map((task) => {
             const reqId = task["Request ID"] || task.RequestID || "";
             const status = task.StatusTask || "";
-            const canStart = reqId && status !== "Planned" && status !== "Completed" && status !== "Closed" && status !== "Done";
-            const canStop  = reqId && status === "Planned";
+            const canStart = reqId && status === "Planned";
+            const canStop  = reqId && status === "Started";
             const startBtn = canStart
               ? `<button type="button" class="task-start-btn" data-task-req-id="${escapeHtml(reqId)}" title="Starta arbetsmoment">▶ Starta</button>`
               : "";
