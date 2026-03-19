@@ -479,17 +479,13 @@
 
       /* ── Status filter chips (legacy, kept for compatibility) ──── */
       .status-filter-row {
-        display: none;
+        display: flex;
         flex-wrap: wrap;
         gap: 0.4rem;
         margin-top: 0.5rem;
         padding-top: 0.5rem;
         border-top: 1px solid var(--panel-border);
         align-items: center;
-      }
-
-      .status-filter-row.has-active {
-        display: flex;
       }
 
       .active-filter-chip {
@@ -1257,7 +1253,6 @@
                 <h2 data-i18n="orders.title">Orders</h2>
               </div>
               <div style="display:flex;gap:0.5rem;align-items:center;">
-                <button type="button" id="sidebar-toggle-btn" class="sidebar-toggle-btn">⚙ Filters</button>
                 <button
                   type="button"
                   id="orders-btn"
@@ -2048,19 +2043,21 @@
           chips.push({ label: `Sort: ${sortLabels[state.sortField] || state.sortField} ${state.sortDir === "asc" ? "↑" : "↓"}`, remove: () => { state.sortField = "date"; state.sortDir = "desc"; renderFilterSidebar(); renderOrders(); } });
         }
 
-        if (chips.length === 0) {
-          row.classList.remove("has-active");
-          row.innerHTML = "";
-          return;
-        }
-
+        // Always show — add the open-filters button at start
         row.classList.add("has-active");
-        row.innerHTML = chips.map((c, i) =>
-          `<button class="active-filter-chip" data-chip-index="${i}" title="Remove filter">
-            ${escapeHtml(c.label)} <span class="chip-remove">✕</span>
-          </button>`
-        ).join("") +
-        `<button class="active-filter-clear-all" id="chip-clear-all">Clear all</button>`;
+        const editLabel = chips.length === 0 ? "⚙ Lägg till filter" : "✏ Redigera filter";
+        row.innerHTML =
+          `<button class="sidebar-toggle-btn" id="chip-filter-open-btn">${editLabel}</button>` +
+          chips.map((c, i) =>
+            `<button class="active-filter-chip" data-chip-index="${i}" title="Remove filter">
+              ${escapeHtml(c.label)} <span class="chip-remove">✕</span>
+            </button>`
+          ).join("") +
+          (chips.length > 0 ? `<button class="active-filter-clear-all" id="chip-clear-all">Rensa alla</button>` : "");
+
+        row.querySelector("#chip-filter-open-btn")?.addEventListener("click", () => {
+          document.getElementById("sidebar-toggle-btn")?.click();
+        });
 
         row.querySelectorAll(".active-filter-chip").forEach((btn) => {
           btn.addEventListener("click", () => {
