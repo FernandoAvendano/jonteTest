@@ -3763,12 +3763,13 @@
           };
         }
         const sorted = [...tasks].sort((a, b) => {
-          const sortA = Number(a.SortOrder ?? a["Sort Order"] ?? Infinity);
-          const sortB = Number(b.SortOrder ?? b["Sort Order"] ?? Infinity);
+          const sortA = Number(a.SortOrder ?? a["Sort Order"] ?? 9999);
+          const sortB = Number(b.SortOrder ?? b["Sort Order"] ?? 9999);
           if (sortA !== sortB) return sortA - sortB;
-          const reqA = (a["Request ID"] || a.RequestID || "").toString();
-          const reqB = (b["Request ID"] || b.RequestID || "").toString();
-          return reqA.localeCompare(reqB);
+          // Stable secondary sort by Request ID (numeric)
+          const reqA = parseInt(a["Request ID"] || a.RequestID || "0", 10);
+          const reqB = parseInt(b["Request ID"] || b.RequestID || "0", 10);
+          return reqA - reqB;
         });
         const html = sorted
           .map((task) => {
