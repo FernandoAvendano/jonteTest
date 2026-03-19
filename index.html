@@ -1275,7 +1275,7 @@
             >
               Sign in to load orders.
             </div>
-            <div class="status-filter-row hidden" id="status-filter-row"></div>
+            <div class="status-filter-row" id="status-filter-row"></div>
             <div class="orders-list" id="orders-list"></div>
           </section>
           </div><!-- /.orders-workspace-row -->
@@ -3433,7 +3433,6 @@
         state.filterDateFrom = "";
         state.filterDateTo = "";
         state.filterLimit = 100;
-        document.getElementById("status-filter-row")?.classList.add("hidden");
         const sidebarEl = document.getElementById("filter-sidebar");
         if (sidebarEl) sidebarEl.innerHTML = "";
         userNameEl.textContent = t("user.notSigned");
