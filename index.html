@@ -2411,16 +2411,9 @@
           }
           // Always include Avslutad (1000) even though it's a terminal state not in transitions
           seen.set(1000, 'Avslutad');
-          // Deduplicate by name — keep lowest StatusID for each unique name
-          const byName = new Map();
-          for (const [id, name] of seen.entries()) {
-            if (!byName.has(name) || id < byName.get(name)) {
-              byName.set(name, id);
-            }
-          }
-          state.availableStatuses = [...byName.entries()]
-            .map(([name, id]) => ({ id, name }))
-            .sort((a, b) => a.id - b.id);
+          state.availableStatuses = [...seen.entries()]
+            .sort((a, b) => a[0] - b[0])
+            .map(([id, name]) => ({ id, name }));
         } catch (e) {
           console.warn('fetchAvailableStatuses failed:', e);
           state.availableStatuses = [];
