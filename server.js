@@ -190,12 +190,14 @@ app.post('/api/order-tasks', async (req, res) => {
   }
 
   const fields = encodeFields([
+    'Request ID',
     'ID',
     'IDOrder',
     'TaskName',
     'DepartmentName',
     'StatusTask',
-    'AssigneeFullName'
+    'AssigneeFullName',
+    'SortOrder'
   ]);
   const query = encodeQuery(`'IDOrder'="${orderId}"`);
   const base = resolveBase(environment);
@@ -301,6 +303,20 @@ app.post('/api/order-comments', async (req, res) => {
   await proxyFetch(res, url, {
     headers: { Authorization: `AR-JWT ${token}`, Accept: 'application/json' }
   }, { route: '/api/order-comments', environment });
+});
+
+app.post('/api/start-task', async (req, res) => {
+  const { token, taskRequestId, environment } = req.body;
+  if (!token || !taskRequestId) {
+    return res.status(400).json({ error: 'Missing token or taskRequestId' });
+  }
+  const base = resolveBase(environment);
+  const url = `${base}/arsys/v1/entry/BTS:SOT:Order:ServiceTask/${taskRequestId}`;
+  await proxyFetch(res, url, {
+    method: 'PUT',
+    headers: { Authorization: `AR-JWT ${token}`, 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ values: { StatusTask: 'Started', zzTriggerAPIUpdate: 'TASKSTART' } })
+  }, { route: '/api/start-task', environment });
 });
 
 app.post('/api/add-comment', async (req, res) => {

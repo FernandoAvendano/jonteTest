@@ -687,6 +687,30 @@
         border-color: rgba(74, 180, 210, 0.5);
       }
 
+      /* ── Task start button ──────────────────────────────────── */
+      .task-start-btn {
+        background: rgba(74, 210, 120, 0.15);
+        border: 1px solid rgba(74, 210, 120, 0.4);
+        color: #4ad278;
+        border-radius: 8px;
+        padding: 0.25rem 0.6rem;
+        font-size: 0.78rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s, border-color 0.15s;
+        white-space: nowrap;
+      }
+
+      .task-start-btn:hover {
+        background: rgba(74, 210, 120, 0.3);
+        border-color: rgba(74, 210, 120, 0.7);
+      }
+
+      .task-start-btn:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+
       /* ── Add comment form ───────────────────────────────────── */
       .add-comment-form {
         margin-top: 0.75rem;
@@ -2350,6 +2374,34 @@
         }
       }
 
+      // Task start button
+      document.getElementById("tasks-list")?.addEventListener("click", async (e) => {
+        const btn = e.target.closest(".task-start-btn");
+        if (!btn) return;
+        const taskReqId = btn.dataset.taskReqId;
+        if (!taskReqId || !state.token) return;
+        btn.disabled = true;
+        btn.textContent = "…";
+        try {
+          await post("/api/start-task", {
+            token: state.token,
+            taskRequestId: taskReqId,
+            environment: state.environment
+          });
+          // Update status pill optimistically
+          const item = document.querySelector(`.task-item[data-task-req-id="${taskReqId}"]`);
+          if (item) {
+            const pill = item.querySelector(".order-status-pill");
+            if (pill) { pill.textContent = "Started"; pill.className = "order-status-pill status-active"; }
+            btn.remove();
+          }
+        } catch (err) {
+          btn.disabled = false;
+          btn.textContent = "▶ Starta";
+          alert("Kunde inte starta arbetsmoment: " + (err.message || err));
+        }
+      });
+
       // Delegate preview button clicks from attachments list
       document.getElementById("attachments-list")?.addEventListener("click", (e) => {
         const btn = e.target.closest(".preview-btn");
@@ -3668,20 +3720,26 @@
           return reqA.localeCompare(reqB);
         });
         const html = sorted
-          .map(
-            (task) => `
-        <div class="detail-item">
+          .map((task) => {
+            const reqId = task["Request ID"] || task.RequestID || "";
+            const status = task.StatusTask || "";
+            const canStart = reqId && status !== "Started" && status !== "Completed" && status !== "Closed";
+            const startBtn = canStart
+              ? `<button type="button" class="task-start-btn" data-task-req-id="${escapeHtml(reqId)}" title="Starta arbetsmoment">▶ Starta</button>`
+              : "";
+            return `
+        <div class="detail-item task-item" data-task-req-id="${escapeHtml(reqId)}">
           <div>
             <strong>${task.TaskName || "Task"}</strong>
             <p>${task.DepartmentName || "—"}</p>
           </div>
-          <div style="text-align:right;">
-            <span class="order-status-pill ${getStatusClass(task.StatusTask)}" style="margin-bottom:0.35rem; display:inline-flex;">${task.StatusTask || "—"}</span>
+          <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;">
+            <span class="order-status-pill ${getStatusClass(status)}" style="display:inline-flex;">${status || "—"}</span>
             <p>${task.AssigneeFullName || ""}</p>
+            ${startBtn}
           </div>
-        </div>
-      `,
-          )
+        </div>`;
+          })
           .join("");
         return {
           title: t("tasks.title"),
