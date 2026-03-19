@@ -239,7 +239,7 @@ app.post('/api/order-attachments-list', async (req, res) => {
     return res.status(400).json({ error: 'Missing token or orderId' });
   }
 
-  const fields = encodeFields(['Attachment_File', 'Request ID', 'Create Date']);
+  const fields = encodeFields(['Attachment_File', 'Request ID', 'Create Date', 'Filename', 'SizeMB', 'Type', 'IDOrder']);
   const query = encodeQuery(`'IDOrder'="${orderId}"`);
   const base = resolveBase(environment);
   const url = `${base}/arsys/v1/entry/BTS:SOT:Order:Attachments?limit=100&q=${query}&fields=${fields}`;

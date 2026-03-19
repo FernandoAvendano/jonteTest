@@ -479,6 +479,114 @@
 
       /* ── Status filter chips (legacy, kept for compatibility) ──── */
       /* ── Filter mini-tab (collapsed state on desktop) ──────── */
+      /* ── Attachment preview modal ───────────────────────────── */
+      .attachment-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+      }
+
+      .attachment-modal.hidden {
+        display: none;
+      }
+
+      .attachment-modal-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(0,0,0,0.75);
+        backdrop-filter: blur(4px);
+      }
+
+      .attachment-modal-box {
+        position: relative;
+        z-index: 1;
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+        border-radius: 20px;
+        width: min(900px, 95vw);
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+      }
+
+      .attachment-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--panel-border);
+        gap: 0.5rem;
+      }
+
+      .attachment-modal-title {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .attachment-modal-close {
+        background: none;
+        border: none;
+        color: var(--muted);
+        font-size: 1.1rem;
+        cursor: pointer;
+        padding: 0.2rem 0.4rem;
+        border-radius: 6px;
+        flex-shrink: 0;
+      }
+
+      .attachment-modal-close:hover { color: var(--text); }
+
+      .attachment-modal-content {
+        flex: 1;
+        overflow: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        min-height: 200px;
+      }
+
+      .attachment-modal-content img {
+        max-width: 100%;
+        max-height: 70vh;
+        object-fit: contain;
+        border-radius: 8px;
+      }
+
+      .attachment-modal-content iframe {
+        width: 100%;
+        height: 70vh;
+        border: none;
+        border-radius: 8px;
+        background: white;
+      }
+
+      .preview-btn {
+        background: none;
+        border: 1px solid var(--panel-border);
+        color: var(--muted);
+        border-radius: 8px;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: color 0.15s, border-color 0.15s;
+      }
+
+      .preview-btn:hover {
+        color: var(--accent);
+        border-color: rgba(74, 180, 210, 0.5);
+      }
+
       /* ── Add comment form ───────────────────────────────────── */
       .add-comment-form {
         margin-top: 0.75rem;
@@ -1925,6 +2033,66 @@
       const commentSubmitBtn  = document.getElementById("comment-submit-btn");
       const commentError      = document.getElementById("comment-error");
 
+      // Attachment preview modal (lazy refs)
+      function getModal() { return document.getElementById("attachment-preview-modal"); }
+      function getModalContent() { return document.getElementById("attachment-modal-content"); }
+      function getModalTitle() { return document.getElementById("attachment-modal-title"); }
+      function getModalDownload() { return document.getElementById("attachment-modal-download"); }
+
+      function closeAttachmentModal() {
+        getModal()?.classList.add("hidden");
+        const c = getModalContent(); if (c) c.innerHTML = "";
+      }
+
+      document.addEventListener("click", (e) => {
+        if (e.target.id === "attachment-modal-close" || e.target.id === "attachment-modal-backdrop") closeAttachmentModal();
+      });
+
+      async function openAttachmentPreview(attachmentId, fileName, ext) {
+        const modal = getModal();
+        if (!modal) return;
+        const title = getModalTitle(); if (title) title.textContent = fileName;
+        const content = getModalContent(); if (content) content.innerHTML = `<p style="color:var(--muted)">Laddar…</p>`;
+        modal.classList.remove("hidden");
+
+        // Wire download button
+        const dlBtn = getModalDownload(); if (dlBtn) dlBtn.onclick = () => downloadAttachment(attachmentId, fileName, dlBtn);
+
+        try {
+          // Fetch file as blob
+          const resp = await fetch(`${API_BASE}/api/order-attachment-file`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token: state.token, attachmentId, environment: state.environment })
+          });
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const blob = await resp.blob();
+          const url = URL.createObjectURL(blob);
+          const isImage = ["jpg","jpeg","png","gif","webp","bmp","svg"].includes(ext);
+          const isPdf = ext === "pdf";
+
+          const c2 = getModalContent();
+          if (isImage) {
+            if (c2) c2.innerHTML = `<img src="${url}" alt="${escapeHtml(fileName)}">`;
+          } else if (isPdf || ext === "html" || ext === "htm") {
+            if (c2) c2.innerHTML = `<iframe src="${url}" title="${escapeHtml(fileName)}"></iframe>`;
+          } else {
+            if (c2) c2.innerHTML = `<p style="color:var(--muted)">Förhandsvisning ej tillgänglig för .${ext}-filer. Ladda ned filen för att öppna.</p>`;
+          }
+        } catch (err) {
+          const c2 = getModalContent();
+          if (c2) c2.innerHTML = `<p style="color:#ff9898">Kunde inte ladda filen: ${escapeHtml(err.message)}</p>`;
+        }
+      }
+
+      // Delegate preview button clicks from attachments list
+      document.getElementById("attachments-list")?.addEventListener("click", (e) => {
+        const btn = e.target.closest(".preview-btn");
+        if (!btn) return;
+        const { attachmentId, fileName, ext } = btn.dataset;
+        openAttachmentPreview(attachmentId, fileName, ext);
+      });
+
       commentSubmitBtn?.addEventListener("click", async () => {
         const text = commentInput.value.trim();
         if (!text || !state.selectedOrderId || !state.token) return;
@@ -3299,17 +3467,32 @@
               attachment.ID ||
               attachment.id;
             const created = formatDate(attachment["Create Date"]);
-            const fileName = getAttachmentName(attachment.Attachment_File);
+            // Use Filename field if available, fall back to Attachment_File.name
+            const rawName = attachment.Filename || getAttachmentName(attachment.Attachment_File);
+            // Strip Windows path prefix (C:\... or C__Temp_... style)
+            let fileName = (rawName.replace(/^.*[\\\/]/, "").replace(/^[A-Z]__[^_]+_[A-Z0-9]+_/, "") || rawName || "Attachment").trim();
+            const ext = fileName.split(".").pop().toLowerCase();
+            const sizeMb = attachment.SizeMB ? `${attachment.SizeMB} MB` : "";
             const disabled = requestId ? "" : "disabled";
+            const isImage = ["jpg","jpeg","png","gif","webp","bmp","svg"].includes(ext);
+            const isPdf = ext === "pdf";
+            const isHtml = ["html","htm"].includes(ext);
+            const canPreview = isImage || isPdf || isHtml;
+            const previewBtn = canPreview && requestId
+              ? `<button type="button" class="preview-btn" data-attachment-id="${requestId}" data-file-name="${escapeHtml(fileName)}" data-ext="${ext}" title="Förhandsgranska">👁</button>`
+              : "";
             return `
-          <div class="detail-item">
-            <div>
+          <div class="detail-item attachment-item">
+            <div class="attachment-info">
               <strong>${escapeHtml(fileName)}</strong>
-              <p>${escapeHtml(created)}</p>
+              <p style="font-size:0.75rem;color:var(--muted);">${escapeHtml(created)}${sizeMb ? ` · ${sizeMb}` : ""}</p>
             </div>
-            <button type="button" class="download-btn" data-attachment-id="${requestId || ""}" data-file-name="${escapeHtml(fileName)}" ${disabled}>
-              ${requestId ? t("attachments.download") : t("attachments.unavailable")}
-            </button>
+            <div style="display:flex;gap:0.4rem;align-items:center;">
+              ${previewBtn}
+              <button type="button" class="download-btn" data-attachment-id="${requestId || ""}" data-file-name="${escapeHtml(fileName)}" ${disabled}>
+                ${requestId ? t("attachments.download") : t("attachments.unavailable")}
+              </button>
+            </div>
           </div>
         `;
           })
@@ -3872,5 +4055,19 @@
 
       translateInitialUI();
     </script>
+  <!-- Attachment preview modal -->
+  <div id="attachment-preview-modal" class="attachment-modal hidden">
+    <div class="attachment-modal-backdrop" id="attachment-modal-backdrop"></div>
+    <div class="attachment-modal-box">
+      <div class="attachment-modal-header">
+        <span id="attachment-modal-title" class="attachment-modal-title"></span>
+        <div style="display:flex;gap:0.5rem;">
+          <button type="button" id="attachment-modal-download" class="download-btn" style="font-size:0.8rem;padding:0.3rem 0.75rem;">↓ Ladda ned</button>
+          <button type="button" id="attachment-modal-close" class="attachment-modal-close">✕</button>
+        </div>
+      </div>
+      <div class="attachment-modal-content" id="attachment-modal-content"></div>
+    </div>
+  </div>
   </body>
 </html>
