@@ -1792,31 +1792,22 @@
       function openSidebar() {
         const sidebar = document.getElementById("filter-sidebar");
         const backdrop = document.getElementById("filter-sidebar-backdrop");
-        const btn = document.getElementById("sidebar-toggle-btn");
         if (!sidebar) return;
         sidebar.classList.remove("sidebar-hidden");
         if (isMobile() && backdrop) backdrop.classList.add("visible");
-        if (btn) btn.textContent = "✕ Filters";
       }
       function closeSidebar() {
         const sidebar = document.getElementById("filter-sidebar");
         const backdrop = document.getElementById("filter-sidebar-backdrop");
-        const btn = document.getElementById("sidebar-toggle-btn");
         if (!sidebar) return;
         sidebar.classList.add("sidebar-hidden");
         if (backdrop) backdrop.classList.remove("visible");
-        if (btn) btn.textContent = "⚙ Filters";
       }
-
-      document.getElementById("sidebar-toggle-btn")?.addEventListener("click", () => {
+      function toggleSidebar() {
         const sidebar = document.getElementById("filter-sidebar");
         if (!sidebar) return;
-        if (sidebar.classList.contains("sidebar-hidden")) {
-          openSidebar();
-        } else {
-          closeSidebar();
-        }
-      });
+        sidebar.classList.contains("sidebar-hidden") ? openSidebar() : closeSidebar();
+      }
 
       // Backdrop click closes sidebar on mobile
       document.getElementById("filter-sidebar-backdrop")?.addEventListener("click", () => {
@@ -2060,9 +2051,7 @@
           ).join("") +
           (chips.length > 0 ? `<button class="active-filter-clear-all" id="chip-clear-all">Rensa alla</button>` : "");
 
-        row.querySelector("#chip-filter-open-btn")?.addEventListener("click", () => {
-          document.getElementById("sidebar-toggle-btn")?.click();
-        });
+        row.querySelector("#chip-filter-open-btn")?.addEventListener("click", toggleSidebar);
 
         row.querySelectorAll(".active-filter-chip").forEach((btn) => {
           btn.addEventListener("click", () => {
