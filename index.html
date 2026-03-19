@@ -3143,14 +3143,12 @@
           renderSummarySection(order);
         }
 
-        if (state.details[order.ID] && !options.forceReload) {
+        // Always fetch fresh data on click; only use cache for preserveScroll (auto-reselect after refresh)
+        if (state.details[order.ID] && options.preserveScroll && !options.forceReload) {
           if (mobile) {
             showMobileDetail(order, state.details[order.ID]);
           } else {
             renderDesktopDetail(order, state.details[order.ID]);
-            if (!options.preserveScroll) {
-              scrollToDetail(order.ID);
-            }
           }
           return;
         }
