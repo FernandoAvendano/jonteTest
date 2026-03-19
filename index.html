@@ -4188,13 +4188,13 @@
     window._loadThree = function(cb) {
       if (window._threeReady) { cb(); return; }
       const s1 = document.createElement('script');
-      s1.src = 'https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.min.js';
+      s1.src = 'https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js';
       s1.onload = function() {
         const s2 = document.createElement('script');
-        s2.src = 'https://cdn.jsdelivr.net/npm/three@0.162.0/examples/js/loaders/STLLoader.js';
+        s2.src = 'https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/STLLoader.js';
         s2.onload = function() {
           const s3 = document.createElement('script');
-          s3.src = 'https://cdn.jsdelivr.net/npm/three@0.162.0/examples/js/controls/OrbitControls.js';
+          s3.src = 'https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/controls/OrbitControls.js';
           s3.onload = function() { window._threeReady = true; cb(); };
           document.head.appendChild(s3);
         };
