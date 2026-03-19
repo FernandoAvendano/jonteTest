@@ -303,6 +303,27 @@ app.post('/api/order-comments', async (req, res) => {
   }, { route: '/api/order-comments', environment });
 });
 
+app.post('/api/add-comment', async (req, res) => {
+  const { token, orderId, commentText, submitter, environment } = req.body;
+  if (!token || !orderId || !commentText) {
+    return res.status(400).json({ error: 'Missing token, orderId or commentText' });
+  }
+  const base = resolveBase(environment);
+  const url = `${base}/arsys/v1/entry/BTS:SOT:OrderComment`;
+  await proxyFetch(res, url, {
+    method: 'POST',
+    headers: { Authorization: `AR-JWT ${token}`, 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({
+      values: {
+        IDOrder: orderId,
+        Submitter: submitter || '$USER$',
+        Status: 10,
+        CommentText: commentText
+      }
+    })
+  }, { route: '/api/add-comment', environment });
+});
+
 app.use(express.static(__dirname));
 
 app.get('*', (_req, res) => {

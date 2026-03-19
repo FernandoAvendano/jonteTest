@@ -479,6 +479,59 @@
 
       /* ── Status filter chips (legacy, kept for compatibility) ──── */
       /* ── Filter mini-tab (collapsed state on desktop) ──────── */
+      /* ── Add comment form ───────────────────────────────────── */
+      .add-comment-form {
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid var(--panel-border);
+      }
+
+      .comment-textarea {
+        width: 100%;
+        background: var(--input-bg);
+        border: 1px solid var(--input-border);
+        border-radius: 10px;
+        padding: 0.6rem 0.75rem;
+        font: inherit;
+        font-size: 0.85rem;
+        color: var(--text);
+        resize: vertical;
+        box-sizing: border-box;
+        transition: border-color 0.15s;
+      }
+
+      .comment-textarea:focus {
+        outline: none;
+        border-color: rgba(74, 180, 210, 0.6);
+      }
+
+      .comment-submit-btn {
+        border: 1px solid rgba(74, 180, 210, 0.5);
+        background: rgba(74, 180, 210, 0.12);
+        color: var(--accent);
+        border-radius: 999px;
+        padding: 0.35rem 1rem;
+        font: inherit;
+        font-size: 0.82rem;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+
+      .comment-submit-btn:hover {
+        background: rgba(74, 180, 210, 0.25);
+      }
+
+      .comment-submit-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .comment-error {
+        font-size: 0.78rem;
+        color: #ff9898;
+        margin-top: 0.3rem;
+      }
+
       .filter-mini-tab {
         display: none;
         flex-direction: column;
@@ -1462,6 +1515,13 @@
                   <span class="section-status" id="comments-status">Awaiting selection</span>
                 </div>
                 <div id="comments-list" class="detail-items"></div>
+                <div class="add-comment-form" id="add-comment-form" style="display:none;">
+                  <textarea id="comment-input" class="comment-textarea" placeholder="Skriv en kommentar…" rows="2"></textarea>
+                  <div style="display:flex;justify-content:flex-end;gap:0.5rem;margin-top:0.4rem;">
+                    <button type="button" id="comment-submit-btn" class="comment-submit-btn">Skicka</button>
+                  </div>
+                  <p id="comment-error" class="comment-error" style="display:none;"></p>
+                </div>
               </article>
             </div>
             </div><!-- /.detail-panel-body -->
@@ -1860,6 +1920,35 @@
       const attachmentsList   = document.getElementById("attachments-list");
       const commentsStatus    = document.getElementById("comments-status");
       const commentsList      = document.getElementById("comments-list");
+      const addCommentForm    = document.getElementById("add-comment-form");
+      const commentInput      = document.getElementById("comment-input");
+      const commentSubmitBtn  = document.getElementById("comment-submit-btn");
+      const commentError      = document.getElementById("comment-error");
+
+      commentSubmitBtn?.addEventListener("click", async () => {
+        const text = commentInput.value.trim();
+        if (!text || !state.selectedOrderId || !state.token) return;
+        commentSubmitBtn.disabled = true;
+        commentError.style.display = "none";
+        try {
+          await post("/api/add-comment", {
+            token: state.token,
+            environment: state.environment,
+            orderId: state.selectedOrderId,
+            commentText: text,
+            submitter: state.user
+          });
+          commentInput.value = "";
+          // Reload comments
+          const order = state.orders.find(o => o.ID === state.selectedOrderId);
+          if (order) await fetchOrderDetails(order);
+        } catch (err) {
+          commentError.textContent = err.message || "Kunde inte skicka kommentar.";
+          commentError.style.display = "block";
+        } finally {
+          commentSubmitBtn.disabled = false;
+        }
+      });
 
       mobileBackBtn.addEventListener("click", hideMobileDetail);
 
@@ -2433,6 +2522,9 @@
       async function selectOrder(order, options = {}) {
         if (!order) return;
         state.selectedOrderId = order.ID;
+        if (addCommentForm) addCommentForm.style.display = "block";
+        if (commentInput) commentInput.value = "";
+        if (commentError) commentError.style.display = "none";
         renderOrders();
 
         const mobile = !isDesktopView();
