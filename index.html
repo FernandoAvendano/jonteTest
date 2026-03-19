@@ -2435,6 +2435,17 @@
               btn.remove();
             }
           }
+          // Reload tasks from server in background
+          post("/api/order-tasks", {
+            token: state.token,
+            orderId: state.selectedOrderId,
+            environment: state.environment
+          }).then(res => {
+            const tasks = (res?.entries ?? []).map(e => e.values);
+            const section = buildTasksSection(tasks, null);
+            if (tasksStatus) tasksStatus.textContent = section.status;
+            if (tasksList) tasksList.innerHTML = section.html;
+          }).catch(() => {});
         } catch (err) {
           btn.disabled = false;
           btn.textContent = isStart ? "▶ Starta" : "■ Stop";
