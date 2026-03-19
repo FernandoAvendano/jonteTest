@@ -640,17 +640,46 @@
         color: var(--text);
       }
 
-      @media (max-width: 1023px) {
-        .orders-workspace-row {
-          flex-direction: column;
-        }
+      /* ── Backdrop for mobile sidebar overlay ──────────────── */
+      #filter-sidebar-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.55);
+        z-index: 199;
+        backdrop-filter: blur(2px);
+      }
+      #filter-sidebar-backdrop.visible {
+        display: block;
+      }
 
+      @media (max-width: 1023px) {
+        /* Mobile: sidebar is a fixed overlay that slides in from the left */
         #filter-sidebar {
-          width: 100%;
+          position: fixed;
+          top: 0;
+          left: 0;
+          bottom: 0;
+          width: min(85vw, 300px);
+          z-index: 200;
+          border-radius: 0 20px 20px 0;
+          overflow-y: auto;
+          transform: translateX(-110%);
+          transition: transform 0.28s cubic-bezier(0.4,0,0.2,1), opacity 0.28s;
+          opacity: 0;
         }
 
         #filter-sidebar.sidebar-hidden {
-          display: none;
+          display: flex; /* keep in DOM, just off-screen */
+          transform: translateX(-110%);
+          opacity: 0;
+          pointer-events: none;
+        }
+
+        #filter-sidebar:not(.sidebar-hidden) {
+          transform: translateX(0);
+          opacity: 1;
+          pointer-events: auto;
         }
       }
 
@@ -860,6 +889,20 @@
       .app-header-title .eyebrow {
         margin: 0;
         flex-shrink: 0;
+      }
+
+      .app-header-lab-name {
+        font-size: 0.72rem;
+        color: var(--muted);
+        background: rgba(255,255,255,0.07);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 999px;
+        padding: 0.15rem 0.6rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 180px;
+        flex-shrink: 1;
       }
 
       .user-menu-wrap {
@@ -1112,6 +1155,7 @@
           <div class="app-header-title">
             <span class="eyebrow" data-i18n="app.badge">Tandis AI</span>
             <h1 data-i18n="app.title">Tandis - Orderhantering</h1>
+            <span id="header-lab-name" class="app-header-lab-name hidden"></span>
           </div>
           <div class="user-menu-wrap">
             <button class="user-avatar-btn" id="user-avatar-btn" type="button" aria-haspopup="true" aria-expanded="false">
@@ -1151,6 +1195,8 @@
         <div class="workspace">
           <!-- Left column: filter sidebar + orders panel -->
           <div class="orders-workspace-row">
+            <!-- Backdrop for mobile sidebar overlay -->
+            <div id="filter-sidebar-backdrop"></div>
             <!-- Filter sidebar -->
             <aside id="filter-sidebar" class="sidebar-hidden"></aside>
 
@@ -1594,6 +1640,7 @@
         filterLimit: 0,               // 0 = All
         sortField: "date",            // "date" | "order" | "status"
         sortDir: "desc",              // "asc" | "desc"
+        availableStatuses: [],        // [{id, name}] populated from /api/status-transitions
       };
 
       // ── Screen refs ──────────────────────────────────────────
@@ -1696,23 +1743,47 @@
       form.addEventListener("submit", handleLogin);
       ordersBtn.addEventListener("click", () => fetchOrders(true));
 
-      // Sidebar toggle
+      // Sidebar toggle helpers
+      function isMobile() { return window.innerWidth < 1024; }
+      function openSidebar() {
+        const sidebar = document.getElementById("filter-sidebar");
+        const backdrop = document.getElementById("filter-sidebar-backdrop");
+        const btn = document.getElementById("sidebar-toggle-btn");
+        if (!sidebar) return;
+        sidebar.classList.remove("sidebar-hidden");
+        if (isMobile() && backdrop) backdrop.classList.add("visible");
+        if (btn) btn.textContent = "✕ Filters";
+      }
+      function closeSidebar() {
+        const sidebar = document.getElementById("filter-sidebar");
+        const backdrop = document.getElementById("filter-sidebar-backdrop");
+        const btn = document.getElementById("sidebar-toggle-btn");
+        if (!sidebar) return;
+        sidebar.classList.add("sidebar-hidden");
+        if (backdrop) backdrop.classList.remove("visible");
+        if (btn) btn.textContent = "⚙ Filters";
+      }
+
       document.getElementById("sidebar-toggle-btn")?.addEventListener("click", () => {
         const sidebar = document.getElementById("filter-sidebar");
         if (!sidebar) return;
-        const isHidden = sidebar.classList.toggle("sidebar-hidden");
-        const btn = document.getElementById("sidebar-toggle-btn");
-        btn.textContent = isHidden ? "⚙ Filters" : "✕ Filters";
+        if (sidebar.classList.contains("sidebar-hidden")) {
+          openSidebar();
+        } else {
+          closeSidebar();
+        }
+      });
+
+      // Backdrop click closes sidebar on mobile
+      document.getElementById("filter-sidebar-backdrop")?.addEventListener("click", () => {
+        closeSidebar();
       });
 
       // On mobile (< 1024px) sidebar hidden by default (already set via sidebar-hidden class)
       // On desktop show by default
       (() => {
-        const sidebar = document.getElementById("filter-sidebar");
-        const btn = document.getElementById("sidebar-toggle-btn");
-        if (sidebar && window.innerWidth >= 1024) {
-          sidebar.classList.remove("sidebar-hidden");
-          if (btn) btn.textContent = "✕ Filters";
+        if (window.innerWidth >= 1024) {
+          openSidebar();
         }
       })();
       signOutBtn.addEventListener("click", () => {
@@ -1815,6 +1886,7 @@
           ordersBtn.disabled = false;
           await detectUserRole();
           updateRoleBadge();
+          await fetchAvailableStatuses();
           await autoSelectOrShowSelector();
         } catch (error) {
           statusMsg.textContent = error.message || t("status.loginFailed");
@@ -1856,7 +1928,9 @@
           });
           // Reset status filter when new data arrives (statuses may have changed)
           // Keep date range and limit as-is so user preferences persist
+          // Default: no explicit filter (show all non-archived), archived checkboxes start unchecked
           state.selectedStatuses = new Set();
+          updateHeaderLabName();
           renderFilterSidebar();
           renderOrders();
           if (!state.orders.length) {
@@ -1965,32 +2039,49 @@
         const sidebar = document.getElementById("filter-sidebar");
         if (!sidebar) return;
 
-        // Collect unique statuses sorted by StatusID (numeric)
-        const statusMap = new Map();
-        for (const o of state.orders) {
-          if (o.StatusName && !statusMap.has(o.StatusName)) {
-            statusMap.set(o.StatusName, o.StatusID ?? 9999);
-          }
+        const ARCHIVED_IDS = new Set([1000, 1100]);
+
+        // Use availableStatuses from API; fall back to deriving from orders if empty
+        let allStatuses = state.availableStatuses && state.availableStatuses.length > 0
+          ? state.availableStatuses
+          : (() => {
+              const m = new Map();
+              for (const o of state.orders) {
+                if (o.StatusName && !m.has(o.StatusID ?? o.StatusName)) {
+                  m.set(Number(o.StatusID ?? 9999), o.StatusName);
+                }
+              }
+              return [...m.entries()].sort((a,b)=>a[0]-b[0]).map(([id,name])=>({id,name}));
+            })();
+
+        const normalStatuses   = allStatuses.filter(s => !ARCHIVED_IDS.has(s.id));
+        const archivedStatuses = allStatuses.filter(s =>  ARCHIVED_IDS.has(s.id));
+
+        function checkboxHtml(s) {
+          const checked = state.selectedStatuses.has(s.name);
+          return `<label class="filter-status-label">
+            <input type="checkbox" data-status="${escapeHtml(s.name)}"${checked ? " checked" : ""}>
+            <span class="order-status-pill ${getStatusClass(s.name)}" style="font-size:0.72rem;padding:0.15rem 0.6rem;">${escapeHtml(s.name)}</span>
+          </label>`;
         }
-        const statuses = [...statusMap.entries()]
-          .sort((a, b) => Number(a[1]) - Number(b[1]))
-          .map(([name]) => name);
-        const hasAnyFilter = state.selectedStatuses.size > 0 || state.filterDateFrom || state.filterDateTo || state.filterLimit !== 100;
+
+        const normalHtml = normalStatuses.length === 0
+          ? `<span style="font-size:0.8rem;color:var(--muted)">No statuses loaded</span>`
+          : normalStatuses.map(checkboxHtml).join('');
+
+        const archivedHtml = archivedStatuses.length > 0
+          ? `<p class="filter-sidebar-heading" style="margin-top:0.8rem;padding-top:0.6rem;border-top:1px solid rgba(255,255,255,0.1);">Avslutade/Avbrutna</p>
+             <div class="filter-status-list">${archivedStatuses.map(checkboxHtml).join('')}</div>`
+          : '';
 
         sidebar.innerHTML = `
           <button type="button" class="filter-clear-btn" id="filter-clear-btn">✕ Clear all filters</button>
 
           <p class="filter-sidebar-heading">Status</p>
           <div class="filter-status-list" id="filter-status-list">
-            ${statuses.length === 0
-              ? `<span style="font-size:0.8rem;color:var(--muted)">No orders loaded</span>`
-              : statuses.map((s) => `
-                <label class="filter-status-label">
-                  <input type="checkbox" data-status="${escapeHtml(s)}"${state.selectedStatuses.has(s) ? " checked" : ""}>
-                  <span class="order-status-pill ${getStatusClass(s)}" style="font-size:0.72rem;padding:0.15rem 0.6rem;">${escapeHtml(s)}</span>
-                </label>`).join("")
-            }
+            ${normalHtml}
           </div>
+          ${archivedHtml}
 
           <p class="filter-sidebar-heading">Date range</p>
           <label style="font-size:0.75rem;color:var(--muted);">From</label>
@@ -2019,8 +2110,8 @@
           </div>
         `;
 
-        // Wire status checkboxes
-        sidebar.querySelectorAll("#filter-status-list input[type='checkbox']").forEach((cb) => {
+        // Wire status checkboxes (covers both normal and archived lists)
+        sidebar.querySelectorAll("input[type='checkbox'][data-status]").forEach((cb) => {
           cb.addEventListener("change", () => {
             const s = cb.dataset.status;
             if (cb.checked) state.selectedStatuses.add(s);
@@ -2283,6 +2374,37 @@
       }
 
       /**
+       * Fetch all possible statuses from /api/status-transitions.
+       * Populates state.availableStatuses as [{id, name}] sorted by id.
+       * Archived statuses (1000 Avslutad, 1100 Avbruten) are included but tagged.
+       */
+      async function fetchAvailableStatuses() {
+        try {
+          const data = await post('/api/status-transitions', { token: state.token, environment: state.environment });
+          const entries = Array.isArray(data?.entries) ? data.entries : [];
+          const seen = new Map();
+          for (const entry of entries) {
+            const v = entry.values || {};
+            // Include both From and To statuses
+            if (v.ToStatusID && v.ToStatusName) {
+              seen.set(Number(v.ToStatusID), v.ToStatusName);
+            }
+            if (v.FromStatusID && v.FromStatusName) {
+              seen.set(Number(v.FromStatusID), v.FromStatusName);
+            }
+          }
+          // Always include Avslutad (1000) even though it's a terminal state not in transitions
+          seen.set(1000, 'Avslutad');
+          state.availableStatuses = [...seen.entries()]
+            .sort((a, b) => a[0] - b[0])
+            .map(([id, name]) => ({ id, name }));
+        } catch (e) {
+          console.warn('fetchAvailableStatuses failed:', e);
+          state.availableStatuses = [];
+        }
+      }
+
+      /**
        * Detect user role by probing clinic and lab associations.
        * Sets state.userRole ('dentist' | 'technician' | 'unknown').
        */
@@ -2300,6 +2422,28 @@
           return;
         }
         state.userRole = 'unknown';
+      }
+
+      /**
+       * Show the selected lab/clinic name in the app header.
+       */
+      function updateHeaderLabName() {
+        const el = document.getElementById('header-lab-name');
+        if (!el) return;
+        let name = '';
+        if (state.selectedLabId && state.labs.length) {
+          const lab = state.labs.find(l => l.IDLab === state.selectedLabId);
+          if (lab) name = lab.Company || lab.Name || '';
+        } else if (state.selectedClinicId && state.clinics.length) {
+          const clinic = state.clinics.find(c => c.IDClinic === state.selectedClinicId);
+          if (clinic) name = clinic.Company || clinic.Name || '';
+        }
+        if (name) {
+          el.textContent = name;
+          el.classList.remove('hidden');
+        } else {
+          el.classList.add('hidden');
+        }
       }
 
       /**
@@ -3201,6 +3345,7 @@
         try {
           await detectUserRole();
           updateRoleBadge();
+          await fetchAvailableStatuses();
           // Restore saved location selection if still valid
           if (stored.selectedClinicId && state.clinics.some((c) => c.IDClinic === stored.selectedClinicId)) {
             state.selectedClinicId = stored.selectedClinicId;

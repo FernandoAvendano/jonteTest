@@ -333,3 +333,13 @@ app.post('/api/user-labs', async (req, res) => {
     headers: { Authorization: `AR-JWT ${token}`, Accept: 'application/json' }
   }, { route: '/api/user-labs', environment });
 });
+
+app.post('/api/status-transitions', async (req, res) => {
+  const { token, environment } = req.body;
+  if (!token) return res.status(400).json({ error: 'Missing token' });
+  const base = resolveBase(environment);
+  const url = `${base}/arsys/v1/entry/BTS%3ASOT%3AStatusTransition?limit=100&fields=${encodeURIComponent('values(FromStatusID,FromStatusName,ToStatusName,ToStatusID)')}&q=${encodeURIComponent("'Status'=\"Active\"")}`;
+  await proxyFetch(res, url, {
+    headers: { Authorization: `AR-JWT ${token}`, Accept: 'application/json' }
+  }, { route: '/api/status-transitions', environment });
+});
