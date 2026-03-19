@@ -711,6 +711,26 @@
         cursor: default;
       }
 
+      .task-stop-btn {
+        background: rgba(210, 80, 80, 0.15);
+        border: 1px solid rgba(210, 80, 80, 0.4);
+        color: #d25050;
+        border-radius: 8px;
+        padding: 0.25rem 0.6rem;
+        font-size: 0.78rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s, border-color 0.15s;
+        white-space: nowrap;
+      }
+
+      .task-stop-btn:hover {
+        background: rgba(210, 80, 80, 0.3);
+        border-color: rgba(210, 80, 80, 0.7);
+      }
+
+      .task-stop-btn:disabled { opacity: 0.4; cursor: default; }
+
       /* ── Add comment form ───────────────────────────────────── */
       .add-comment-form {
         margin-top: 0.75rem;
@@ -2374,31 +2394,51 @@
         }
       }
 
-      // Task start button
+      // Task start/stop buttons
       document.getElementById("tasks-list")?.addEventListener("click", async (e) => {
-        const btn = e.target.closest(".task-start-btn");
+        const startBtn = e.target.closest(".task-start-btn");
+        const stopBtn  = e.target.closest(".task-stop-btn");
+        const btn = startBtn || stopBtn;
         if (!btn) return;
         const taskReqId = btn.dataset.taskReqId;
         if (!taskReqId || !state.token) return;
+        const isStart = !!startBtn;
+
         btn.disabled = true;
         btn.textContent = "…";
         try {
-          await post("/api/start-task", {
+          await post(isStart ? "/api/start-task" : "/api/stop-task", {
             token: state.token,
             taskRequestId: taskReqId,
             environment: state.environment
           });
-          // Update status pill optimistically
+          // Optimistic UI update
           const item = document.querySelector(`.task-item[data-task-req-id="${taskReqId}"]`);
           if (item) {
             const pill = item.querySelector(".order-status-pill");
-            if (pill) { pill.textContent = "Started"; pill.className = "order-status-pill status-active"; }
-            btn.remove();
+            if (isStart) {
+              if (pill) { pill.textContent = "Started"; pill.className = "order-status-pill status-active"; }
+              btn.remove();
+              // Add stop button
+              const btnWrap = item.querySelector("div[style*='flex-direction:column']");
+              if (btnWrap) {
+                const newStop = document.createElement("button");
+                newStop.type = "button";
+                newStop.className = "task-stop-btn";
+                newStop.dataset.taskReqId = taskReqId;
+                newStop.title = "Avsluta arbetsmoment";
+                newStop.textContent = "■ Stop";
+                btnWrap.appendChild(newStop);
+              }
+            } else {
+              if (pill) { pill.textContent = "Done"; pill.className = "order-status-pill status-done"; }
+              btn.remove();
+            }
           }
         } catch (err) {
           btn.disabled = false;
-          btn.textContent = "▶ Starta";
-          alert("Kunde inte starta arbetsmoment: " + (err.message || err));
+          btn.textContent = isStart ? "▶ Starta" : "■ Stop";
+          alert((isStart ? "Kunde inte starta" : "Kunde inte stoppa") + " arbetsmoment: " + (err.message || err));
         }
       });
 
@@ -3723,9 +3763,13 @@
           .map((task) => {
             const reqId = task["Request ID"] || task.RequestID || "";
             const status = task.StatusTask || "";
-            const canStart = reqId && status !== "Started" && status !== "Completed" && status !== "Closed";
+            const canStart = reqId && status !== "Started" && status !== "Completed" && status !== "Closed" && status !== "Done";
+            const canStop  = reqId && status === "Started";
             const startBtn = canStart
               ? `<button type="button" class="task-start-btn" data-task-req-id="${escapeHtml(reqId)}" title="Starta arbetsmoment">▶ Starta</button>`
+              : "";
+            const stopBtn = canStop
+              ? `<button type="button" class="task-stop-btn" data-task-req-id="${escapeHtml(reqId)}" title="Avsluta arbetsmoment">■ Stop</button>`
               : "";
             return `
         <div class="detail-item task-item" data-task-req-id="${escapeHtml(reqId)}">
@@ -3736,7 +3780,7 @@
           <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;">
             <span class="order-status-pill ${getStatusClass(status)}" style="display:inline-flex;">${status || "—"}</span>
             <p>${task.AssigneeFullName || ""}</p>
-            ${startBtn}
+            ${startBtn}${stopBtn}
           </div>
         </div>`;
           })

@@ -319,6 +319,20 @@ app.post('/api/start-task', async (req, res) => {
   }, { route: '/api/start-task', environment });
 });
 
+app.post('/api/stop-task', async (req, res) => {
+  const { token, taskRequestId, environment } = req.body;
+  if (!token || !taskRequestId) {
+    return res.status(400).json({ error: 'Missing token or taskRequestId' });
+  }
+  const base = resolveBase(environment);
+  const url = `${base}/arsys/v1/entry/BTS:SOT:Order:ServiceTask/${taskRequestId}`;
+  await proxyFetch(res, url, {
+    method: 'PUT',
+    headers: { Authorization: `AR-JWT ${token}`, 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ values: { StatusTask: 'Done', zzTriggerAPIUpdate: 'TASKSTOP' } })
+  }, { route: '/api/stop-task', environment });
+});
+
 app.post('/api/add-comment', async (req, res) => {
   const { token, orderId, commentText, submitter, environment } = req.body;
   if (!token || !orderId || !commentText) {
