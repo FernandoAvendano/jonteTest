@@ -608,10 +608,13 @@
         overflow-y: auto;
         overflow-x: hidden;
         width: 100%;
+        max-height: 65vh;
         display: flex;
-        justify-content: center;
+        flex-direction: column;
+        align-items: center;
         border-radius: 8px;
         background: #555;
+        padding: 0.5rem;
       }
 
       #pdf-render-canvas {
@@ -2146,7 +2149,11 @@
 
         function renderPage(num) {
           _pdfDoc.getPage(num).then(page => {
-            const viewport = page.getViewport({ scale: Math.min(2, (container.clientWidth - 32) / page.getViewport({ scale: 1 }).width) });
+            const baseViewport = page.getViewport({ scale: 1 });
+            const wrap = container.querySelector('.pdf-canvas-wrap');
+            const availW = (wrap?.clientWidth || 700) - 24;
+            const scale = Math.min(1.5, availW / baseViewport.width);
+            const viewport = page.getViewport({ scale });
             canvas.width = viewport.width;
             canvas.height = viewport.height;
             page.render({ canvasContext: ctx, viewport });
