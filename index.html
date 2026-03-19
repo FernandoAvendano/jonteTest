@@ -3823,7 +3823,7 @@
             const reqId = task["Request ID"] || task.RequestID || "";
             const status = task.StatusTask || "";
             const canStart = reqId && status === "Planned";
-            const canStop  = reqId && status === "Started";
+            const canStop  = reqId && (status === "Started" || status === "Paused");
             const startBtn = canStart
               ? `<button type="button" class="task-start-btn" data-task-req-id="${escapeHtml(reqId)}" title="Starta arbetsmoment">▶ Starta</button>`
               : "";
