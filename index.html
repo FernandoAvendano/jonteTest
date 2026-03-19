@@ -2394,6 +2394,64 @@
         }
       }
 
+      async function refreshTasksAndOrder(orderId) {
+        if (!orderId || !state.token) return;
+        try {
+          // Fetch tasks + fresh order data in parallel
+          const [tasksRes, ordersRes] = await Promise.allSettled([
+            post("/api/order-tasks", { token: state.token, orderId, environment: state.environment }),
+            post("/api/orders", (() => {
+              const body = { token: state.token, environment: state.environment, limit: 1 };
+              if (state.userRole === "technician" && state.selectedLabId) body.labIds = [state.selectedLabId];
+              else if (state.userRole === "dentist" && state.selectedClinicId) body.clinicIds = [state.selectedClinicId];
+              return body;
+            })())
+          ]);
+
+          // Update tasks list
+          if (tasksRes.status === "fulfilled") {
+            const tasks = (tasksRes.value?.entries ?? []).map(e => e.values);
+            const section = buildTasksSection(tasks, null);
+            if (tasksStatus) tasksStatus.textContent = section.status;
+            if (tasksList) tasksList.innerHTML = section.html;
+            // Update cached details
+            if (state.details[orderId]) state.details[orderId].tasks = tasks;
+          }
+
+          // Refresh order status in orders list from a targeted single-order fetch
+          const orderRes = await post("/api/orders", (() => {
+            const body = { token: state.token, environment: state.environment, limit: 500, includeArchived: true };
+            if (state.userRole === "technician" && state.selectedLabId) body.labIds = [state.selectedLabId];
+            else if (state.userRole === "dentist" && state.selectedClinicId) body.clinicIds = [state.selectedClinicId];
+            return body;
+          })()).catch(() => null);
+
+          if (orderRes?.entries) {
+            const fresh = orderRes.entries.map(e => e.values || {});
+            const updated = fresh.find(o => o.ID === orderId);
+            if (updated) {
+              // Update in state.orders
+              const idx = state.orders.findIndex(o => o.ID === orderId);
+              if (idx >= 0) {
+                state.orders[idx] = { ...state.orders[idx], ...updated };
+                renderOrders();
+                // Update detail panel status pills
+                const statusName = updated.StatusName || "";
+                if (detailOrderStatus) {
+                  detailOrderStatus.textContent = statusName;
+                  detailOrderStatus.className = `order-status-pill ${getStatusClass(statusName)}${!statusName ? " hidden" : ""}`;
+                }
+                const mobileStatus = document.getElementById("mobile-order-status");
+                if (mobileStatus) {
+                  mobileStatus.textContent = statusName;
+                  mobileStatus.className = `order-status-pill ${getStatusClass(statusName)}${!statusName ? " hidden" : ""}`;
+                }
+              }
+            }
+          }
+        } catch (_) {}
+      }
+
       // Task start/stop buttons
       document.getElementById("tasks-list")?.addEventListener("click", async (e) => {
         const startBtn = e.target.closest(".task-start-btn");
@@ -2435,17 +2493,8 @@
               btn.remove();
             }
           }
-          // Reload tasks from server in background
-          post("/api/order-tasks", {
-            token: state.token,
-            orderId: state.selectedOrderId,
-            environment: state.environment
-          }).then(res => {
-            const tasks = (res?.entries ?? []).map(e => e.values);
-            const section = buildTasksSection(tasks, null);
-            if (tasksStatus) tasksStatus.textContent = section.status;
-            if (tasksList) tasksList.innerHTML = section.html;
-          }).catch(() => {});
+          // Reload tasks + order status in background
+          refreshTasksAndOrder(state.selectedOrderId);
         } catch (err) {
           btn.disabled = false;
           btn.textContent = isStart ? "▶ Starta" : "■ Stop";
