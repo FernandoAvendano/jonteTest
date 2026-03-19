@@ -1906,7 +1906,12 @@
 
         try {
           // Build order filter based on detected role and selected location
-          const orderBody = { token: state.token, environment: state.environment, limit: 100 };
+          // Include archived (StatusID >= 1000) only if user has explicitly selected them
+          const hasArchivedSelected = [...state.selectedStatuses].some(s => {
+            const found = state.availableStatuses.find(a => a.name === s);
+            return found && found.id >= 1000;
+          });
+          const orderBody = { token: state.token, environment: state.environment, limit: 100, includeArchived: hasArchivedSelected };
           if (state.userRole === 'dentist' && state.selectedClinicId) {
             orderBody.clinicIds = [state.selectedClinicId];
           } else if (state.userRole === 'technician' && state.selectedLabId) {

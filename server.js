@@ -134,13 +134,20 @@ app.post('/api/orders', async (req, res) => {
     'OrderPrice'
   ]);
   const { clinicIds, labIds } = req.body;
+  const { includeArchived } = req.body;
+  const archivedClause = includeArchived ? '' : `'StatusID'<"1000"`;
+
   let queryParam = '';
   if (Array.isArray(clinicIds) && clinicIds.length > 0) {
     const clinicFilter = clinicIds.map((id) => `'IDClinic'="${id}"`).join(' OR ');
-    queryParam = `&q=${encodeQuery(clinicFilter)}`;
+    const combined = archivedClause ? `(${clinicFilter}) AND ${archivedClause}` : clinicFilter;
+    queryParam = `&q=${encodeQuery(combined)}`;
   } else if (Array.isArray(labIds) && labIds.length > 0) {
     const labFilter = labIds.map((id) => `'IDLab'="${id}"`).join(' OR ');
-    queryParam = `&q=${encodeQuery(labFilter)}`;
+    const combined = archivedClause ? `(${labFilter}) AND ${archivedClause}` : labFilter;
+    queryParam = `&q=${encodeQuery(combined)}`;
+  } else if (archivedClause) {
+    queryParam = `&q=${encodeQuery(archivedClause)}`;
   }
 
   const base = resolveBase(environment);
