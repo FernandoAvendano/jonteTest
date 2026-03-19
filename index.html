@@ -478,6 +478,55 @@
       }
 
       /* ── Status filter chips (legacy, kept for compatibility) ──── */
+      .sort-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.4rem 0;
+        border-bottom: 1px solid var(--panel-border);
+        margin-bottom: 0.25rem;
+      }
+
+      .sort-toolbar-label {
+        font-size: 0.72rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        white-space: nowrap;
+      }
+
+      .sort-field-select {
+        appearance: none;
+        border: 1px solid var(--input-border);
+        background: var(--input-bg);
+        color: var(--text);
+        border-radius: 8px;
+        padding: 0.25rem 0.5rem;
+        font: inherit;
+        font-size: 0.8rem;
+        cursor: pointer;
+        flex: 1;
+      }
+
+      .sort-dir-btn {
+        border: 1px solid var(--input-border);
+        background: var(--input-bg);
+        color: var(--text);
+        border-radius: 8px;
+        padding: 0.25rem 0.6rem;
+        font: inherit;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s;
+        line-height: 1;
+      }
+
+      .sort-dir-btn:hover {
+        background: rgba(74, 180, 210, 0.15);
+        color: var(--accent);
+        border-color: rgba(74, 180, 210, 0.4);
+      }
+
       .status-filter-row {
         display: flex;
         flex-wrap: wrap;
@@ -1270,6 +1319,15 @@
             >
               Sign in to load orders.
             </div>
+            <div class="sort-toolbar" id="sort-toolbar">
+              <span class="sort-toolbar-label">Sortera:</span>
+              <select id="sort-field-select" class="sort-field-select">
+                <option value="date">Datum</option>
+                <option value="order">Ordernr</option>
+                <option value="status">Status</option>
+              </select>
+              <button type="button" id="sort-dir-btn" class="sort-dir-btn" title="Byt riktning">↓</button>
+            </div>
             <div class="status-filter-row" id="status-filter-row"></div>
             <div class="orders-list" id="orders-list"></div>
           </section>
@@ -1815,6 +1873,27 @@
       });
 
       // On mobile (< 1024px) sidebar hidden by default (already set via sidebar-hidden class)
+      // Wire sort toolbar
+      (() => {
+        const fieldSel = document.getElementById("sort-field-select");
+        const dirBtn = document.getElementById("sort-dir-btn");
+        if (fieldSel) {
+          fieldSel.value = state.sortField;
+          fieldSel.addEventListener("change", () => {
+            state.sortField = fieldSel.value;
+            renderOrders();
+          });
+        }
+        if (dirBtn) {
+          dirBtn.textContent = state.sortDir === "asc" ? "↑" : "↓";
+          dirBtn.addEventListener("click", () => {
+            state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
+            dirBtn.textContent = state.sortDir === "asc" ? "↑" : "↓";
+            renderOrders();
+          });
+        }
+      })();
+
       // On desktop show by default; close on mobile
       (() => {
         if (window.innerWidth >= 1024) {
@@ -2215,16 +2294,6 @@
             <option value="0"${state.filterLimit === 0 ? " selected" : ""}>All orders</option>
           </select>
 
-          <p class="filter-sidebar-heading">Sort</p>
-          <select id="filter-sort-field" class="filter-limit-select">
-            <option value="date"${state.sortField === "date" ? " selected" : ""}>Date</option>
-            <option value="order"${state.sortField === "order" ? " selected" : ""}>Order number</option>
-            <option value="status"${state.sortField === "status" ? " selected" : ""}>Status</option>
-          </select>
-          <div style="display:flex;gap:0.4rem;margin-top:0.4rem;">
-            <button type="button" id="sort-asc" class="filter-clear-btn${state.sortDir === "asc" ? " sort-active" : ""}" style="flex:1;padding:0.3rem 0.4rem;font-size:0.78rem;">↑ Asc</button>
-            <button type="button" id="sort-desc" class="filter-clear-btn${state.sortDir === "desc" ? " sort-active" : ""}" style="flex:1;padding:0.3rem 0.4rem;font-size:0.78rem;">↓ Desc</button>
-          </div>
         `;
 
         // Wire status checkboxes (covers both normal and archived lists)
@@ -2254,20 +2323,7 @@
         });
 
         // Wire sort
-        sidebar.querySelector("#filter-sort-field")?.addEventListener("change", (e) => {
-          state.sortField = e.target.value;
-          renderOrders();
-        });
-        sidebar.querySelector("#sort-asc")?.addEventListener("click", () => {
-          state.sortDir = "asc";
-          renderFilterSidebar();
-          renderOrders();
-        });
-        sidebar.querySelector("#sort-desc")?.addEventListener("click", () => {
-          state.sortDir = "desc";
-          renderFilterSidebar();
-          renderOrders();
-        });
+
 
         // Wire clear button
         sidebar.querySelector("#filter-clear-btn")?.addEventListener("click", () => {
