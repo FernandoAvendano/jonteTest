@@ -479,7 +479,56 @@
 
       /* ── Status filter chips (legacy, kept for compatibility) ──── */
       .status-filter-row {
-        display: none !important;
+        display: none;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-top: 0.5rem;
+        padding-top: 0.5rem;
+        border-top: 1px solid var(--panel-border);
+        align-items: center;
+      }
+
+      .status-filter-row.has-active {
+        display: flex;
+      }
+
+      .active-filter-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.2rem 0.6rem 0.2rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        background: rgba(74, 180, 210, 0.15);
+        border: 1px solid rgba(74, 180, 210, 0.4);
+        color: var(--accent);
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+
+      .active-filter-chip:hover {
+        background: rgba(74, 180, 210, 0.28);
+      }
+
+      .active-filter-chip .chip-remove {
+        font-size: 0.85rem;
+        line-height: 1;
+        opacity: 0.7;
+      }
+
+      .active-filter-clear-all {
+        font-size: 0.72rem;
+        color: var(--muted);
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0.2rem 0.4rem;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+
+      .active-filter-clear-all:hover {
+        color: var(--text);
       }
 
       /* ── Filter sidebar ──────────────────────────────────────── */
@@ -1972,6 +2021,65 @@
         }
       }
 
+      function renderActiveFilterChips() {
+        const row = document.getElementById("status-filter-row");
+        if (!row) return;
+        const chips = [];
+
+        // Status chips
+        for (const s of state.selectedStatuses) {
+          chips.push({ label: s, remove: () => { state.selectedStatuses.delete(s); renderFilterSidebar(); renderOrders(); } });
+        }
+        // Date from
+        if (state.filterDateFrom) {
+          chips.push({ label: `From: ${state.filterDateFrom}`, remove: () => { state.filterDateFrom = ""; renderFilterSidebar(); renderOrders(); } });
+        }
+        // Date to
+        if (state.filterDateTo) {
+          chips.push({ label: `To: ${state.filterDateTo}`, remove: () => { state.filterDateTo = ""; renderFilterSidebar(); renderOrders(); } });
+        }
+        // Limit
+        if (state.filterLimit > 0) {
+          chips.push({ label: `Max: ${state.filterLimit}`, remove: () => { state.filterLimit = 0; renderFilterSidebar(); renderOrders(); } });
+        }
+        // Sort (only if non-default)
+        if (state.sortField !== "date" || state.sortDir !== "desc") {
+          const sortLabels = { date: "Date", order: "Order#", status: "Status" };
+          chips.push({ label: `Sort: ${sortLabels[state.sortField] || state.sortField} ${state.sortDir === "asc" ? "↑" : "↓"}`, remove: () => { state.sortField = "date"; state.sortDir = "desc"; renderFilterSidebar(); renderOrders(); } });
+        }
+
+        if (chips.length === 0) {
+          row.classList.remove("has-active");
+          row.innerHTML = "";
+          return;
+        }
+
+        row.classList.add("has-active");
+        row.innerHTML = chips.map((c, i) =>
+          `<button class="active-filter-chip" data-chip-index="${i}" title="Remove filter">
+            ${escapeHtml(c.label)} <span class="chip-remove">✕</span>
+          </button>`
+        ).join("") +
+        `<button class="active-filter-clear-all" id="chip-clear-all">Clear all</button>`;
+
+        row.querySelectorAll(".active-filter-chip").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const idx = Number(btn.dataset.chipIndex);
+            chips[idx]?.remove();
+          });
+        });
+        row.querySelector("#chip-clear-all")?.addEventListener("click", () => {
+          state.selectedStatuses = new Set();
+          state.filterDateFrom = "";
+          state.filterDateTo = "";
+          state.filterLimit = 0;
+          state.sortField = "date";
+          state.sortDir = "desc";
+          renderFilterSidebar();
+          renderOrders();
+        });
+      }
+
       function renderOrders() {
         ordersList.innerHTML = "";
 
@@ -2010,6 +2118,8 @@
             ? (shown < total ? `${shown} / ${total}` : `${total}`)
             : t("orders.badge");
         }
+
+        renderActiveFilterChips();
 
         if (!filtered.length) {
           ordersList.innerHTML = `<p class="empty">${t("orders.listEmpty")}</p>`;
