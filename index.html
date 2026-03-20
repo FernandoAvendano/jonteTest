@@ -2984,7 +2984,7 @@
         if (state.searchQuery) {
           const q = state.searchQuery;
           filtered = filtered.filter((o) =>
-            (o.OrdernumberShort || "").toLowerCase().includes(q) ||
+            String(o.OrdernumberShort || "").toLowerCase().includes(q) ||
             (o.Patient_FirstName || "").toLowerCase().includes(q) ||
             (o.Patient_LastName || "").toLowerCase().includes(q) ||
             (`${o.Patient_FirstName || ""} ${o.Patient_LastName || ""}`.toLowerCase()).includes(q) ||
