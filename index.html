@@ -3841,6 +3841,7 @@
           const reqB = parseInt(b["Request ID"] || b.RequestID || "0", 10);
           return reqA - reqB;
         });
+        const hasActiveTask = sorted.some(t => { const s = t.StatusTask || ""; return s === "Started" || s === "Paused"; });
         let firstPlannedShown = false;
         const html = sorted
           .map((task) => {
@@ -3848,7 +3849,7 @@
             const status = task.StatusTask || "";
             const isFirstPlanned = reqId && status === "Planned" && !firstPlannedShown;
             if (isFirstPlanned) firstPlannedShown = true;
-            const canStart = isFirstPlanned;
+            const canStart = isFirstPlanned && !hasActiveTask;
             const canStop  = reqId && (status === "Started" || status === "Paused");
             const startBtn = canStart
               ? `<button type="button" class="task-start-btn" data-task-req-id="${escapeHtml(reqId)}" title="Starta arbetsmoment">▶ Starta</button>`
