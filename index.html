@@ -266,6 +266,11 @@
           grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
           gap: 1.25rem;
           align-items: start;
+          transition: grid-template-columns 0.2s ease;
+        }
+
+        .workspace.detail-expanded {
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1.8fr);
         }
 
         #detail-panel {
@@ -685,6 +690,24 @@
       .preview-btn:hover {
         color: var(--accent);
         border-color: rgba(74, 180, 210, 0.5);
+      }
+
+      /* ── Detail panel close button ─────────────────────────── */
+      #detail-close-btn {
+        background: none;
+        border: 1px solid var(--panel-border);
+        color: var(--muted);
+        border-radius: 8px;
+        padding: 0.25rem 0.6rem;
+        font-size: 0.85rem;
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: color 0.15s, border-color 0.15s;
+      }
+
+      #detail-close-btn:hover {
+        color: var(--text);
+        border-color: rgba(255,255,255,0.3);
       }
 
       /* ── Task start button ──────────────────────────────────── */
@@ -1722,6 +1745,7 @@
               <div class="detail-header-actions">
                 <span id="detail-order-status" class="order-status-pill hidden"></span>
                 <button type="button" id="detail-pin-btn" class="detail-pin-btn" title="Nåla fast scroll-position" aria-label="Nåla fast scroll-position">📌</button>
+                <button type="button" id="detail-close-btn" title="Stäng detaljvy">✕</button>
               </div>
             </div>
             <div class="detail-panel-body">
@@ -2690,6 +2714,20 @@
         }
       });
 
+      function openDetailPanel() {
+        document.getElementById("detail-panel")?.classList.remove("hidden");
+        document.querySelector(".workspace")?.classList.add("detail-expanded");
+      }
+
+      function closeDetailPanel() {
+        document.getElementById("detail-panel")?.classList.add("hidden");
+        document.querySelector(".workspace")?.classList.remove("detail-expanded");
+        state.selectedOrderId = null;
+        renderOrders();
+      }
+
+      document.getElementById("detail-close-btn")?.addEventListener("click", closeDetailPanel);
+
       document.getElementById("detail-pin-btn").addEventListener("click", () => {
         state.detailScrollPinned = !state.detailScrollPinned;
         const btn = document.getElementById("detail-pin-btn");
@@ -3115,7 +3153,7 @@
         const mobile = !isDesktopView();
 
         if (!mobile) {
-          document.getElementById("detail-panel")?.classList.remove("hidden");
+          openDetailPanel();
           renderSummarySection(order);
         }
 
