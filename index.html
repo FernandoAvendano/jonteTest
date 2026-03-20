@@ -2423,32 +2423,41 @@
         const order = state.orders.find(o => o.ID === orderId);
         if (!order) return;
         try {
-          // Full detail reload (tasks, services, materials, comments, attachments)
-          const details = await fetchOrderDetails(order);
-          state.details[orderId] = details;
-
           const mobile = !isDesktopView();
-          if (mobile) {
-            showMobileDetail(order, details);
-          } else {
-            renderDesktopDetail(order, details);
-          }
 
-          // Also refresh the order itself in the list (status, department etc.)
+          // 1. Full detail reload in parallel with fresh order data
           const body = { token: state.token, environment: state.environment, limit: 500, includeArchived: true };
           if (state.userRole === "technician" && state.selectedLabId) body.labIds = [state.selectedLabId];
           else if (state.userRole === "dentist" && state.selectedClinicId) body.clinicIds = [state.selectedClinicId];
-          const orderRes = await post("/api/orders", body).catch(() => null);
+
+          const [details, orderRes] = await Promise.all([
+            fetchOrderDetails(order),
+            post("/api/orders", body).catch(() => null),
+          ]);
+
+          state.details[orderId] = details;
+
+          // 2. Update order in list with fresh data
+          let freshOrder = order;
           if (orderRes?.entries) {
             const updated = orderRes.entries.map(e => e.values || {}).find(o => o.ID === orderId);
             if (updated) {
               const idx = state.orders.findIndex(o => o.ID === orderId);
               if (idx >= 0) {
                 state.orders[idx] = { ...state.orders[idx], ...updated };
-                renderOrders();
+                freshOrder = state.orders[idx];
               }
             }
           }
+
+          // 3. Re-render detail panel with fresh data
+          if (mobile) {
+            showMobileDetail(freshOrder, details);
+          } else {
+            renderSummarySection(freshOrder);
+            renderDesktopDetail(freshOrder, details);
+          }
+          renderOrders();
         } catch (_) {}
       }
 
