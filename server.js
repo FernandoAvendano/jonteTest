@@ -315,7 +315,7 @@ app.post('/api/start-task', async (req, res) => {
   await proxyFetch(res, url, {
     method: 'PUT',
     headers: { Authorization: `AR-JWT ${token}`, 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify({ values: { StatusTask: 'Started' } })
+    body: JSON.stringify({ values: { zzTriggerAPIUpdate: 'TASKSTART' } })
   }, { route: '/api/start-task', environment });
 });
 
@@ -329,7 +329,7 @@ app.post('/api/stop-task', async (req, res) => {
   await proxyFetch(res, url, {
     method: 'PUT',
     headers: { Authorization: `AR-JWT ${token}`, 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify({ values: { StatusTask: 'Done' } })
+    body: JSON.stringify({ values: { zzTriggerAPIUpdate: 'TASKSTOP' } })
   }, { route: '/api/stop-task', environment });
 });
 
