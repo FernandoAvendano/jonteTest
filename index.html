@@ -927,6 +927,15 @@
       .orders-search-wrap {
         padding: 0.5rem 0 0.25rem;
       }
+      .orders-search-label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--text-muted, var(--text));
+        margin-bottom: 0.25rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
       .orders-search {
         width: 100%;
         box-sizing: border-box;
@@ -1737,7 +1746,8 @@
             </div>
             <div class="status-filter-row" id="status-filter-row"></div>
             <div class="orders-search-wrap">
-              <input type="search" id="orders-search" class="orders-search" placeholder="Sök order #, patient, klinik…" autocomplete="off">
+              <label for="orders-search" class="orders-search-label">Sök</label>
+              <input type="search" id="orders-search" class="orders-search" placeholder="Order #, patient, klinik…" autocomplete="off">
             </div>
             <div class="orders-list" id="orders-list"></div>
           </section>
