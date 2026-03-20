@@ -2621,6 +2621,7 @@
         if (!sidebar) return;
         sidebar.classList.remove("sidebar-hidden");
         if (isMobile() && backdrop) backdrop.classList.add("visible");
+        saveFilters(state.user);
       }
       function closeSidebar() {
         const sidebar = document.getElementById("filter-sidebar");
@@ -2628,6 +2629,7 @@
         if (!sidebar) return;
         sidebar.classList.add("sidebar-hidden");
         if (backdrop) backdrop.classList.remove("visible");
+        saveFilters(state.user);
       }
       function toggleSidebar() {
         const sidebar = document.getElementById("filter-sidebar");
@@ -4194,6 +4196,7 @@
       function saveFilters(username) {
         if (!username) return;
         try {
+          const sidebar = document.getElementById("filter-sidebar");
           localStorage.setItem(FILTERS_KEY_PREFIX + username, JSON.stringify({
             selectedStatuses: [...state.selectedStatuses],
             filterDateFrom: state.filterDateFrom,
@@ -4201,6 +4204,7 @@
             filterLimit: state.filterLimit,
             sortField: state.sortField,
             sortDir: state.sortDir,
+            sidebarOpen: sidebar ? !sidebar.classList.contains("sidebar-hidden") : null,
           }));
         } catch (e) { /* ignore */ }
       }
@@ -4217,6 +4221,12 @@
           state.filterLimit = saved.filterLimit || 0;
           state.sortField = saved.sortField || "date";
           state.sortDir = saved.sortDir || "desc";
+          if (saved.sidebarOpen != null) {
+            const sidebar = document.getElementById("filter-sidebar");
+            if (sidebar) {
+              sidebar.classList.toggle("sidebar-hidden", !saved.sidebarOpen);
+            }
+          }
           return true;
         } catch (e) { return false; }
       }
