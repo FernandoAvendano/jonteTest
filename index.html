@@ -924,6 +924,25 @@
         align-items: center;
       }
 
+      .orders-search-wrap {
+        padding: 0.5rem 0 0.25rem;
+      }
+      .orders-search {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 0.4rem 0.7rem;
+        border: 1px solid var(--panel-border);
+        border-radius: 6px;
+        background: var(--panel-bg, #fff);
+        color: inherit;
+        font-size: 0.85rem;
+      }
+      .orders-search:focus {
+        outline: none;
+        border-color: var(--accent, #3b82f6);
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #3b82f6) 20%, transparent);
+      }
+
       .active-filter-chip {
         display: inline-flex;
         align-items: center;
@@ -1717,6 +1736,9 @@
               </div>
             </div>
             <div class="status-filter-row" id="status-filter-row"></div>
+            <div class="orders-search-wrap">
+              <input type="search" id="orders-search" class="orders-search" placeholder="Sök order #, patient, klinik…" autocomplete="off">
+            </div>
             <div class="orders-list" id="orders-list"></div>
           </section>
           </div><!-- /.orders-workspace-row -->
@@ -2139,6 +2161,7 @@
         filterLimit: 0,               // 0 = All
         sortField: "date",            // "date" | "order" | "status"
         sortDir: "desc",              // "asc" | "desc"
+        searchQuery: "",              // free-text search
         availableStatuses: [],        // [{id, name}] populated from /api/status-transitions
       };
 
@@ -2613,6 +2636,11 @@
       form.addEventListener("submit", handleLogin);
       ordersBtn.addEventListener("click", () => fetchOrders(true));
 
+      document.getElementById("orders-search")?.addEventListener("input", (e) => {
+        state.searchQuery = e.target.value.trim().toLowerCase();
+        renderOrders();
+      });
+
       // Sidebar toggle helpers
       function isMobile() { return window.innerWidth < 1024; }
       function openSidebar() {
@@ -2953,6 +2981,17 @@
           filtered = filtered.filter((o) => o["Create Date"] && o["Create Date"] <= state.filterDateTo + "T23:59:59");
         if (state.filterLimit > 0)
           filtered = filtered.slice(0, state.filterLimit);
+        if (state.searchQuery) {
+          const q = state.searchQuery;
+          filtered = filtered.filter((o) =>
+            (o.OrdernumberShort || "").toLowerCase().includes(q) ||
+            (o.Patient_FirstName || "").toLowerCase().includes(q) ||
+            (o.Patient_LastName || "").toLowerCase().includes(q) ||
+            (`${o.Patient_FirstName || ""} ${o.Patient_LastName || ""}`.toLowerCase()).includes(q) ||
+            (o.ClinicName || "").toLowerCase().includes(q) ||
+            (o.Order_Description || "").toLowerCase().includes(q)
+          );
+        }
 
         // Sort
         const dir = state.sortDir === "asc" ? 1 : -1;
