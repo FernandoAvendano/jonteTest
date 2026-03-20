@@ -1827,6 +1827,7 @@
       const SESSION_KEY = "tandisSession";
       const SESSION_TTL = 60 * 60 * 1000;
       const LANGUAGE_KEY = "tandisLanguage";
+      const FILTERS_KEY_PREFIX = "tandisFilters_";
 
       const translations = {
         en: {
@@ -2840,14 +2841,15 @@
               delete state.loadingDetails[id];
             }
           });
-          // Reset status filter when new data arrives (statuses may have changed)
-          // Keep date range and limit as-is so user preferences persist
-          if (state.userRole === 'technician') {
-            // Default statuses for technicians
-            const TECH_DEFAULT_STATUSES = new Set(['Skickad', 'Mottagen', 'Godkänd', 'Pågående', 'Provning klar', 'Packning']);
-            state.selectedStatuses = new Set([...state.orders.map(o => o.StatusName)].filter(s => TECH_DEFAULT_STATUSES.has(s)));
-          } else {
-            state.selectedStatuses = new Set();
+          // Apply saved filters if available, otherwise use defaults
+          const hadSavedFilters = loadFilters(state.user);
+          if (!hadSavedFilters) {
+            if (state.userRole === 'technician') {
+              const TECH_DEFAULT_STATUSES = new Set(['Skickad', 'Mottagen', 'Godkänd', 'Pågående', 'Provning klar', 'Packning']);
+              state.selectedStatuses = new Set([...state.orders.map(o => o.StatusName)].filter(s => TECH_DEFAULT_STATUSES.has(s)));
+            } else {
+              state.selectedStatuses = new Set();
+            }
           }
           updateHeaderLabName();
           renderFilterSidebar();
@@ -2937,6 +2939,7 @@
 
       function renderOrders() {
         ordersList.innerHTML = "";
+        saveFilters(state.user);
 
         // Apply filters
         let filtered = state.orders;
@@ -4186,6 +4189,36 @@
         } catch (error) {
           // ignore
         }
+      }
+
+      function saveFilters(username) {
+        if (!username) return;
+        try {
+          localStorage.setItem(FILTERS_KEY_PREFIX + username, JSON.stringify({
+            selectedStatuses: [...state.selectedStatuses],
+            filterDateFrom: state.filterDateFrom,
+            filterDateTo: state.filterDateTo,
+            filterLimit: state.filterLimit,
+            sortField: state.sortField,
+            sortDir: state.sortDir,
+          }));
+        } catch (e) { /* ignore */ }
+      }
+
+      function loadFilters(username) {
+        if (!username) return false;
+        try {
+          const raw = localStorage.getItem(FILTERS_KEY_PREFIX + username);
+          if (!raw) return false;
+          const saved = JSON.parse(raw);
+          state.selectedStatuses = new Set(saved.selectedStatuses || []);
+          state.filterDateFrom = saved.filterDateFrom || "";
+          state.filterDateTo = saved.filterDateTo || "";
+          state.filterLimit = saved.filterLimit || 0;
+          state.sortField = saved.sortField || "date";
+          state.sortDir = saved.sortDir || "desc";
+          return true;
+        } catch (e) { return false; }
       }
 
       function translateStaticText() {
