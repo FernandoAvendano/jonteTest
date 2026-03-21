@@ -2495,8 +2495,8 @@
         } catch (_) {}
       }
 
-      // Task start/stop buttons
-      document.getElementById("tasks-list")?.addEventListener("click", async (e) => {
+      // Task start/stop buttons — delegate on document to cover both desktop #tasks-list and mobile inline view
+      document.addEventListener("click", async (e) => {
         const startBtn = e.target.closest(".task-start-btn");
         const stopBtn  = e.target.closest(".task-stop-btn");
         const btn = startBtn || stopBtn;
